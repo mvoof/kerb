@@ -1,0 +1,43 @@
+[package]
+name = "kerb"
+version = "0.1.0"
+edition = "2024"
+description = "Real-time telemetry from racing simulators — iRacing, Assetto Corsa, AC Evo, Le Mans Ultimate"
+repository = "https://github.com/mvoof/kerb"
+license = "MIT"
+keywords = ["iracing", "telemetry", "sim-racing", "assetto-corsa"]
+categories = ["game-development"]
+
+[features]
+default = ["iracing", "ac", "lmu"]
+iracing = ["dep:windows-sys", "dep:serde_yaml"]
+ac = ["dep:windows-sys"]
+ac-evo = ["dep:windows-sys"]
+lmu = ["dep:windows-sys"]
+
+[dependencies]
+kerb-derive = { path = "kerb-derive" }
+encoding_rs = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = { version = "0.9", optional = true }
+windows-sys = { version = "0.61.2", features = [
+    "Win32_Foundation",
+    "Win32_System_Memory",
+    "Win32_System_Threading",
+], optional = true }
+
+[workspace]
+members = [
+    "tools/codegen",
+    "examples",
+    "kerb-derive",
+]
+resolver = "2"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "telemetry_benches"
+harness = false
+

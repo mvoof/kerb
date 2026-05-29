@@ -1,0 +1,582 @@
+use std::collections::HashMap;
+use std::thread::sleep;
+use std::time::Duration;
+use windows_sys::Win32::Foundation::{CloseHandle, FALSE, GetLastError, HANDLE, WAIT_OBJECT_0};
+use windows_sys::Win32::System::Memory::{
+    FILE_MAP_READ, MEMORY_MAPPED_VIEW_ADDRESS, MapViewOfFile, OpenFileMappingW, UnmapViewOfFile,
+};
+use windows_sys::Win32::System::Threading::{OpenEventW, WaitForSingleObject};
+
+use crate::iracing::types::{IRSDK_MAX_BUFS, VarType, irsdk_header, irsdk_varHeader};
+use crate::types::TelemetryValue;
+
+const SYNCHRONIZE: u32 = 0x00100000;
+
+const SHM_MEM_MAP_FILE: &str = "Local\\IRSDKMemMapFileName";
+const SHM_DATA_VALID_EVENT: &str = "Local\\IRSDKDataValidEventName";
+
+/// Decode a null-terminated cp1252 byte array into a Rust `String`.
+/// iRacing stores all strings in shared memory as fixed-size, null-padded cp1252 buffers.
+fn parse_c_str(bytes: &[u8]) -> String {
+    let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
+    crate::decode_cp1252(&bytes[..len])
+}
+
+/// Live connection to the iRacing telemetry service via Win32 shared memory.
+///
+/// Holds the file-mapping handle, the mapped memory view, and an optional
+/// data-ready event used for efficient frame-synchronised waiting.
+pub struct IRsdkConnection {
+    h_map: HANDLE,
+    view_address: MEMORY_MAPPED_VIEW_ADDRESS,
+    h_event: HANDLE,
+    pub vars: HashMap<String, irsdk_varHeader>,
+    cached_session: std::cell::RefCell<Option<(i32, crate::iracing::session::IracingSession)>>,
+}
+
+impl IRsdkConnection {
+    /// Create a mock connection for unit testing and benchmarking.
+    /// Exposes low-level fields internally.
+    #[doc(hidden)]
+    pub fn new_mock(
+        view_address: *mut std::ffi::c_void,
+        vars: HashMap<String, irsdk_varHeader>,
+    ) -> Self {
+        Self {
+            h_map: 0 as _,
+            view_address: MEMORY_MAPPED_VIEW_ADDRESS {
+                Value: view_address,
+            },
+            h_event: 0 as _,
+            vars,
+            cached_session: std::cell::RefCell::new(None),
+        }
+    }
+
+    /// Open the iRacing shared-memory region and parse the variable header table.
+    /// Returns `Err` if the sim is not running or the header is invalid.
+    pub fn connect() -> Result<Self, crate::error::SimError> {
+        unsafe {
+            let map_name: Vec<u16> = SHM_MEM_MAP_FILE
+                .encode_utf16()
+                .chain(std::iter::once(0))
+                .collect();
+
+            let h_map = OpenFileMappingW(FILE_MAP_READ, FALSE, map_name.as_ptr());
+
+            if h_map.is_null() {
+                let err = GetLastError();
+
+                return Err(crate::error::SimError::NotConnected(format!(
+                    "Shared memory not found (Windows error: {})",
+                    err
+                )));
+            }
+
+            let view_address = MapViewOfFile(h_map, FILE_MAP_READ, 0, 0, 0);
+
+            if view_address.Value.is_null() {
+                let err = GetLastError();
+
+                CloseHandle(h_map);
+
+                return Err(crate::error::SimError::NotConnected(format!(
+                    "Failed to map view of file (error: {})",
+                    err
+                )));
+            }
+
+            let event_name: Vec<u16> = SHM_DATA_VALID_EVENT
+                .encode_utf16()
+                .chain(std::iter::once(0))
+                .collect();
+
+            let h_event = OpenEventW(SYNCHRONIZE, FALSE, event_name.as_ptr());
+
+            let shared_mem = view_address.Value as *const u8;
+            let header = *(shared_mem as *const irsdk_header);
+
+            if header.ver <= 0 || header.ver > 10 || header.num_vars <= 0 {
+                if !h_event.is_null() {
+                    CloseHandle(h_event);
+                }
+
+                UnmapViewOfFile(view_address);
+
+                CloseHandle(h_map);
+
+                return Err(crate::error::SimError::InvalidHeader(format!(
+                    "Invalid iRacing telemetry header (ver={}, num_vars={})",
+                    header.ver, header.num_vars
+                )));
+            }
+
+            let mut vars = HashMap::new();
+
+            for i in 0..header.num_vars as usize {
+                let offset =
+                    header.var_header_offset as usize + i * std::mem::size_of::<irsdk_varHeader>();
+
+                let var_header_ptr = shared_mem.add(offset) as *const irsdk_varHeader;
+                let var_header = *var_header_ptr;
+
+                let name_str = parse_c_str(&var_header.name);
+
+                vars.insert(name_str, var_header);
+            }
+
+            Ok(Self {
+                h_map,
+                view_address,
+                h_event,
+                vars,
+                cached_session: std::cell::RefCell::new(None),
+            })
+        }
+    }
+
+    /// Returns `true` when the iRacing sim is actively broadcasting telemetry (status bit 0).
+    pub fn is_connected(&self) -> bool {
+        unsafe {
+            let shared_mem = self.view_address.Value as *const u8;
+            let header = *(shared_mem as *const irsdk_header);
+
+            (header.status & 1) != 0
+        }
+    }
+
+    /// Returns `true` if the data-valid event handle was opened successfully,
+    /// meaning we can do efficient event-based waiting instead of sleeping.
+    pub fn has_event_sync(&self) -> bool {
+        !self.h_event.is_null()
+    }
+
+    /// Block until the sim signals new data, or until `timeout_ms` elapses.
+    /// Falls back to a 16 ms sleep if the event handle is unavailable.
+    pub fn wait_for_data(&self, timeout_ms: u32) -> bool {
+        unsafe {
+            if self.h_event.is_null() {
+                sleep(Duration::from_millis(16));
+
+                true
+            } else {
+                let wait_result = WaitForSingleObject(self.h_event, timeout_ms);
+
+                wait_result == WAIT_OBJECT_0
+            }
+        }
+    }
+
+    /// Read the session-info YAML string from shared memory.
+    /// Returns `None` if the header reports a zero-length info block.
+    pub fn get_session_info(&self) -> Option<String> {
+        unsafe {
+            let shared_mem = self.view_address.Value as *const u8;
+            let header = *(shared_mem as *const irsdk_header);
+
+            if header.session_info_len <= 0 {
+                return None;
+            }
+
+            let info_ptr = shared_mem.add(header.session_info_offset as usize);
+            let bytes = std::slice::from_raw_parts(info_ptr, header.session_info_len as usize);
+
+            let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
+
+            Some(crate::decode_cp1252(&bytes[..len]))
+        }
+    }
+
+    /// Return the session info update version counter.
+    /// This counter increments whenever the session info YAML block changes.
+    pub fn session_info_update(&self) -> i32 {
+        unsafe {
+            if self.view_address.Value.is_null() {
+                return -1;
+            }
+
+            let shared_mem = self.view_address.Value as *const u8;
+            let header = *(shared_mem as *const irsdk_header);
+
+            header.session_info_update
+        }
+    }
+
+    /// Return a sorted list of `(name, type_string, description)` for every telemetry variable.
+    pub fn list_variables(&self) -> Vec<(String, String, String)> {
+        let mut list = Vec::new();
+        for (name, var) in &self.vars {
+            let type_str = match VarType::from_i32(var.type_) {
+                Some(VarType::Char) => "char",
+                Some(VarType::Bool) => "bool",
+                Some(VarType::Int) => "int",
+                Some(VarType::BitField) => "bitfield",
+                Some(VarType::Float) => "float",
+                Some(VarType::Double) => "double",
+                None => "unknown",
+            };
+
+            let count_str = if var.count > 1 {
+                format!("[{}]", var.count)
+            } else {
+                "".to_string()
+            };
+
+            list.push((
+                name.clone(),
+                format!("{}{}", type_str, count_str),
+                parse_c_str(&var.desc),
+            ));
+        }
+
+        list.sort_by(|a, b| a.0.cmp(&b.0));
+
+        list
+    }
+
+    // Find the double-buffer with the highest tick count and return a pointer to its data.
+    fn get_latest_data_ptr(&self) -> Option<*const u8> {
+        unsafe {
+            let shared_mem = self.view_address.Value as *const u8;
+
+            let header = *(shared_mem as *const irsdk_header);
+
+            if header.num_buf <= 0 || header.num_buf as usize > IRSDK_MAX_BUFS {
+                return None;
+            }
+
+            let mut latest_buf_idx = 0;
+            let mut max_tick_count = -1;
+
+            for i in 0..header.num_buf as usize {
+                let tick_count = header.var_buf[i].tick_count;
+
+                if tick_count > max_tick_count {
+                    max_tick_count = tick_count;
+
+                    latest_buf_idx = i;
+                }
+            }
+
+            if max_tick_count < 0 {
+                return None;
+            }
+
+            let buf_offset = header.var_buf[latest_buf_idx].buf_offset as usize;
+
+            Some(shared_mem.add(buf_offset))
+        }
+    }
+
+    /// Read a single telemetry variable by name from the latest data buffer.
+    /// Uses `read_unaligned` because shared-memory offsets are not guaranteed
+    /// to satisfy Rust's alignment requirements.
+    pub fn read_variable(&self, name: &str) -> Option<TelemetryValue> {
+        let var = self.vars.get(name)?;
+        let data_ptr = self.get_latest_data_ptr()?;
+        let offset = var.offset as usize;
+
+        unsafe {
+            let ptr = data_ptr.add(offset);
+            let count = var.count as usize;
+
+            match VarType::from_i32(var.type_)? {
+                VarType::Char => {
+                    if var.count_as_char != 0 {
+                        let slice = std::slice::from_raw_parts(ptr, count);
+
+                        Some(TelemetryValue::String(parse_c_str(slice)))
+                    } else if count == 1 {
+                        Some(TelemetryValue::Char(std::ptr::read_unaligned(ptr)))
+                    } else {
+                        let mut vec = Vec::with_capacity(count);
+
+                        for idx in 0..count {
+                            vec.push(std::ptr::read_unaligned(ptr.add(idx)));
+                        }
+
+                        Some(TelemetryValue::String(crate::decode_cp1252(&vec)))
+                    }
+                }
+
+                VarType::Bool => {
+                    if count == 1 {
+                        Some(TelemetryValue::Bool(std::ptr::read_unaligned(ptr) != 0))
+                    } else {
+                        let mut vec = Vec::with_capacity(count);
+
+                        for idx in 0..count {
+                            vec.push(std::ptr::read_unaligned(ptr.add(idx)) != 0);
+                        }
+
+                        Some(TelemetryValue::BoolArray(vec))
+                    }
+                }
+
+                VarType::Int => {
+                    let int_ptr = ptr as *const i32;
+
+                    if count == 1 {
+                        Some(TelemetryValue::Int(std::ptr::read_unaligned(int_ptr)))
+                    } else {
+                        let mut vec = Vec::with_capacity(count);
+
+                        for idx in 0..count {
+                            vec.push(std::ptr::read_unaligned(int_ptr.add(idx)));
+                        }
+
+                        Some(TelemetryValue::IntArray(vec))
+                    }
+                }
+
+                VarType::BitField => {
+                    let uint_ptr = ptr as *const u32;
+
+                    if count == 1 {
+                        Some(TelemetryValue::BitField(std::ptr::read_unaligned(uint_ptr)))
+                    } else {
+                        let mut vec = Vec::with_capacity(count);
+
+                        for idx in 0..count {
+                            let u32_val = std::ptr::read_unaligned(uint_ptr.add(idx));
+
+                            vec.push(u32_val as i32);
+                        }
+
+                        Some(TelemetryValue::IntArray(vec))
+                    }
+                }
+
+                VarType::Float => {
+                    let float_ptr = ptr as *const f32;
+
+                    if count == 1 {
+                        Some(TelemetryValue::Float(std::ptr::read_unaligned(float_ptr)))
+                    } else {
+                        let mut vec = Vec::with_capacity(count);
+
+                        for idx in 0..count {
+                            vec.push(std::ptr::read_unaligned(float_ptr.add(idx)));
+                        }
+
+                        Some(TelemetryValue::FloatArray(vec))
+                    }
+                }
+
+                VarType::Double => {
+                    let double_ptr = ptr as *const f64;
+
+                    if count == 1 {
+                        Some(TelemetryValue::Double(std::ptr::read_unaligned(double_ptr)))
+                    } else {
+                        let mut vec = Vec::with_capacity(count);
+
+                        for idx in 0..count {
+                            vec.push(std::ptr::read_unaligned(double_ptr.add(idx)));
+                        }
+
+                        Some(TelemetryValue::DoubleArray(vec))
+                    }
+                }
+            }
+        }
+    }
+
+    /// Snapshot every known variable from the latest data buffer into a map.
+    pub fn read_all_variables(&self) -> HashMap<String, TelemetryValue> {
+        let mut map = HashMap::new();
+
+        for name in self.vars.keys() {
+            if let Some(val) = self.read_variable(name) {
+                map.insert(name.clone(), val);
+            }
+        }
+        map
+    }
+
+    /// Convenience: read a single `f32` variable by name.
+    pub fn read_float(&self, name: &str) -> Option<f32> {
+        if let Some(TelemetryValue::Float(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a single `f64` variable by name.
+    pub fn read_double(&self, name: &str) -> Option<f64> {
+        if let Some(TelemetryValue::Double(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a single `i32` variable by name.
+    pub fn read_int(&self, name: &str) -> Option<i32> {
+        if let Some(TelemetryValue::Int(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a single `bool` variable by name.
+    pub fn read_bool(&self, name: &str) -> Option<bool> {
+        if let Some(TelemetryValue::Bool(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a `Vec<f32>` array variable by name.
+    pub fn read_float_array(&self, name: &str) -> Option<Vec<f32>> {
+        if let Some(TelemetryValue::FloatArray(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a `Vec<f64>` array variable by name.
+    pub fn read_double_array(&self, name: &str) -> Option<Vec<f64>> {
+        if let Some(TelemetryValue::DoubleArray(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a `Vec<i32>` array variable by name.
+    pub fn read_int_array(&self, name: &str) -> Option<Vec<i32>> {
+        if let Some(TelemetryValue::IntArray(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Convenience: read a `Vec<bool>` array variable by name.
+    pub fn read_bool_array(&self, name: &str) -> Option<Vec<bool>> {
+        if let Some(TelemetryValue::BoolArray(v)) = self.read_variable(name) {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Raw YAML session string from iRacing shared memory.
+    pub fn session_yaml(&self) -> Option<String> {
+        self.get_session_info()
+    }
+
+    /// Parsed session info. Cached — only re-parses when iRacing reports a change.
+    pub fn session_info(&self) -> Option<crate::iracing::session::IracingSession> {
+        self.session()
+    }
+
+    /// All current telemetry variables as a map with sim-native names and units.
+    pub fn telemetry_snapshot(
+        &self,
+    ) -> std::collections::HashMap<String, crate::types::TelemetryValue> {
+        self.read_all_variables()
+    }
+
+    /// Metadata for every telemetry variable iRacing currently exposes.
+    pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
+        use crate::iracing::types::VarType;
+
+        self.vars
+            .iter()
+            .map(|(name, hdr)| {
+                let type_name = match VarType::from_i32(hdr.type_) {
+                    Some(VarType::Char) => "char",
+                    Some(VarType::Bool) => "bool",
+                    Some(VarType::Int) => "int",
+                    Some(VarType::BitField) => "bitfield",
+                    Some(VarType::Float) => "float",
+                    Some(VarType::Double) => "double",
+                    None => "unknown",
+                };
+
+                let unit = {
+                    let len = hdr
+                        .unit
+                        .iter()
+                        .position(|&x| x == 0)
+                        .unwrap_or(hdr.unit.len());
+
+                    crate::decode_cp1252(&hdr.unit[..len])
+                };
+
+                let desc = {
+                    let len = hdr
+                        .desc
+                        .iter()
+                        .position(|&x| x == 0)
+                        .unwrap_or(hdr.desc.len());
+
+                    crate::decode_cp1252(&hdr.desc[..len])
+                };
+
+                crate::types::VarMeta {
+                    name: name.clone(),
+                    type_name: type_name.to_string(),
+                    unit,
+                    desc,
+                    count: hdr.count as u32,
+                }
+            })
+            .collect()
+    }
+
+    /// Capture a full telemetry frame. Reads all variables from shared memory in one pass.
+    pub fn frame(&self) -> crate::iracing::vars::IracingFrame {
+        crate::iracing::vars::IracingFrame::from_vars(&self.read_all_variables())
+    }
+
+    /// Parse the current session-info YAML into an `IracingSession`.
+    ///
+    /// Automatically caches the parsed representation and only re-parses the large
+    /// YAML block if iRacing reports that the session info has changed.
+    pub fn session(&self) -> Option<crate::iracing::session::IracingSession> {
+        let current_version = self.session_info_update();
+
+        if let Some((_, session)) = self
+            .cached_session
+            .borrow()
+            .as_ref()
+            .filter(|(v, _)| *v == current_version)
+        {
+            return Some(session.clone());
+        }
+
+        let yaml = self.get_session_info()?;
+
+        let session = crate::iracing::session::IracingSession::from_yaml(&yaml)?;
+
+        *self.cached_session.borrow_mut() = Some((current_version, session.clone()));
+
+        Some(session)
+    }
+}
+
+/// Releases Win32 handles and unmaps the shared-memory view on drop.
+impl Drop for IRsdkConnection {
+    fn drop(&mut self) {
+        unsafe {
+            if !self.h_event.is_null() {
+                CloseHandle(self.h_event);
+            }
+
+            if !self.view_address.Value.is_null() {
+                UnmapViewOfFile(self.view_address);
+            }
+
+            if !self.h_map.is_null() {
+                CloseHandle(self.h_map);
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+/target
+*.rs.bk
+*.pdb
+
+# Generated output files
+*.txt
+*.yaml
+!**/README.md
+
+# AI
+.claude
+.antigravitycli
+Claude.md
+Agents.md
+
+# local script for debugging
+/examples/examples/test.rs

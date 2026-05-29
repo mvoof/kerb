@@ -1,0 +1,21 @@
+[package]
+name = "kerb-codegen"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "kerb_codegen"
+path = "src/lib.rs"
+
+[[bin]]
+name = "codegen"
+path = "src/main.rs"
+
+[dependencies]
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+kerb = { path = "../..", features = ["iracing"] }
+
+[[test]]
+name = "codegen_tests"
+path = "tests/codegen_tests.rs"
