@@ -13,29 +13,44 @@ const SHM_EVO_PHYSICS: &str = "Local\\acevo_pmf_physics";
 const SHM_EVO_GRAPHICS: &str = "Local\\acevo_pmf_graphics";
 const SHM_EVO_STATIC: &str = "Local\\acevo_pmf_static";
 
-/// A snapshot of the three shared memory pages for classic Assetto Corsa.
+/// Point-in-time snapshot of the three classic Assetto Corsa shared-memory pages.
+///
+/// All fields are the player's car only — AC does not expose other cars via SHM.
+///
+/// - `physics` — per-tick physics: inputs, speeds, tyres, damage. See [`SPageFilePhysics`].
+/// - `graphics` — per-frame HUD state: lap times, position, flags, fuel. See [`SPageFileGraphics`].
+/// - `static_data` — session constants written at load: car model, track, aids. See [`SPageFileStatic`].
 #[derive(Clone, Copy, Debug)]
 pub struct AcClassicFrame {
+    /// Physics page — per-tick data: inputs, RPM, speed, tyres, damage.
     pub physics: SPageFilePhysics,
+    /// Graphics/HUD page — per-frame data: lap times, race position, flags, pit state.
     pub graphics: SPageFileGraphics,
+    /// Static page — written once at session load: car model, track, aids, limits.
     pub static_data: SPageFileStatic,
 }
 
-/// A snapshot of the three shared memory pages for Assetto Corsa Evo.
+/// Point-in-time snapshot of the three AC Evo shared-memory pages.
 ///
-/// Evo-specific fields (brake compounds, pad/disc life, engine state, etc.)
-/// are in `physics` and the extended `graphics` page.
+/// All fields are the player's car only — AC Evo does not expose other cars via SHM.
+///
+/// - `physics` — per-tick physics including Evo-specific fields (pad/disc life, engine state, vibrations). See [`SPageFilePhysicsEvo`].
+/// - `graphics` — per-frame HUD state with Evo extensions (rain forecast, delta, tyre detail). See [`SPageFileGraphicsEvo`].
+/// - `static_data` — session constants including wet/dry tyre names. See [`SPageFileStaticEvo`].
 #[derive(Clone, Copy, Debug)]
 pub struct AcEvoFrame {
+    /// Physics page — per-tick data including Evo-only fields (brake compound, pad/disc life, engine state).
     pub physics: SPageFilePhysicsEvo,
+    /// Graphics/HUD page — per-frame data including Evo-only fields (rain forecast, delta, per-tyre detail).
     pub graphics: SPageFileGraphicsEvo,
+    /// Static page — written once at session load; includes wet/dry tyre compound names.
     pub static_data: SPageFileStaticEvo,
 }
 
-/// A point-in-time snapshot from either Assetto Corsa or Assetto Corsa Evo.
+/// Point-in-time snapshot from either Assetto Corsa or Assetto Corsa Evo.
 ///
 /// Use the common accessor methods for fields shared by both games.
-/// Match on the variant to access Evo-specific fields:
+/// Match on the variant to access game-specific fields:
 ///
 /// ```ignore
 /// let frame = conn.frame();
@@ -219,10 +234,10 @@ pub struct AcConnection {
 }
 
 impl AcConnection {
-    /// Connect to whichever AC game is running.
+    /// Connect to whichever Assetto Corsa game is currently running.
     ///
-    /// Tries AC Evo (`acevo_pmf_*`) first, then classic AC (`acpmf_*`).
-    /// Returns [`SimError::NotConnected`] if neither is running.
+    /// Tries AC Evo shared memory (`acevo_pmf_*`) first, then falls back to classic AC (`acpmf_*`).
+    /// Returns [`SimError::NotConnected`] if neither game's shared memory is available.
     pub fn connect() -> Result<Self, SimError> {
         // Try Evo first
         if let (Ok(p), Ok(g), Ok(s)) = (
@@ -253,7 +268,15 @@ impl AcConnection {
         })
     }
 
-    /// Read a snapshot from whichever game is connected.
+    /// Read a point-in-time snapshot from the connected game.
+    ///
+    /// Returns [`AcFrame::Classic`] or [`AcFrame::Evo`] depending on which game was detected at
+    /// [`connect`](AcConnection::connect) time. Use the common accessor methods
+    /// (`rpms()`, `speed_kmh()`, `gear()`, etc.) for fields shared by both variants.
+    /// Match on the variant to access game-specific fields.
+    ///
+    /// **Packed-field rule:** Always copy struct fields to local variables before using them in
+    /// expressions — taking a reference to an unaligned packed field is a compile error.
     pub fn frame(&self) -> AcFrame {
         unsafe {
             match &self.variant {
@@ -289,19 +312,29 @@ impl AcConnection {
         }
     }
 
-    /// All current telemetry variables as a flat map.
+    /// All telemetry variables as a flat `HashMap<String, TelemetryValue>`.
+    ///
+    /// Keys are field names from `SPageFilePhysics` / `SPageFilePhysicsEvo` (and their
+    /// graphics/static counterparts). Scope: **player's car only**.
+    ///
+    /// Use [`save_telemetry_snapshot`](crate::save_telemetry_snapshot) to dump to a text file
+    /// for field discovery.
     pub fn telemetry_snapshot(
         &self,
     ) -> std::collections::HashMap<String, crate::types::TelemetryValue> {
         crate::ac::snapshot::build_snapshot(&self.frame())
     }
 
-    /// Metadata for every telemetry variable.
+    /// Metadata for every field exposed in the telemetry snapshot.
+    ///
+    /// Returns one [`VarMeta`](crate::types::VarMeta) per field with name, type, unit, and description.
     pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
         crate::ac::snapshot::var_list()
     }
 
-    /// Returns `true` if the sim is actively running.
+    /// Returns `true` when the sim is actively running (status == `AC_STATUS_LIVE`).
+    ///
+    /// Returns `false` during menus, replays, or when the game is paused.
     pub fn is_connected(&self) -> bool {
         unsafe {
             let status = match &self.variant {
@@ -317,7 +350,10 @@ impl AcConnection {
         }
     }
 
-    /// Sleep for up to `timeout_ms` milliseconds waiting for fresh data.
+    /// Sleep for up to `timeout_ms` milliseconds.
+    ///
+    /// AC does not expose a data-ready event, so this is a simple sleep capped at 16 ms
+    /// (one ~60 Hz frame). Call in your polling loop to avoid busy-waiting.
     pub fn wait_for_data(&self, timeout_ms: u32) {
         std::thread::sleep(std::time::Duration::from_millis(timeout_ms.min(16) as u64));
     }

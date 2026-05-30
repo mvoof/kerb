@@ -134,6 +134,18 @@ The `ac` feature covers both classic Assetto Corsa and AC Evo — no separate fl
 
 ### iRacing
 
+**Connection:** `IRsdkConnection` (via `Connection::IRacing`)
+
+| Method                 | Returns                           | Scope         | Notes                                                       |
+| ---------------------- | --------------------------------- | ------------- | ----------------------------------------------------------- |
+| `frame()`              | `IracingFrame`                    | player's car  | ~90 typed fields; IDE autocomplete works                    |
+| `session_info()`       | `Option<IracingSession>`          | whole session | Parsed YAML; cached until iRacing reports a change          |
+| `session_yaml()`       | `Option<String>`                  | whole session | Raw YAML string for manual parsing                          |
+| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car  | Dynamic access by iRacing variable name                     |
+| `var_list()`           | `Vec<VarMeta>`                    | —             | All variable names, types, units, and descriptions          |
+| `wait_for_data(ms)`    | `bool`                            | —             | Blocks until new data or timeout; uses Win32 event (0% CPU) |
+| `is_connected()`       | `bool`                            | —             | `true` when iRacing is broadcasting telemetry               |
+
 `IracingFrame` is a typed struct with one pub field per variable — your IDE autocomplete shows all ~90 available fields directly. Fields use snake_case (`SteeringWheelAngle` → `steering_wheel_angle`). To see all fields with their types and units, save a snapshot:
 
 ```rust
@@ -169,9 +181,29 @@ kerb::save_session(&conn, "session.yaml")?;
 
 ### Assetto Corsa / AC Evo
 
-Both games use a single `Connection::Ac` variant. `connect()` auto-detects which is running.
+**Connection:** `AcConnection` (via `Connection::Ac`) — auto-detects which game is running.
 
-`AcFrame` is an enum with two variants — `Classic` and `Evo`. Use the common accessor methods for fields shared by both games, and match on the variant for Evo-specific fields:
+| Method                 | Returns                           | Scope        | Notes                                                              |
+| ---------------------- | --------------------------------- | ------------ | ------------------------------------------------------------------ |
+| `frame()`              | `AcFrame` (enum)                  | player's car | `Classic` or `Evo` variant; use common accessors for shared fields |
+| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car | Keys are field names from the physics/graphics/static structs      |
+| `var_list()`           | `Vec<VarMeta>`                    | —            | All available field names                                          |
+| `is_connected()`       | `bool`                            | —            | `true` when status == `AC_STATUS_LIVE` (not paused, not replay)    |
+| `wait_for_data(ms)`    | —                                 | —            | Sleep up to 16 ms; AC has no data-ready event                      |
+
+**`AcFrame` contents by page:**
+
+| Page          | Struct                                       | Update rate          | What it contains                                                                                                                         |
+| ------------- | -------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `physics`     | `SPageFilePhysics` / `SPageFilePhysicsEvo`   | Every sim tick       | Inputs (throttle, brake, steer, clutch), RPM, speed, tyres (temp, wear, pressure, slip), suspension, aero (DRS, turbo), damage, G-forces |
+| `graphics`    | `SPageFileGraphics` / `SPageFileGraphicsEvo` | Every render frame   | Lap times, race position, sector times, flags, fuel estimate, pit state, MFD settings; Evo adds rain forecast, delta, per-tyre detail    |
+| `static_data` | `SPageFileStatic` / `SPageFileStaticEvo`     | Once at session load | Car model, track name, player name, max RPM/torque/fuel, aid settings, tyre names                                                        |
+
+**Common accessor methods on `AcFrame`** (work for both Classic and Evo):
+`rpms()`, `gear()`, `speed_kmh()`, `gas()`, `brake()`, `fuel()`, `tc()`, `abs()`,
+`heading()`, `pitch()`, `roll()`, `brake_bias()`, `clutch()`, `turbo_boost()`,
+`air_temp()`, `road_temp()`, `position()`, `completed_laps()`,
+`i_current_time()`, `i_last_time()`, `i_best_time()`, `is_in_pit()`, `session_time_left()`
 
 ```rust
 use kerb::ac::connection::AcFrame;
@@ -201,38 +233,55 @@ Then look up the field name in `SPageFilePhysics` / `SPageFilePhysicsEvo` (and t
 
 ### Le Mans Ultimate
 
-Three shared memory regions — `telemetry`, `scoring`, `extended`. `player_telemetry()` cross-references scoring and telemetry arrays to find the player's entry.
+**Connection:** `LmuConnection` (via `Connection::Lmu`)
 
-To discover all available fields, save a snapshot to a text file and open it:
+| Method                       | Returns                           | Scope           | Notes                                                                     |
+| ---------------------------- | --------------------------------- | --------------- | ------------------------------------------------------------------------- |
+| `frame()`                    | `Box<LmuFrame>`                   | all cars        | ~500 KB struct; boxed to avoid stack overflow                             |
+| `frame.player_telemetry()`   | `&rF2VehicleTelemetry`            | **player only** | Cross-references scoring + telemetry by vehicle ID; falls back to index 0 |
+| `frame.player_scoring_idx()` | `Option<usize>`                   | **player only** | Index into `frame.scoring.vehicles` for the player's entry                |
+| `telemetry_snapshot()`       | `HashMap<String, TelemetryValue>` | **player only** | Field names from `rF2VehicleTelemetry`                                    |
+| `var_list()`                 | `Vec<VarMeta>`                    | —               | All field names from `rF2VehicleTelemetry`                                |
+| `is_connected()`             | `bool`                            | —               | `true` when plugin is loaded and session has started                      |
+| `wait_for_data(ms)`          | —                                 | —               | Sleep up to 16 ms; LMU has no data-ready event                            |
 
-```rust
-kerb::save_telemetry_snapshot(&conn, "lmu_snapshot.txt")?;
-```
+**`LmuFrame` structure:**
 
-Then look up the field name in the structs `rF2VehicleTelemetry` and `rF2VehicleScoring`.
+| Field       | Type           | Scope                  | Update rate        | Contents                                                                                                           |
+| ----------- | -------------- | ---------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `telemetry` | `rF2Telemetry` | **all cars**           | Every physics tick | Engine, inputs, position, orientation, aero, fuel, damage, wheel physics per car                                   |
+| `scoring`   | `rF2Scoring`   | **all cars** + session | ~2 Hz              | Race position, lap times, sector splits, pit state, flags, gap to leader; `scoring_info` has track/weather/session |
+| `extended`  | `rF2Extended`  | session meta           | On change          | Plugin enabled flag, session started flag, physics thread timing                                                   |
 
 ```rust
 Connection::Lmu(conn) => {
     let frame = conn.frame();
-    let player = frame.player_telemetry(); // &rF2VehicleTelemetry
 
+    // Player's car only — engine, inputs, tyres
+    let player = frame.player_telemetry(); // &rF2VehicleTelemetry
     // Must copy packed fields to locals before use
     let rpm = player.engine_rpm;
     let gear = player.gear;
     println!("{:.0} rpm  gear {}", rpm, gear);
 
-    // Player's scoring entry (place, lap count, flags, headlights, etc.)
+    // Player's race position, lap times, flags
     if let Some(idx) = frame.player_scoring_idx() {
-        let headlights = frame.scoring.vehicles[idx].headlights;
-        println!("headlights={}", headlights);
+        let place = frame.scoring.vehicles[idx].place;
+        let last_lap = frame.scoring.vehicles[idx].last_lap_time;
+        println!("P{}  last lap {:.3}s", place, last_lap);
     }
 
-    // All cars in race
+    // All cars on track — leaderboard
     let n = frame.scoring.header.num_vehicles as usize;
     for v in &frame.scoring.vehicles[..n] {
         let place = v.place;
         println!("  place {}", place);
     }
+
+    // Track and weather from session info
+    let track = crate::lmu::structs::parse_rf2_str(&frame.scoring.scoring_info.track_name);
+    let temp = frame.scoring.scoring_info.track_temp;
+    println!("track: {}  temp: {:.1}°C", track, temp);
 }
 ```
 
@@ -332,12 +381,10 @@ cargo run -p kerb-examples --example facade_lmu
 | Assetto Corsa Evo          | [Shared Memory Documentation](https://steamcommunity.com/sharedfiles/filedetails/?id=3707421508) — Steam guide                                                           |
 | Le Mans Ultimate           | Uses [rF2SharedMemoryMapPlugin](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) — community plugin built on ISI/S397 internals sample                    |
 
----
-
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE)
