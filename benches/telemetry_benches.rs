@@ -2,7 +2,7 @@ use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
 #[cfg(feature = "ac")]
 use kerb::ac::{
-    connection::{AcClassicFrame, AcEvoFrame, AcFrame},
+    connection::{AcClassicFrame, AcFrame},
     snapshot::build_snapshot as build_ac_snapshot,
 };
 
@@ -21,8 +21,8 @@ use kerb::decode_cp1252;
 fn bench_string_decoders(c: &mut Criterion) {
     let mut group = c.benchmark_group("String Decoders");
 
-    let ascii_bytes     = b"Spa-Francorchamps";
-    let accented_bytes  = b"N\xfcrburgring Nordschleife"; // 'ü' = 0xFC in CP-1252
+    let ascii_bytes = b"Spa-Francorchamps";
+    let accented_bytes = b"N\xfcrburgring Nordschleife"; // 'ü' = 0xFC in CP-1252
 
     group.bench_function("decode_cp1252 ASCII", |b| {
         b.iter(|| black_box(decode_cp1252(black_box(ascii_bytes))))
@@ -38,14 +38,14 @@ fn bench_string_decoders(c: &mut Criterion) {
 /// Assetto Corsa — frame construction and field access.
 #[cfg(feature = "ac")]
 fn bench_assetto_corsa(c: &mut Criterion) {
-    use kerb::ac::types::{AcGraphicsData, AcPhysicsData, AcStaticData};
+    use kerb::ac::types::{AcPhysicsData, AcStaticData};
 
     let mut group = c.benchmark_group("Assetto Corsa");
 
     // AcGraphicsData contains [[f32;3];60] which has no Default — use zeroed instead
     let inner = AcClassicFrame {
-        physics:     AcPhysicsData::default(),
-        graphics:    unsafe { std::mem::zeroed() },
+        physics: AcPhysicsData::default(),
+        graphics: unsafe { std::mem::zeroed() },
         static_data: AcStaticData::default(),
     };
     let frame = AcFrame::Classic(Box::new(inner.clone()));
@@ -77,9 +77,10 @@ fn bench_le_mans_ultimate(c: &mut Criterion) {
     // LmuFrame::Default is zeroed — mirrors are safe to default-init
     let frame = LmuFrame::default();
 
-    group.bench_function("Read single field (vehicles_telemetry[0].engine_rpm)", |b| {
-        b.iter(|| black_box(black_box(&frame).vehicles_telemetry[0].engine_rpm))
-    });
+    group.bench_function(
+        "Read single field (vehicles_telemetry[0].engine_rpm)",
+        |b| b.iter(|| black_box(black_box(&frame).vehicles_telemetry[0].engine_rpm)),
+    );
 
     group.bench_function("vehicles_telemetry() slice (0 vehicles)", |b| {
         b.iter(|| black_box(black_box(&frame).vehicles_telemetry()))
@@ -103,15 +104,15 @@ fn bench_iracing(c: &mut Criterion) {
 
     // Build a minimal mock SHM buffer: header + 4-byte RPM float + session YAML
     let mut header: irsdk_header = unsafe { std::mem::zeroed() };
-    header.ver       = 1;
-    header.status    = 1;
-    header.num_buf   = 1;
-    header.var_buf[0].tick_count  = 100;
-    header.var_buf[0].buf_offset  = std::mem::size_of::<irsdk_header>() as i32;
+    header.ver = 1;
+    header.status = 1;
+    header.num_buf = 1;
+    header.var_buf[0].tick_count = 100;
+    header.var_buf[0].buf_offset = std::mem::size_of::<irsdk_header>() as i32;
 
-    let yaml  = "WeekendInfo:\n  TrackDisplayName: Spa-Francorchamps\n\0";
-    let hz    = std::mem::size_of::<irsdk_header>();
-    header.session_info_len    = yaml.len() as i32;
+    let yaml = "WeekendInfo:\n  TrackDisplayName: Spa-Francorchamps\n\0";
+    let hz = std::mem::size_of::<irsdk_header>();
+    header.session_info_len = yaml.len() as i32;
     header.session_info_offset = (hz + 4) as i32;
     header.session_info_update = 1;
 
@@ -123,21 +124,13 @@ fn bench_iracing(c: &mut Criterion) {
             hz,
         );
         let rpm: f32 = 7500.0;
-        std::ptr::copy_nonoverlapping(
-            &rpm as *const f32 as *const u8,
-            buf.as_mut_ptr().add(hz),
-            4,
-        );
-        std::ptr::copy_nonoverlapping(
-            yaml.as_ptr(),
-            buf.as_mut_ptr().add(hz + 4),
-            yaml.len(),
-        );
+        std::ptr::copy_nonoverlapping(&rpm as *const f32 as *const u8, buf.as_mut_ptr().add(hz), 4);
+        std::ptr::copy_nonoverlapping(yaml.as_ptr(), buf.as_mut_ptr().add(hz + 4), yaml.len());
     }
 
     let mut vars = std::collections::HashMap::new();
     let mut rpm_hdr = irsdk_varHeader {
-        type_: 4,   // Float
+        type_: 4, // Float
         offset: 0,
         count: 1,
         count_as_char: 0,
@@ -170,7 +163,9 @@ fn bench_iracing(c: &mut Criterion) {
     let header_ptr = buf.as_mut_ptr() as *mut irsdk_header;
     group.bench_function("session() — cold parse (YAML re-parse each call)", |b| {
         b.iter(|| {
-            unsafe { (*header_ptr).session_info_update += 1; }
+            unsafe {
+                (*header_ptr).session_info_update += 1;
+            }
             black_box(black_box(&conn).session())
         })
     });
