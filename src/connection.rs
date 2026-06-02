@@ -27,12 +27,14 @@ pub enum SimType {
 ///     }
 ///     Connection::Ac(c) => {
 ///         let frame = c.frame();
-///         // Common fields via methods — work for both AC and AC Evo
-///         println!("{:.0} rpm  gear {}", frame.rpms(), frame.gear());
-///
-///         // Evo-specific fields — match on the variant
-///         if let AcFrame::Evo(f) = &frame {
-///             println!("pad_life: {:?}", f.physics.pad_life);
+///         match &frame {
+///             AcFrame::Classic(f) => {
+///                 println!("{:.0} rpm  gear {}", f.physics.rpms, f.physics.gear);
+///             }
+///             AcFrame::Evo(f) => {
+///                 println!("{:.0} rpm  gear {}", f.physics.rpms, f.physics.gear);
+///                 println!("pad_life: {:?}", f.physics.pad_life);
+///             }
 ///         }
 ///     }
 ///     Connection::Lmu(c) => {

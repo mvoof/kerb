@@ -45,166 +45,25 @@ pub struct AcEvoFrame {
 
 /// Point-in-time snapshot from either Assetto Corsa or Assetto Corsa Evo.
 ///
-/// Use the common accessor methods for fields shared by both games.
-/// Match on the variant to access game-specific fields:
+/// Match on the variant to access fields:
 ///
 /// ```ignore
 /// let frame = conn.frame()?;
 ///
-/// // Common fields — work for both AC and AC Evo
-/// println!("{:.0} rpm  gear {}", frame.rpms(), frame.gear());
-///
-/// // Evo-specific fields — match on the variant
-/// if let AcFrame::Evo(f) = &frame {
-///     println!("pad_life: {:?}", f.physics.pad_life);
+/// match &frame {
+///     AcFrame::Classic(f) => {
+///         println!("{:.0} rpm  gear {}", f.physics.rpms, f.physics.gear);
+///     }
+///     AcFrame::Evo(f) => {
+///         println!("{:.0} rpm  gear {}", f.physics.rpms, f.physics.gear);
+///         println!("pad_life: {:?}", f.physics.pad_life);
+///     }
 /// }
 /// ```
 #[derive(Clone, Debug, serde::Serialize)]
 pub enum AcFrame {
     Classic(Box<AcClassicFrame>),
     Evo(Box<AcEvoFrame>),
-}
-
-impl AcFrame {
-    pub fn rpms(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.rpms,
-            AcFrame::Evo(f) => f.physics.rpms,
-        }
-    }
-    pub fn gear(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.gear,
-            AcFrame::Evo(f) => f.physics.gear,
-        }
-    }
-    pub fn speed_kmh(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.speed_kmh,
-            AcFrame::Evo(f) => f.physics.speed_kmh,
-        }
-    }
-    pub fn gas(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.gas,
-            AcFrame::Evo(f) => f.physics.gas,
-        }
-    }
-    pub fn brake(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.brake,
-            AcFrame::Evo(f) => f.physics.brake,
-        }
-    }
-    pub fn fuel(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.fuel,
-            AcFrame::Evo(f) => f.physics.fuel,
-        }
-    }
-    pub fn tc(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.tc,
-            AcFrame::Evo(f) => f.physics.tc,
-        }
-    }
-    pub fn abs(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.abs,
-            AcFrame::Evo(f) => f.physics.abs,
-        }
-    }
-    pub fn heading(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.heading,
-            AcFrame::Evo(f) => f.physics.heading,
-        }
-    }
-    pub fn pitch(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.pitch,
-            AcFrame::Evo(f) => f.physics.pitch,
-        }
-    }
-    pub fn roll(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.roll,
-            AcFrame::Evo(f) => f.physics.roll,
-        }
-    }
-    pub fn brake_bias(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.brake_bias,
-            AcFrame::Evo(f) => f.physics.brake_bias,
-        }
-    }
-    pub fn clutch(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.clutch,
-            AcFrame::Evo(f) => f.physics.clutch,
-        }
-    }
-    pub fn turbo_boost(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.turbo_boost,
-            AcFrame::Evo(f) => f.physics.turbo_boost,
-        }
-    }
-    pub fn air_temp(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.air_temp,
-            AcFrame::Evo(f) => f.physics.air_temp,
-        }
-    }
-    pub fn road_temp(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.physics.road_temp,
-            AcFrame::Evo(f) => f.physics.road_temp,
-        }
-    }
-    // Graphics common fields
-    pub fn position(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.graphics.position,
-            AcFrame::Evo(f) => f.graphics.position,
-        }
-    }
-    pub fn completed_laps(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.graphics.completed_laps,
-            AcFrame::Evo(f) => f.graphics.completed_laps,
-        }
-    }
-    pub fn i_current_time(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.graphics.i_current_time,
-            AcFrame::Evo(f) => f.graphics.i_current_time,
-        }
-    }
-    pub fn i_last_time(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.graphics.i_last_time,
-            AcFrame::Evo(f) => f.graphics.i_last_time,
-        }
-    }
-    pub fn i_best_time(&self) -> i32 {
-        match self {
-            AcFrame::Classic(f) => f.graphics.i_best_time,
-            AcFrame::Evo(f) => f.graphics.i_best_time,
-        }
-    }
-    pub fn is_in_pit(&self) -> bool {
-        match self {
-            AcFrame::Classic(f) => f.graphics.is_in_pit != 0,
-            AcFrame::Evo(f) => f.graphics.is_in_pit != 0,
-        }
-    }
-    pub fn session_time_left(&self) -> f32 {
-        match self {
-            AcFrame::Classic(f) => f.graphics.session_time_left,
-            AcFrame::Evo(f) => f.graphics.session_time_left,
-        }
-    }
 }
 
 enum AcShmVariant {

@@ -66,13 +66,7 @@ unsafe fn read_region_consistent<T: Copy>(
         }
 
         // Step 2: copy the whole region (only when consistent).
-        unsafe {
-            std::ptr::copy_nonoverlapping(
-                ptr,
-                raw as *mut u8,
-                std::mem::size_of::<T>(),
-            )
-        };
+        unsafe { std::ptr::copy_nonoverlapping(ptr, raw as *mut u8, std::mem::size_of::<T>()) };
 
         // Step 3: read end after the copy — if it changed, a write snuck in.
         let end = unsafe { std::ptr::read_volatile(ptr.add(end_offset) as *const u32) };

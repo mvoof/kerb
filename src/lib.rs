@@ -15,8 +15,12 @@
 //!     }
 //!     #[cfg(feature = "ac")]
 //!     Connection::Ac(c) => {
+//!         use kerb::ac::connection::AcFrame;
 //!         let frame = c.frame().expect("failed to read frame");
-//!         println!("{:.0} rpm  gear {}", frame.rpms(), frame.gear());
+//!         match &frame {
+//!             AcFrame::Classic(f) => println!("rpm={} gear={}", f.physics.rpms, f.physics.gear),
+//!             AcFrame::Evo(f) => println!("rpm={} gear={}", f.physics.rpms, f.physics.gear),
+//!         }
 //!     }
 //!     #[cfg(feature = "lmu")]
 //!     Connection::Lmu(c) => {

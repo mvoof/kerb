@@ -183,13 +183,13 @@ kerb::save_session(&conn, "session.yaml")?;
 
 **Connection:** `AcConnection` (via `Connection::Ac`) — auto-detects which game is running.
 
-| Method                 | Returns                           | Scope        | Notes                                                              |
-| ---------------------- | --------------------------------- | ------------ | ------------------------------------------------------------------ |
-| `frame()`              | `AcFrame` (enum)                  | player's car | `Classic` or `Evo` variant; use common accessors for shared fields |
-| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car | Keys are field names from the physics/graphics/static structs      |
-| `var_list()`           | `Vec<VarMeta>`                    | —            | All available field names                                          |
-| `is_connected()`       | `bool`                            | —            | `true` when status == `AC_STATUS_LIVE` (not paused, not replay)    |
-| `wait_for_data(ms)`    | —                                 | —            | Sleep up to 16 ms; AC has no data-ready event                      |
+| Method                 | Returns                           | Scope        | Notes                                                           |
+| ---------------------- | --------------------------------- | ------------ | --------------------------------------------------------------- |
+| `frame()`              | `AcFrame` (enum)                  | player's car | `Classic` or `Evo` variant                                      |
+| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car | Keys are field names from the physics/graphics/static structs   |
+| `var_list()`           | `Vec<VarMeta>`                    | —            | All available field names                                       |
+| `is_connected()`       | `bool`                            | —            | `true` when status == `AC_STATUS_LIVE` (not paused, not replay) |
+| `wait_for_data(ms)`    | —                                 | —            | Sleep up to 16 ms; AC has no data-ready event                   |
 
 **`AcFrame` contents by page:**
 
@@ -199,26 +199,24 @@ kerb::save_session(&conn, "session.yaml")?;
 | `graphics`    | `SPageFileGraphics` / `SPageFileGraphicsEvo` | Every render frame   | Lap times, race position, sector times, flags, fuel estimate, pit state, MFD settings; Evo adds rain forecast, delta, per-tyre detail    |
 | `static_data` | `SPageFileStatic` / `SPageFileStaticEvo`     | Once at session load | Car model, track name, player name, max RPM/torque/fuel, aid settings, tyre names                                                        |
 
-**Common accessor methods on `AcFrame`** (work for both Classic and Evo):
-`rpms()`, `gear()`, `speed_kmh()`, `gas()`, `brake()`, `fuel()`, `tc()`, `abs()`,
-`heading()`, `pitch()`, `roll()`, `brake_bias()`, `clutch()`, `turbo_boost()`,
-`air_temp()`, `road_temp()`, `position()`, `completed_laps()`,
-`i_current_time()`, `i_last_time()`, `i_best_time()`, `is_in_pit()`, `session_time_left()`
-
 ```rust
 use kerb::ac::connection::AcFrame;
 
 Connection::Ac(conn) => {
     let frame = conn.frame();
 
-    // Common methods — work for both AC and AC Evo
-    println!("{:.0} rpm  gear {}  {:.1} km/h",
-        frame.rpms(), frame.gear(), frame.speed_kmh());
+    match &frame {
+        AcFrame::Classic(f) => {
+            println!("{:.0} rpm  gear {}  {:.1} km/h",
+                f.physics.rpms, f.physics.gear, f.physics.speed_kmh);
+        }
+        AcFrame::Evo(f) => {
+            println!("{:.0} rpm  gear {}  {:.1} km/h",
+                f.physics.rpms, f.physics.gear, f.physics.speed_kmh);
 
-    // Evo-specific fields
-    if let AcFrame::Evo(f) = &frame {
-        let pad_fl = f.physics.pad_life[0];
-        println!("pad life FL: {:.0}%", pad_fl);
+            let pad_fl = f.physics.pad_life[0];
+            println!("pad life FL: {:.0}%", pad_fl);
+        }
     }
 }
 ```

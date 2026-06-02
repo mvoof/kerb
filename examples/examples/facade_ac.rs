@@ -24,17 +24,23 @@ fn main() -> Result<(), SimError> {
 
                     let frame = conn.frame()?;
 
-                    // Common fields — work for both AC and AC Evo
-                    let rpms = frame.rpms();
-                    let gear = frame.gear();
-                    let speed = frame.speed_kmh();
-
-                    print!("\r{:.0} rpm  gear {}  {:.1} km/h", rpms, gear, speed);
-
-                    // Evo-specific fields
-                    if let AcFrame::Evo(f) = &frame {
-                        let pad_fl = f.physics.pad_life[0];
-                        print!("  pad_fl={:.0}%", pad_fl);
+                    match &frame {
+                        AcFrame::Classic(f) => {
+                            let rpms = f.physics.rpms;
+                            let gear = f.physics.gear;
+                            let speed = f.physics.speed_kmh;
+                            print!("\r{:.0} rpm  gear {}  {:.1} km/h", rpms, gear, speed);
+                        }
+                        AcFrame::Evo(f) => {
+                            let rpms = f.physics.rpms;
+                            let gear = f.physics.gear;
+                            let speed = f.physics.speed_kmh;
+                            let pad_fl = f.physics.pad_life[0];
+                            print!(
+                                "\r{:.0} rpm  gear {}  {:.1} km/h  pad_fl={:.0}%",
+                                rpms, gear, speed, pad_fl
+                            );
+                        }
                     }
 
                     let _ = io::stdout().flush();

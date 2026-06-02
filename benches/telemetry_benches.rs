@@ -58,8 +58,13 @@ fn bench_assetto_corsa(c: &mut Criterion) {
         b.iter(|| black_box(black_box(&frame).clone()))
     });
 
-    group.bench_function("Common accessor rpms()", |b| {
-        b.iter(|| black_box(black_box(&frame).rpms()))
+    group.bench_function("Match to extract rpms", |b| {
+        b.iter(|| {
+            black_box(match black_box(&frame) {
+                AcFrame::Classic(f) => f.physics.rpms,
+                AcFrame::Evo(f) => f.physics.rpms,
+            })
+        })
     });
 
     group.bench_function("Build snapshot HashMap", |b| {

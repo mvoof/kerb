@@ -662,8 +662,6 @@ pub struct LmuExtended {
     pub session_started: u8,
 }
 
-
-
 impl From<rF2Extended> for LmuExtended {
     fn from(raw: rF2Extended) -> Self {
         Self {
