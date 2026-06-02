@@ -7,7 +7,6 @@ use kerb_derive::Snapshot;
 /// Maximum number of vehicles the shared-memory buffers can hold.
 pub const RF2_MAX_VEHICLES: usize = 128;
 
-
 /// Per-wheel physics data (suspension, tyre temps, wear, forces, etc.).
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default, Snapshot)]
@@ -520,4 +519,3 @@ impl Default for rF2Extended {
         unsafe { std::mem::zeroed() }
     }
 }
-

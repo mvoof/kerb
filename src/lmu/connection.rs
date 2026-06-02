@@ -1,6 +1,8 @@
 use crate::error::SimError;
 use crate::lmu::structs::{rF2Extended, rF2Scoring, rF2Telemetry};
-use crate::lmu::types::{LmuExtended, LmuFrame, LmuScoringInfo, LmuVehicleScoring, LmuVehicleTelemetry};
+use crate::lmu::types::{
+    LmuExtended, LmuFrame, LmuScoringInfo, LmuVehicleScoring, LmuVehicleTelemetry,
+};
 use crate::shm::SharedMemRegion;
 
 const SHM_TELEMETRY: &str = "$rFactor2SMMP_Telemetry$";

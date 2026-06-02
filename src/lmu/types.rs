@@ -3,10 +3,10 @@
 //! These types shadow the internal `#[repr(C, packed)]` structs from `structs.rs`
 //! and are safe to hold, clone, and serialize without packed-field UB concerns.
 
-use crate::sim_string::SimString;
 use crate::lmu::structs::{
     rF2Extended, rF2ScoringInfo, rF2VehicleScoring, rF2VehicleTelemetry, rF2Wheel,
 };
+use crate::sim_string::SimString;
 
 pub use crate::lmu::structs::RF2_MAX_VEHICLES;
 
@@ -716,8 +716,14 @@ impl serde::Serialize for LmuFrame {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::SerializeStruct;
         let mut s = serializer.serialize_struct("LmuFrame", 5)?;
-        s.serialize_field("vehicles_telemetry", &self.vehicles_telemetry[..self.num_vehicles])?;
-        s.serialize_field("vehicles_scoring", &self.vehicles_scoring[..self.num_vehicles])?;
+        s.serialize_field(
+            "vehicles_telemetry",
+            &self.vehicles_telemetry[..self.num_vehicles],
+        )?;
+        s.serialize_field(
+            "vehicles_scoring",
+            &self.vehicles_scoring[..self.num_vehicles],
+        )?;
         s.serialize_field("num_vehicles", &self.num_vehicles)?;
         s.serialize_field("scoring_info", &self.scoring_info)?;
         s.serialize_field("extended", &self.extended)?;

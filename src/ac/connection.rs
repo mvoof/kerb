@@ -270,20 +270,34 @@ impl AcConnection {
     pub fn frame(&self) -> Result<AcFrame, SimError> {
         unsafe {
             match &self.variant {
-                AcShmVariant::Classic { physics, graphics, static_data } => {
-                    let raw_p = std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysics);
-                    let raw_g = std::ptr::read_unaligned(graphics.as_ptr() as *const SPageFileGraphics);
-                    let raw_s = std::ptr::read_unaligned(static_data.as_ptr() as *const SPageFileStatic);
+                AcShmVariant::Classic {
+                    physics,
+                    graphics,
+                    static_data,
+                } => {
+                    let raw_p =
+                        std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysics);
+                    let raw_g =
+                        std::ptr::read_unaligned(graphics.as_ptr() as *const SPageFileGraphics);
+                    let raw_s =
+                        std::ptr::read_unaligned(static_data.as_ptr() as *const SPageFileStatic);
                     Ok(AcFrame::Classic(Box::new(AcClassicFrame {
                         physics: AcPhysicsData::from(raw_p),
                         graphics: AcGraphicsData::from(raw_g),
                         static_data: AcStaticData::from(raw_s),
                     })))
                 }
-                AcShmVariant::Evo { physics, graphics, static_data } => {
-                    let raw_p = std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysicsEvo);
-                    let raw_g = std::ptr::read_unaligned(graphics.as_ptr() as *const SPageFileGraphicsEvo);
-                    let raw_s = std::ptr::read_unaligned(static_data.as_ptr() as *const SPageFileStaticEvo);
+                AcShmVariant::Evo {
+                    physics,
+                    graphics,
+                    static_data,
+                } => {
+                    let raw_p =
+                        std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysicsEvo);
+                    let raw_g =
+                        std::ptr::read_unaligned(graphics.as_ptr() as *const SPageFileGraphicsEvo);
+                    let raw_s =
+                        std::ptr::read_unaligned(static_data.as_ptr() as *const SPageFileStaticEvo);
                     Ok(AcFrame::Evo(Box::new(AcEvoFrame {
                         physics: AcPhysicsDataEvo::from(raw_p),
                         graphics: AcGraphicsDataEvo::from(raw_g),

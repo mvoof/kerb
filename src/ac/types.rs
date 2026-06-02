@@ -1,15 +1,14 @@
-﻿//! Public mirror types for Assetto Corsa shared-memory structs.
+//! Public mirror types for Assetto Corsa shared-memory structs.
 //!
 //! These are safe, non-packed copies of the raw `SPageFile*` structs.
 //! `[u16; N]` string fields are wrapped in [`SimStringU16<N>`] and
 //! `[u8; N]` string fields are wrapped in [`SimString<N>`].
 
-use crate::sim_string::{SimStringU16};
 use crate::ac::structs::{
-    SPageFilePhysics, SPageFileGraphics, SPageFileStatic,
-    SPageFilePhysicsEvo, SPageFileGraphicsEvo, SPageFileStaticEvo,
-    SMEvoTyreState,
+    SMEvoTyreState, SPageFileGraphics, SPageFileGraphicsEvo, SPageFilePhysics, SPageFilePhysicsEvo,
+    SPageFileStatic, SPageFileStaticEvo,
 };
+use crate::sim_string::SimStringU16;
 
 // ── Classic AC ────────────────────────────────────────────────────────────────
 

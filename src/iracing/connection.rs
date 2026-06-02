@@ -495,7 +495,9 @@ impl IRsdkConnection {
     /// Capture a full telemetry frame. Reads all variables from shared memory in one pass.
     pub fn frame(&self) -> Result<crate::iracing::vars::IracingFrame, crate::error::SimError> {
         if self.get_latest_data_ptr().is_none() {
-            return Err(crate::error::SimError::InvalidHeader("No valid data buffer".into()));
+            return Err(crate::error::SimError::InvalidHeader(
+                "No valid data buffer".into(),
+            ));
         }
         Ok(crate::iracing::vars::IracingFrame::from_connection(self))
     }

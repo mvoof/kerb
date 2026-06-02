@@ -351,7 +351,6 @@ impl Default for SPageFileStatic {
     }
 }
 
-
 // ── Assetto Corsa Evo ─────────────────────────────────────────────────────────
 
 /// Per-tyre state embedded in the AC Evo graphics page.

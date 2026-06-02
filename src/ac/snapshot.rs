@@ -20,12 +20,28 @@ const AC_PHYSICS_VARS: &[(&str, &str, &str)] = &[
     ("wheel_slip", "float[4]", "Wheel slip FL FR RL RR"),
     ("wheel_load", "float[4]", "Wheel load FL FR RL RR"),
     ("wheels_pressure", "float[4]", "Wheel pressure FL FR RL RR"),
-    ("wheel_angular_speed", "float[4]", "Wheel angular speed FL FR RL RR"),
+    (
+        "wheel_angular_speed",
+        "float[4]",
+        "Wheel angular speed FL FR RL RR",
+    ),
     ("tyre_wear", "float[4]", "Tyre wear FL FR RL RR"),
-    ("tyre_dirty_level", "float[4]", "Tyre dirt level FL FR RL RR"),
-    ("tyre_core_temperature", "float[4]", "Tyre core temp FL FR RL RR"),
+    (
+        "tyre_dirty_level",
+        "float[4]",
+        "Tyre dirt level FL FR RL RR",
+    ),
+    (
+        "tyre_core_temperature",
+        "float[4]",
+        "Tyre core temp FL FR RL RR",
+    ),
     ("camber_rad", "float[4]", "Camber angle rad FL FR RL RR"),
-    ("suspension_travel", "float[4]", "Suspension travel FL FR RL RR"),
+    (
+        "suspension_travel",
+        "float[4]",
+        "Suspension travel FL FR RL RR",
+    ),
     ("drs", "float", "DRS flap angle"),
     ("tc", "float", "Traction control level"),
     ("heading", "float", "Heading angle (rad)"),
@@ -45,7 +61,11 @@ const AC_PHYSICS_VARS: &[(&str, &str, &str)] = &[
     ("air_density", "float", "Air density"),
     ("air_temp", "float", "Air temperature"),
     ("road_temp", "float", "Road temperature"),
-    ("local_angular_vel", "float[3]", "Local angular velocity XYZ"),
+    (
+        "local_angular_vel",
+        "float[3]",
+        "Local angular velocity XYZ",
+    ),
     ("final_ff", "float", "Final force feedback"),
     ("performance_meter", "float", "Performance meter"),
     ("engine_brake", "int", "Engine brake level"),
@@ -63,8 +83,16 @@ const AC_PHYSICS_VARS: &[(&str, &str, &str)] = &[
     ("tyre_temp_o", "float[4]", "Tyre outer temp FL FR RL RR"),
     ("is_ai_controlled", "int", "AI control flag"),
     ("tyre_contact_point", "float[12]", "Tyre contact point 4x3"),
-    ("tyre_contact_normal", "float[12]", "Tyre contact normal 4x3"),
-    ("tyre_contact_heading", "float[12]", "Tyre contact heading 4x3"),
+    (
+        "tyre_contact_normal",
+        "float[12]",
+        "Tyre contact normal 4x3",
+    ),
+    (
+        "tyre_contact_heading",
+        "float[12]",
+        "Tyre contact heading 4x3",
+    ),
     ("brake_bias", "float", "Brake balance front/rear"),
     ("local_velocity", "float[3]", "Local velocity XYZ"),
 ];
@@ -90,7 +118,11 @@ const AC_GRAPHICS_VARS: &[(&str, &str, &str)] = &[
     ("number_of_laps", "int", "Total laps in session"),
     ("tyre_compound", "string", "Tyre compound name"),
     ("replay_time_multiplier", "float", "Replay time multiplier"),
-    ("normalized_car_position", "float", "Normalized car position 0.0–1.0"),
+    (
+        "normalized_car_position",
+        "float",
+        "Normalized car position 0.0–1.0",
+    ),
     ("active_cars", "int", "Active cars count"),
     ("car_coordinates", "float[180]", "Car coordinates 60x3"),
     ("car_id", "int[60]", "Car IDs"),
@@ -117,7 +149,11 @@ const AC_GRAPHICS_VARS: &[(&str, &str, &str)] = &[
     ("lights_stage", "int", "Lights stage level"),
     ("exhaust_temperature", "float", "Exhaust temperature"),
     ("wiper_lv", "int", "Wiper level"),
-    ("driver_stint_total_time_left", "int", "Driver stint total time left ms"),
+    (
+        "driver_stint_total_time_left",
+        "int",
+        "Driver stint total time left ms",
+    ),
     ("driver_stint_time_left", "int", "Driver stint time left ms"),
     ("rain_tyres", "int", "Rain tyres equipped flag"),
 ];
@@ -137,14 +173,26 @@ const AC_STATIC_VARS: &[(&str, &str, &str)] = &[
     ("max_power", "float", "Max engine power kW"),
     ("max_rpm", "int", "Max engine RPM"),
     ("max_fuel", "float", "Max fuel capacity liters"),
-    ("suspension_max_travel", "float[4]", "Suspension max travel FL FR RL RR"),
+    (
+        "suspension_max_travel",
+        "float[4]",
+        "Suspension max travel FL FR RL RR",
+    ),
     ("tyre_radius", "float[4]", "Tyre radius FL FR RL RR"),
     ("max_turbo_boost", "float", "Max turbo boost bar"),
     ("penalties_enabled", "int", "Penalties enabled flag"),
     ("aid_fuel_rate", "float", "Fuel consumption aid rate"),
     ("aid_tire_rate", "float", "Tyre wear aid rate"),
-    ("aid_mechanical_damage", "float", "Mechanical damage aid rate"),
-    ("aid_allow_tyre_blankets", "int", "Tyre blankets allowed flag"),
+    (
+        "aid_mechanical_damage",
+        "float",
+        "Mechanical damage aid rate",
+    ),
+    (
+        "aid_allow_tyre_blankets",
+        "int",
+        "Tyre blankets allowed flag",
+    ),
     ("aid_stability", "float", "Stability aid level"),
     ("aid_auto_clutch", "int", "Auto clutch aid flag"),
     ("aid_auto_blip", "int", "Auto blip aid flag"),
@@ -152,10 +200,22 @@ const AC_STATIC_VARS: &[(&str, &str, &str)] = &[
     ("has_ers", "int", "Car has ERS flag"),
     ("has_kers", "int", "Car has KERS flag"),
     ("kers_max_j", "float", "KERS max energy J"),
-    ("engine_brake_settings_count", "int", "Engine brake settings count"),
-    ("ers_power_controller_count", "int", "ERS power controller count"),
+    (
+        "engine_brake_settings_count",
+        "int",
+        "Engine brake settings count",
+    ),
+    (
+        "ers_power_controller_count",
+        "int",
+        "ERS power controller count",
+    ),
     ("track_spline_length", "float", "Track spline length meters"),
-    ("track_configuration", "string", "Track configuration variant"),
+    (
+        "track_configuration",
+        "string",
+        "Track configuration variant",
+    ),
     ("ers_max_j", "float", "ERS max energy J"),
     ("is_timed_race", "int", "Timed race flag"),
     ("has_extra_lap", "int", "Extra lap available flag"),
@@ -167,7 +227,8 @@ const AC_STATIC_VARS: &[(&str, &str, &str)] = &[
 ];
 
 pub fn var_list() -> Vec<VarMeta> {
-    AC_PHYSICS_VARS.iter()
+    AC_PHYSICS_VARS
+        .iter()
         .chain(AC_GRAPHICS_VARS.iter())
         .chain(AC_STATIC_VARS.iter())
         .map(|(name, type_name, desc)| VarMeta {
