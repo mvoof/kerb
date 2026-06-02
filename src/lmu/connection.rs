@@ -18,26 +18,73 @@ const SHM_EXTENDED: &str = "$rFactor2SMMP_Extended$";
 /// # Safety
 /// Caller must ensure `begin_offset` and `end_offset` are valid byte offsets into
 /// the region, and that the region is at least `size_of::<T>()` bytes large.
+/// Read a consistent snapshot of `T` from a shared-memory region into a heap-allocated Box.
+///
+/// Allocating on the heap avoids stack overflow for large structs (e.g. rF2Telemetry
+/// with 128 vehicles). Spins until the seqlock counters match and are even.
+/// Returns `Err` after 100 retries to avoid an infinite loop if the sim hangs.
+/// Read a consistent snapshot of `T` from a shared-memory region into a heap-allocated Box.
+///
+/// Uses the classic seqlock reader pattern:
+///   1. Read `begin` counter
+///   2. Copy region into heap buffer
+///   3. Read `end` counter
+///   4. If begin == end and both even → consistent, return
+///
+/// Allocating on the heap avoids stack overflow for large structs (e.g. rF2Telemetry).
+/// Retries up to 1000 times before giving up.
 unsafe fn read_region_consistent<T: Copy>(
     region: &crate::shm::SharedMemRegion,
     begin_offset: usize,
     end_offset: usize,
-) -> Result<T, crate::error::SimError> {
+) -> Result<Box<T>, crate::error::SimError> {
     let ptr = region.as_ptr();
+
+    // Pre-allocate the destination buffer once outside the retry loop.
+    let layout = std::alloc::Layout::new::<T>();
+    let raw = unsafe { std::alloc::alloc(layout) as *mut T };
+    if raw.is_null() {
+        std::alloc::handle_alloc_error(layout);
+    }
+
     let mut retries = 0u32;
     loop {
-        // read_volatile prevents the compiler from caching the reads across loop iterations.
-        let (begin, data, end) = unsafe {
-            let begin = std::ptr::read_volatile(ptr.add(begin_offset) as *const u32);
-            let data = std::ptr::read_unaligned(ptr as *const T);
-            let end = std::ptr::read_volatile(ptr.add(end_offset) as *const u32);
-            (begin, data, end)
-        };
-        if begin == end && begin % 2 == 0 {
-            return Ok(data);
+        // Step 1: read begin; skip the copy if a write is in progress (begin != end).
+        let begin = unsafe { std::ptr::read_volatile(ptr.add(begin_offset) as *const u32) };
+        let end_pre = unsafe { std::ptr::read_volatile(ptr.add(end_offset) as *const u32) };
+        if begin != end_pre {
+            // Write in progress — spin without copying.
+            retries += 1;
+            if retries > 10_000 {
+                unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
+                return Err(crate::error::SimError::InvalidHeader(
+                    "Torn read timeout in LMU region".into(),
+                ));
+            }
+            std::hint::spin_loop();
+            continue;
         }
+
+        // Step 2: copy the whole region (only when consistent).
+        unsafe {
+            std::ptr::copy_nonoverlapping(
+                ptr,
+                raw as *mut u8,
+                std::mem::size_of::<T>(),
+            )
+        };
+
+        // Step 3: read end after the copy — if it changed, a write snuck in.
+        let end = unsafe { std::ptr::read_volatile(ptr.add(end_offset) as *const u32) };
+
+        // Step 4: consistent if end still matches begin.
+        if begin == end {
+            return Ok(unsafe { Box::from_raw(raw) });
+        }
+
         retries += 1;
-        if retries > 100 {
+        if retries > 10_000 {
+            unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
             return Err(crate::error::SimError::InvalidHeader(
                 "Torn read timeout in LMU region".into(),
             ));
@@ -87,7 +134,7 @@ impl LmuConnection {
                 std::mem::offset_of!(rF2Extended, version_update_end),
             )?;
 
-            let num = (raw_scoring.header.num_vehicles as usize).min(RF2_MAX_VEHICLES);
+            let num = (raw_scoring.scoring_info.num_vehicles as usize).min(RF2_MAX_VEHICLES);
 
             let mut frame = Box::<LmuFrame>::new(LmuFrame::default());
 
@@ -97,7 +144,7 @@ impl LmuConnection {
             }
             frame.num_vehicles = num;
             frame.scoring_info = LmuScoringInfo::from(raw_scoring.scoring_info);
-            frame.extended = LmuExtended::from(raw_extended);
+            frame.extended = LmuExtended::from(*raw_extended);
 
             Ok(frame)
         }
@@ -120,12 +167,34 @@ impl LmuConnection {
         crate::lmu::snapshot::var_list()
     }
 
-    /// Returns `true` when the rF2/LMU plugin is active and a session has started.
-    pub fn is_connected(&self) -> bool {
+    /// Returns `true` when the rF2/LMU shared-memory plugin is loaded and writing data.
+    ///
+    /// Checks that `version_update_begin` is non-zero — the plugin increments this
+    /// seqlock counter on every update, so zero means no data has been written yet.
+    ///
+    /// This is `true` even when the game is in the main menu (no session running).
+    /// Use [`is_session_started`](Self::is_session_started) to check whether a
+    /// driveable session (practice / qualifying / race) is currently active.
+    pub fn is_plugin_active(&self) -> bool {
+        unsafe { std::ptr::read_volatile(self.extended.as_ptr() as *const u32) != 0 }
+    }
+
+    /// Returns `true` when a driveable session has started (practice, qualifying, or race).
+    ///
+    /// Will be `false` while the game is loading or sitting in the main menu even if
+    /// [`is_plugin_active`](Self::is_plugin_active) returns `true`.
+    pub fn is_session_started(&self) -> bool {
         unsafe {
             let ext = std::ptr::read_unaligned(self.extended.as_ptr() as *const rF2Extended);
-            ext.is_plugin_enabled != 0 && ext.session_started != 0
+            ext.session_started != 0
         }
+    }
+
+    /// Returns `true` when the plugin is active **and** a session has started.
+    ///
+    /// Equivalent to `is_plugin_active() && is_session_started()`.
+    pub fn is_connected(&self) -> bool {
+        self.is_plugin_active() && self.is_session_started()
     }
 
     /// Returns the player's vehicle telemetry, if available.

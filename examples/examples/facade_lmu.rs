@@ -11,7 +11,13 @@ fn main() -> Result<(), SimError> {
             Ok(Connection::Lmu(conn)) => {
                 println!("Connected to LMU");
 
-                while conn.is_connected() {
+                while conn.is_plugin_active() {
+                    if !conn.is_session_started() {
+                        print!("\r  Waiting for session...   ");
+                        let _ = io::stdout().flush();
+                        conn.wait_for_data(500);
+                        continue;
+                    }
                     conn.wait_for_data(16);
 
                     let frame = match conn.frame() {

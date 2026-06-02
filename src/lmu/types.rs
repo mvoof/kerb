@@ -608,7 +608,6 @@ impl Default for LmuScoringInfo {
 impl From<rF2ScoringInfo> for LmuScoringInfo {
     fn from(raw: rF2ScoringInfo) -> Self {
         let track_name = raw.track_name;
-        let result_name = raw.result_name;
         let player_name = raw.player_name;
         let plr_file_name = raw.plr_file_name;
         let server_name = raw.server_name;
@@ -619,7 +618,7 @@ impl From<rF2ScoringInfo> for LmuScoringInfo {
             end_et: raw.end_et,
             max_laps: raw.max_laps,
             lap_dist: raw.lap_dist,
-            result_name: SimString::from_bytes(&result_name),
+            result_name: SimString::default(),
             num_vehicles: raw.num_vehicles,
             game_phase: raw.game_phase,
             yellow_flag_state: raw.yellow_flag_state,
@@ -651,47 +650,28 @@ impl From<rF2ScoringInfo> for LmuScoringInfo {
 // ── LmuExtended ───────────────────────────────────────────────────────────────
 
 /// Public mirror of `rF2Extended` — plugin/session metadata.
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct LmuExtended {
     pub version_update_begin: u32,
     pub version_update_end: u32,
-    pub bytes_in_version: i32,
-    pub bytes_in_extended: i32,
-    pub physics_to_graphics_offset: [f32; 3],
-    pub is_plugin_enabled: u8,
-    pub direct_memory_access_enabled: u8,
+    /// Plugin version string (e.g. "3.7.15.1"), ASCII, null-padded.
+    pub version: [u8; 12],
+    /// 1 when the player is in realtime driving (on track).
+    pub in_realtime_fc: u8,
+    /// 1 when a practice/qualifying/race session has started.
     pub session_started: u8,
-    pub phys_avg_thread_time_ms: f64,
 }
 
-impl Default for LmuExtended {
-    fn default() -> Self {
-        Self {
-            version_update_begin: 0,
-            version_update_end: 0,
-            bytes_in_version: 0,
-            bytes_in_extended: 0,
-            physics_to_graphics_offset: [0.0; 3],
-            is_plugin_enabled: 0,
-            direct_memory_access_enabled: 0,
-            session_started: 0,
-            phys_avg_thread_time_ms: 0.0,
-        }
-    }
-}
+
 
 impl From<rF2Extended> for LmuExtended {
     fn from(raw: rF2Extended) -> Self {
         Self {
             version_update_begin: raw.version_update_begin,
             version_update_end: raw.version_update_end,
-            bytes_in_version: raw.bytes_in_version,
-            bytes_in_extended: raw.bytes_in_extended,
-            physics_to_graphics_offset: raw.physics_to_graphics_offset,
-            is_plugin_enabled: raw.is_plugin_enabled,
-            direct_memory_access_enabled: raw.direct_memory_access_enabled,
+            version: raw.version,
+            in_realtime_fc: raw.in_realtime_fc,
             session_started: raw.session_started,
-            phys_avg_thread_time_ms: raw.phys_avg_thread_time_ms,
         }
     }
 }
@@ -751,10 +731,15 @@ impl LmuFrame {
     }
 
     /// Returns a reference to the player's telemetry entry, or `None` if not found.
+    ///
+    /// Searches by `is_player != 0` first; falls back to `control == 0` (local player
+    /// control type) because LMU does not always set the `is_player` flag.
     pub fn player_telemetry(&self) -> Option<&LmuVehicleTelemetry> {
-        let idx = self.vehicles_scoring[..self.num_vehicles]
+        let scoring = &self.vehicles_scoring[..self.num_vehicles];
+        let idx = scoring
             .iter()
-            .position(|v| v.is_player != 0)?;
+            .position(|v| v.is_player != 0)
+            .or_else(|| scoring.iter().position(|v| v.control == 0))?;
         Some(&self.vehicles_telemetry[idx])
     }
 }
