@@ -10,9 +10,17 @@ use serde::ser::Serializer;
 pub struct SimString<const N: usize>(pub(crate) [u8; N]);
 
 impl<const N: usize> SimString<N> {
-    /// Wrap a fixed-size byte array from shared memory.
+    /// Wrap a fixed-size byte array from shared memory (by reference).
     pub fn from_bytes(src: &[u8; N]) -> Self {
         Self(*src)
+    }
+
+    /// Wrap a fixed-size byte array passed by value.
+    ///
+    /// Used when copying fields out of `#[repr(C, packed)]` structs to avoid
+    /// taking an unaligned reference.
+    pub fn from_u8_array(src: [u8; N]) -> Self {
+        Self(src)
     }
 
     /// Decode to an owned `String` (CP-1252, truncated at the first null byte).

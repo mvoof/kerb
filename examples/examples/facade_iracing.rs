@@ -11,7 +11,7 @@ fn main() -> Result<(), SimError> {
             Ok(Connection::IRacing(conn)) => {
                 println!("Connected to iRacing");
 
-                if let Some(session) = conn.session() {
+                if let Some(session) = conn.session_info() {
                     let track = session
                         .get_value("WeekendInfo.TrackDisplayName")
                         .unwrap_or_else(|| "Unknown".into());

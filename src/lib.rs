@@ -15,12 +15,8 @@
 //!     }
 //!     #[cfg(feature = "ac")]
 //!     Connection::Ac(c) => {
-//!         use kerb::ac::connection::AcFrame;
 //!         let frame = c.frame().expect("failed to read frame");
-//!         match &frame {
-//!             AcFrame::Classic(f) => println!("rpm={} gear={}", f.physics.rpms, f.physics.gear),
-//!             AcFrame::Evo(f) => println!("rpm={} gear={}", f.physics.rpms, f.physics.gear),
-//!         }
+//!         println!("rpm={} gear={}", frame.physics.rpms, frame.physics.gear);
 //!     }
 //!     #[cfg(feature = "lmu")]
 //!     Connection::Lmu(c) => {
@@ -53,11 +49,12 @@ compile_error!(
 compile_error!("kerb only supports Windows targets (iRacing/AC/LMU use Windows Shared Memory API)");
 
 pub(crate) mod error;
+pub(crate) mod serializer;
 pub(crate) mod types;
 pub(crate) mod utils;
 
-pub mod connection;
-pub mod sim_string;
+pub(crate) mod connection;
+pub(crate) mod sim_string;
 
 #[cfg(feature = "iracing")]
 pub mod iracing;
@@ -68,17 +65,17 @@ pub mod ac;
 #[cfg(feature = "lmu")]
 pub mod lmu;
 
-#[cfg(any(feature = "ac", feature = "lmu"))]
-pub(crate) mod shm;
+#[doc(hidden)]
+pub mod shm;
 
 pub use connection::{Connection, SimConnection, SimType};
 pub use error::SimError;
 pub use sim_string::{SimString, SimStringU16};
-pub use types::{TelemetryValue, VarMeta, VarType};
+pub use types::{TelemetryValue, VarMeta};
 pub use utils::decode_cp1252;
 
 #[cfg(feature = "iracing")]
 pub use utils::save_session;
 
 #[cfg(any(feature = "iracing", feature = "ac", feature = "lmu"))]
-pub use utils::{HasSnapshot, save_telemetry_snapshot, save_var_list};
+pub use utils::{HasSnapshot, save_telemetry_snapshot, save_var_list_snapshot};

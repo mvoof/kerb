@@ -2,14 +2,12 @@
 //! plugin layout byte-for-byte. Field order and sizes must match the C definitions
 //! in `rF2SharedMemoryPlugin` exactly — do not reorder or add padding.
 
-use kerb_derive::Snapshot;
-
 /// Maximum number of vehicles the shared-memory buffers can hold.
 pub const RF2_MAX_VEHICLES: usize = 128;
 
 /// Per-wheel physics data (suspension, tyre temps, wear, forces, etc.).
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Default, Snapshot)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct rF2Wheel {
     /// Suspension deflection (compression) in metres; positive = compressed.
     pub suspension_deflection: f64,
@@ -74,7 +72,7 @@ pub(crate) struct rF2Wheel {
 /// Per-vehicle telemetry: engine, driver inputs, aerodynamics, wheels, position and orientation.
 /// Only valid for vehicles present in `rF2Telemetry::vehicles[..header.num_vehicles]`.
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct rF2VehicleTelemetry {
     /// Unique vehicle ID — matches `rF2VehicleScoring::id` for the same car.
     pub id: i32,
@@ -241,18 +239,6 @@ pub(crate) struct rF2Telemetry {
     pub header: rF2TelemetryHeader,
     /// Per-vehicle telemetry data; only `vehicles[0..header.num_vehicles]` are valid.
     pub vehicles: [rF2VehicleTelemetry; RF2_MAX_VEHICLES],
-}
-
-impl Default for rF2Telemetry {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-impl Default for rF2VehicleTelemetry {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
 }
 
 /// Per-vehicle scoring data: position, lap times, sector splits, pit state, and flags.
@@ -438,12 +424,6 @@ pub(crate) struct rF2ScoringInfo {
     pub _expansion: [u8; 200],
 }
 
-impl Default for rF2ScoringInfo {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
 /// Header preceding the scoring-info and vehicle-scoring array.
 ///
 /// Actual layout (rF2MappedBufferVersionBlock + rF2MappedBufferHeaderWithSize):
@@ -470,18 +450,6 @@ pub(crate) struct rF2Scoring {
     pub scoring_info: rF2ScoringInfo,
     /// Per-vehicle scoring data; only `vehicles[0..header.num_vehicles]` are valid.
     pub vehicles: [rF2VehicleScoring; RF2_MAX_VEHICLES],
-}
-
-impl Default for rF2Scoring {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-impl Default for rF2VehicleScoring {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
 }
 
 /// Extended plugin/session metadata: plugin status, session started flag.
@@ -527,11 +495,25 @@ pub(crate) struct rF2Extended {
     pub session_started: u8,
 }
 
-impl Default for rF2Extended {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
+macro_rules! zeroed_default {
+    ($($t:ty),*) => {
+        $(impl Default for $t {
+            fn default() -> Self {
+                // SAFETY: all fields are primitive numeric types (integers, floats,
+                // fixed-size arrays of the same). Zero is a valid bit-pattern for all of them.
+                unsafe { std::mem::zeroed() }
+            }
+        })*
+    };
 }
+zeroed_default!(
+    rF2Telemetry,
+    rF2VehicleTelemetry,
+    rF2ScoringInfo,
+    rF2Scoring,
+    rF2VehicleScoring,
+    rF2Extended
+);
 
 impl std::fmt::Debug for rF2Extended {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

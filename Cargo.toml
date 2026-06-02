@@ -16,7 +16,6 @@ ac-evo = ["dep:windows-sys"]
 lmu = ["dep:windows-sys"]
 
 [dependencies]
-kerb-derive = { path = "kerb-derive" }
 encoding_rs = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = { version = "0.9", optional = true }
@@ -30,7 +29,6 @@ windows-sys = { version = "0.61.2", features = [
 members = [
     "tools/codegen",
     "examples",
-    "kerb-derive",
 ]
 resolver = "2"
 

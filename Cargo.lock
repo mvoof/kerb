@@ -288,7 +288,6 @@ version = "0.1.0"
 dependencies = [
  "criterion",
  "encoding_rs",
- "kerb-derive",
  "serde",
  "serde_yaml",
  "windows-sys",
@@ -301,15 +300,6 @@ dependencies = [
  "kerb",
  "serde",
  "toml",
-]
-
-[[package]]
-name = "kerb-derive"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

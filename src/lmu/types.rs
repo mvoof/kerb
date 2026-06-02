@@ -740,4 +740,13 @@ impl LmuFrame {
             .or_else(|| scoring.iter().position(|v| v.control == 0))?;
         Some(&self.vehicles_telemetry[idx])
     }
+
+    /// Returns the index of the player's vehicle scoring entry in `vehicles_scoring`, if available.
+    pub fn player_scoring_idx(&self) -> Option<usize> {
+        let scoring = &self.vehicles_scoring[..self.num_vehicles];
+        scoring
+            .iter()
+            .position(|v| v.is_player != 0)
+            .or_else(|| scoring.iter().position(|v| v.control == 0))
+    }
 }

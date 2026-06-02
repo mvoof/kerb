@@ -47,6 +47,7 @@ impl IRsdkConnection {
 
     /// Open the iRacing shared-memory region and parse the variable header table.
     /// Returns `Err` if the sim is not running or the header is invalid.
+    #[doc(hidden)]
     pub fn connect() -> Result<Self, crate::error::SimError> {
         let shm = crate::shm::SharedMemRegion::open(SHM_MEM_MAP_FILE)
             .map_err(crate::error::SimError::NotConnected)?;
@@ -116,12 +117,6 @@ impl IRsdkConnection {
         }
     }
 
-    /// Returns `true` if the data-valid event handle was opened successfully,
-    /// meaning we can do efficient event-based waiting instead of sleeping.
-    pub fn has_event_sync(&self) -> bool {
-        !self.h_event.is_null()
-    }
-
     /// Block until the sim signals new data, or until `timeout_ms` elapses.
     /// Falls back to a 16 ms sleep if the event handle is unavailable.
     pub fn wait_for_data(&self, timeout_ms: u32) -> bool {
@@ -140,7 +135,7 @@ impl IRsdkConnection {
 
     /// Return the session info update version counter.
     /// This counter increments whenever the session info YAML block changes.
-    pub fn session_info_update(&self) -> i32 {
+    pub(crate) fn session_info_update(&self) -> i32 {
         unsafe {
             let shared_mem = self.shm.as_ptr();
 
@@ -152,38 +147,6 @@ impl IRsdkConnection {
 
             header.session_info_update
         }
-    }
-
-    /// Return a sorted list of `(name, type_string, description)` for every telemetry variable.
-    pub fn list_variables(&self) -> Vec<(String, String, String)> {
-        let mut list = Vec::new();
-        for (name, var) in &self.vars {
-            let type_str = match VarType::from_i32(var.type_) {
-                Some(VarType::Char) => "char",
-                Some(VarType::Bool) => "bool",
-                Some(VarType::Int) => "int",
-                Some(VarType::BitField) => "bitfield",
-                Some(VarType::Float) => "float",
-                Some(VarType::Double) => "double",
-                None => "unknown",
-            };
-
-            let count_str = if var.count > 1 {
-                format!("[{}]", var.count)
-            } else {
-                "".to_string()
-            };
-
-            list.push((
-                name.clone(),
-                format!("{}{}", type_str, count_str),
-                parse_c_str(&var.desc),
-            ));
-        }
-
-        list.sort_by(|a, b| a.0.cmp(&b.0));
-
-        list
     }
 
     // Find the double-buffer with the highest tick count and return a pointer to its data.
@@ -223,6 +186,7 @@ impl IRsdkConnection {
     /// Read a single telemetry variable by name from the latest data buffer.
     /// Uses `read_unaligned` because shared-memory offsets are not guaranteed
     /// to satisfy Rust's alignment requirements.
+    #[doc(hidden)]
     pub fn read_variable(&self, name: &str) -> Option<TelemetryValue> {
         let var = self.vars.get(name)?;
         let data_ptr = self.get_latest_data_ptr()?;
@@ -346,78 +310,6 @@ impl IRsdkConnection {
         map
     }
 
-    /// Convenience: read a single `f32` variable by name.
-    pub fn read_float(&self, name: &str) -> Option<f32> {
-        if let Some(TelemetryValue::Float(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a single `f64` variable by name.
-    pub fn read_double(&self, name: &str) -> Option<f64> {
-        if let Some(TelemetryValue::Double(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a single `i32` variable by name.
-    pub fn read_int(&self, name: &str) -> Option<i32> {
-        if let Some(TelemetryValue::Int(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a single `bool` variable by name.
-    pub fn read_bool(&self, name: &str) -> Option<bool> {
-        if let Some(TelemetryValue::Bool(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<f32>` array variable by name.
-    pub fn read_float_array(&self, name: &str) -> Option<Vec<f32>> {
-        if let Some(TelemetryValue::FloatArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<f64>` array variable by name.
-    pub fn read_double_array(&self, name: &str) -> Option<Vec<f64>> {
-        if let Some(TelemetryValue::DoubleArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<i32>` array variable by name.
-    pub fn read_int_array(&self, name: &str) -> Option<Vec<i32>> {
-        if let Some(TelemetryValue::IntArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<bool>` array variable by name.
-    pub fn read_bool_array(&self, name: &str) -> Option<Vec<bool>> {
-        if let Some(TelemetryValue::BoolArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
     /// Raw YAML session string from iRacing shared memory.
     pub fn session_yaml(&self) -> Option<String> {
         unsafe {
@@ -445,7 +337,7 @@ impl IRsdkConnection {
     }
 
     /// Metadata for every telemetry variable iRacing currently exposes.
-    pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
+    pub fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta> {
         use crate::iracing::types::VarType;
 
         self.vars
@@ -506,7 +398,7 @@ impl IRsdkConnection {
     ///
     /// Automatically caches the parsed representation and only re-parses the large
     /// YAML block if iRacing reports that the session info has changed.
-    pub fn session(&self) -> Option<crate::iracing::session::IracingSession> {
+    pub fn session_info(&self) -> Option<crate::iracing::session::IracingSession> {
         let current_version = self.session_info_update();
 
         if let Some((_, session)) = self

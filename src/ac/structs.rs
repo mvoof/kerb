@@ -1,784 +1,456 @@
-//! `#[repr(C, packed)]` structs that mirror Assetto Corsa's and AC Evo's shared
+//! `#[repr(C, packed)]` structs that mirror Assetto Corsa Evo's shared
 //! memory layouts byte-for-byte. Field order and sizes must match the game
 //! definitions exactly — do not reorder or add padding.
-
-use kerb_derive::Snapshot;
+//!
+//! Source: https://www.assettocorsa.net/forum/index.php?threads/shared-memory-api-documentation.83659/.
+//! https://docs.google.com/document/d/1WzqMLkW2o_C0LGcvdMRelAV31ZIifux0CSHD9k6ddz0/edit?tab=t.0
 
 pub const AC_STATUS_OFF: i32 = 0;
 pub const AC_STATUS_REPLAY: i32 = 1;
 pub const AC_STATUS_LIVE: i32 = 2;
 pub const AC_STATUS_PAUSE: i32 = 3;
 
-// ── Assetto Corsa (classic) ───────────────────────────────────────────────────
+// ── Assetto Corsa Evo ─────────────────────────────────────────────────────────
 
 /// Physics telemetry page — updated every simulation tick.
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
-pub(crate) struct SPageFilePhysics {
-    /// Monotonically increasing counter; increments each physics tick.
-    pub packet_id: i32,
-    /// Throttle pedal position, 0.0 (released) – 1.0 (full).
-    pub gas: f32,
-    /// Brake pedal position, 0.0 (released) – 1.0 (full).
-    pub brake: f32,
-    /// Remaining fuel in litres.
-    pub fuel: f32,
-    /// Current gear: -1 = reverse, 0 = neutral, 1–7 = forward gears.
-    pub gear: i32,
-    /// Engine speed in RPM.
-    pub rpms: i32,
-    /// Steering wheel angle in degrees; positive = right.
-    pub steer_angle: f32,
-    /// Vehicle speed in km/h.
-    pub speed_kmh: f32,
-    /// Velocity vector in world space (x, y, z), m/s.
-    pub velocity: [f32; 3],
-    /// Lateral, vertical, and longitudinal G-forces (x, y, z).
-    pub acc_g: [f32; 3],
-    /// Wheel slip ratio per tyre: [FL, FR, RL, RR].
-    pub wheel_slip: [f32; 4],
-    /// Vertical load per tyre in Newtons: [FL, FR, RL, RR].
-    pub wheel_load: [f32; 4],
-    /// Tyre pressure in PSI per tyre: [FL, FR, RL, RR].
-    pub wheels_pressure: [f32; 4],
-    /// Angular velocity of each wheel in rad/s: [FL, FR, RL, RR].
-    pub wheel_angular_speed: [f32; 4],
-    /// Tyre wear level 0.0–1.0 per tyre: [FL, FR, RL, RR].
-    pub tyre_wear: [f32; 4],
-    /// Tyre dirt contamination level 0.0–1.0 per tyre: [FL, FR, RL, RR].
-    pub tyre_dirty_level: [f32; 4],
-    /// Tyre core temperature in °C per tyre: [FL, FR, RL, RR].
-    pub tyre_core_temperature: [f32; 4],
-    /// Camber angle in radians per tyre: [FL, FR, RL, RR]. Negative = leaning in.
-    pub camber_rad: [f32; 4],
-    /// Suspension travel in metres per corner: [FL, FR, RL, RR].
-    pub suspension_travel: [f32; 4],
-    /// DRS state: 1.0 = open, 0.0 = closed.
-    pub drs: f32,
-    /// Traction-control intervention level, 0.0–1.0.
-    pub tc: f32,
-    /// Car heading in radians relative to north; range −π to π.
-    pub heading: f32,
-    /// Pitch angle in radians; positive = nose up.
-    pub pitch: f32,
-    /// Roll angle in radians; positive = right side down.
-    pub roll: f32,
-    /// Centre-of-gravity height above ground in metres.
-    pub cg_height: f32,
-    /// Damage levels for [front, rear, left, right, centre], 0.0–1.0.
-    pub car_damage: [f32; 5],
-    /// Number of wheels currently off the track surface.
-    pub number_of_tyres_out: i32,
-    /// 1 when pit-lane speed limiter is active, 0 otherwise.
-    pub pit_limiter_on: i32,
-    /// ABS intervention level, 0.0–1.0.
-    pub abs: f32,
-    /// KERS battery charge level, 0.0–1.0.
-    pub kers_charge: f32,
-    /// KERS deployment input, 0.0–1.0.
-    pub kers_input: f32,
-    /// 1 when auto-shifter is active, 0 otherwise.
-    pub auto_shifter_on: i32,
-    /// Front and rear ride heights in metres: [front, rear].
-    pub ride_height: [f32; 2],
-    /// Turbocharger boost pressure in bar above atmospheric.
-    pub turbo_boost: f32,
-    /// Ballast mass added to the car in kg.
-    pub ballast: f32,
-    /// Ambient air density in kg/m³.
-    pub air_density: f32,
-    /// Ambient air temperature in °C.
-    pub air_temp: f32,
-    /// Track surface temperature in °C.
-    pub road_temp: f32,
-    /// Local angular velocity vector (x, y, z) in rad/s.
-    pub local_angular_vel: [f32; 3],
-    /// Final force-feedback torque output, Nm.
-    pub final_ff: f32,
-    /// Performance delta relative to best lap; negative = faster.
-    pub performance_meter: f32,
-    /// Engine brake setting index (sim-defined range).
-    pub engine_brake: i32,
-    /// ERS recovery level setting (0 = off, higher = more recovery).
-    pub ers_recovery_level: i32,
-    /// ERS power deployment level (0 = off, higher = more deployment).
-    pub ers_power_level: i32,
-    /// 1 when ERS is in heat-charging mode, 0 otherwise.
-    pub ers_heat_charging: i32,
-    /// 1 when ERS is actively charging, 0 otherwise.
-    pub ers_is_charging: i32,
-    /// Current KERS energy stored in kJ.
-    pub kers_current_kj: f32,
-    /// 1 when DRS is available (zone + activation conditions met), 0 otherwise.
-    pub drs_available: i32,
-    /// 1 when DRS is currently open, 0 otherwise.
-    pub drs_enabled: i32,
-    /// Brake disc temperature in °C per corner: [FL, FR, RL, RR].
-    pub brake_temp: [f32; 4],
-    /// Clutch pedal position, 0.0 (disengaged) – 1.0 (engaged).
-    pub clutch: f32,
-    /// Tyre inner surface temperature in °C: [FL, FR, RL, RR].
-    pub tyre_temp_i: [f32; 4],
-    /// Tyre middle surface temperature in °C: [FL, FR, RL, RR].
-    pub tyre_temp_m: [f32; 4],
-    /// Tyre outer surface temperature in °C: [FL, FR, RL, RR].
-    pub tyre_temp_o: [f32; 4],
-    /// 1 when the car is driven by the AI, 0 for human player.
-    pub is_ai_controlled: i32,
-    /// World-space contact point of each tyre (x, y, z) in metres: [FL, FR, RL, RR].
-    pub tyre_contact_point: [[f32; 3]; 4],
-    /// Surface normal at each tyre contact point (unit vector): [FL, FR, RL, RR].
-    pub tyre_contact_normal: [[f32; 3]; 4],
-    /// Heading vector at each tyre contact point (unit vector): [FL, FR, RL, RR].
-    pub tyre_contact_heading: [[f32; 3]; 4],
-    /// Brake bias as a fraction of total braking applied to front axle, 0.0–1.0.
-    pub brake_bias: f32,
-    /// Velocity in the car's local coordinate frame (x, y, z), m/s.
-    pub local_velocity: [f32; 3],
-}
-
-/// Graphics/HUD page — updated each rendered frame.
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
-pub(crate) struct SPageFileGraphics {
-    /// Monotonically increasing counter; increments each graphics frame.
-    pub packet_id: i32,
-    /// Session status: 0 = off, 1 = replay, 2 = live, 3 = paused. Use `AC_STATUS_*` constants.
-    pub status: i32,
-    /// Session type index: 0 = practice, 1 = qualify, 2 = race.
-    pub session: i32,
-    /// Current lap time as a UTF-16 string (mm:ss.mmm), null-terminated, max 15 chars.
-    pub current_time: [u16; 15],
-    /// Last completed lap time as a UTF-16 string (mm:ss.mmm), null-terminated.
-    pub last_time: [u16; 15],
-    /// Session best lap time as a UTF-16 string (mm:ss.mmm), null-terminated.
-    pub best_time: [u16; 15],
-    /// Current sector split time as a UTF-16 string, null-terminated.
-    pub split: [u16; 15],
-    /// Number of completed laps.
-    pub completed_laps: i32,
-    /// Current race position (1 = leader).
-    pub position: i32,
-    /// Current lap time in milliseconds.
-    pub i_current_time: i32,
-    /// Last completed lap time in milliseconds.
-    pub i_last_time: i32,
-    /// Session best lap time in milliseconds.
-    pub i_best_time: i32,
-    /// Remaining session time in seconds; -1 if laps-based race.
-    pub session_time_left: f32,
-    /// Total distance travelled this session in metres.
-    pub distance_traveled: f32,
-    /// 1 when the car is inside the pit box, 0 otherwise.
-    pub is_in_pit: i32,
-    /// Index of the current track sector (0-based).
-    pub current_sector_index: i32,
-    /// Last sector time in milliseconds.
-    pub last_sector_time: i32,
-    /// Total number of laps in the race; -1 for timed races.
-    pub number_of_laps: i32,
-    /// Active tyre compound name as UTF-16, null-terminated, max 33 chars.
-    pub tyre_compound: [u16; 33],
-    /// Replay playback speed multiplier (1.0 = normal).
-    pub replay_time_multiplier: f32,
-    /// Car position on track spline, 0.0 (start) – 1.0 (finish line).
-    pub normalized_car_position: f32,
-    /// Number of cars currently active on track.
-    pub active_cars: i32,
-    /// World-space coordinates (x, y, z) for up to 60 cars.
-    pub car_coordinates: [[f32; 3]; 60],
-    /// Sim-internal IDs for up to 60 cars (maps to `player_car_id`).
-    pub car_id: [i32; 60],
-    /// Sim-internal ID of the player's car (matches an entry in `car_id`).
-    pub player_car_id: i32,
-    /// Drive-through or stop-go penalty time remaining in seconds.
-    pub penalty_time: f32,
-    /// Current flag being shown: 0 = none, 1 = blue, 2 = yellow, 3 = black, etc.
-    pub flag: i32,
-    /// Active penalty type index (sim-defined enumeration).
-    pub penalty: i32,
-    /// 1 when the ideal-line driving aid is enabled, 0 otherwise.
-    pub ideal_line_on: i32,
-    /// 1 when the car is in the pit lane (not necessarily in the pit box), 0 otherwise.
-    pub is_in_pit_lane: i32,
-    /// Track surface grip coefficient, 0.0–1.0.
-    pub surface_grip: f32,
-    /// 1 when the mandatory pit stop has been served, 0 otherwise.
-    pub mandatory_pit_done: i32,
-    /// Wind speed in m/s.
-    pub wind_speed: f32,
-    /// Wind direction in radians relative to north.
-    pub wind_direction: f32,
-    /// 1 when the setup menu is currently visible, 0 otherwise.
-    pub is_setup_menu_visible: i32,
-    /// Index of the currently active main MFD page.
-    pub main_display_index: i32,
-    /// Index of the currently active secondary MFD page.
-    pub secondary_display_index: i32,
-    /// Active TC level setting (sim-defined integer).
-    pub tc: i32,
-    /// Active TC cut level setting (sim-defined integer).
-    pub tc_cut: i32,
-    /// Engine map setting index.
-    pub engine_map: i32,
-    /// Active ABS level setting (sim-defined integer).
-    pub abs: i32,
-    /// Estimated fuel consumption per lap in litres.
-    pub fuel_xlap: f32,
-    /// 1 when rain lights are on, 0 otherwise.
-    pub rain_lights: i32,
-    /// 1 when hazard/flashing lights are active, 0 otherwise.
-    pub flashing_lights: i32,
-    /// Headlight state index: 0 = off, higher = on/high-beam.
-    pub lights_stage: i32,
-    /// Exhaust gas temperature in °C.
-    pub exhaust_temperature: f32,
-    /// Windscreen wiper level (0 = off, higher = faster).
-    pub wiper_lv: i32,
-    /// Total driver stint time remaining in seconds (championship rules).
-    pub driver_stint_total_time_left: i32,
-    /// Current stint time remaining in seconds.
-    pub driver_stint_time_left: i32,
-    /// 1 when rain tyres are fitted, 0 for slicks.
-    pub rain_tyres: i32,
-}
-
-/// Static data page — written once when a session loads; does not update during the session.
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
-pub(crate) struct SPageFileStatic {
-    /// Shared-memory plugin version as UTF-16, null-terminated.
-    pub sm_version: [u16; 15],
-    /// Assetto Corsa game version as UTF-16, null-terminated.
-    pub ac_version: [u16; 15],
-    /// Total number of sessions in the event (practice + qualify + race, etc.).
-    pub number_of_sessions: i32,
-    /// Number of cars in the race.
-    pub num_cars: i32,
-    /// Player's car model identifier as UTF-16, null-terminated (e.g. "ferrari_458").
-    pub car_model: [u16; 33],
-    /// Track identifier as UTF-16, null-terminated (e.g. "monza").
-    pub track: [u16; 33],
-    /// Player's first name as UTF-16, null-terminated.
-    pub player_name: [u16; 33],
-    /// Player's surname as UTF-16, null-terminated.
-    pub player_surname: [u16; 33],
-    /// Player's nickname/tag as UTF-16, null-terminated.
-    pub player_nick: [u16; 33],
-    /// Number of track sectors.
-    pub sector_count: i32,
-    /// Maximum engine torque in Nm.
-    pub max_torque: f32,
-    /// Maximum engine power in W.
-    pub max_power: f32,
-    /// Rev limiter RPM.
-    pub max_rpm: i32,
-    /// Fuel tank capacity in litres.
-    pub max_fuel: f32,
-    /// Maximum suspension travel per corner in metres: [FL, FR, RL, RR].
-    pub suspension_max_travel: [f32; 4],
-    /// Tyre radius per corner in metres: [FL, FR, RL, RR].
-    pub tyre_radius: [f32; 4],
-    /// Maximum turbo boost pressure in bar.
-    pub max_turbo_boost: f32,
-    #[doc(hidden)]
-    pub _deprecated_1: f32,
-    #[doc(hidden)]
-    pub _deprecated_2: f32,
-    /// 1 when track penalties (cut penalties, etc.) are enforced, 0 otherwise.
-    pub penalties_enabled: i32,
-    /// Fuel-consumption aid multiplier (1.0 = realistic, lower = reduced consumption).
-    pub aid_fuel_rate: f32,
-    /// Tyre-wear aid multiplier (1.0 = realistic, lower = reduced wear).
-    pub aid_tire_rate: f32,
-    /// Mechanical-damage aid multiplier (1.0 = realistic, 0.0 = no damage).
-    pub aid_mechanical_damage: f32,
-    /// 1 when tyre blankets (pre-heat) are allowed, 0 otherwise.
-    pub aid_allow_tyre_blankets: i32,
-    /// Stability-control aid level, 0.0 (off) – 1.0 (maximum).
-    pub aid_stability: f32,
-    /// 1 when auto-clutch aid is enabled, 0 otherwise.
-    pub aid_auto_clutch: i32,
-    /// 1 when auto-blip (throttle on downshift) aid is enabled, 0 otherwise.
-    pub aid_auto_blip: i32,
-    /// 1 when the car has DRS capability, 0 otherwise.
-    pub has_drs: i32,
-    /// 1 when the car has ERS (Energy Recovery System), 0 otherwise.
-    pub has_ers: i32,
-    /// 1 when the car has KERS, 0 otherwise.
-    pub has_kers: i32,
-    /// Maximum KERS energy capacity in J.
-    pub kers_max_j: f32,
-    /// Number of available engine-brake settings.
-    pub engine_brake_settings_count: i32,
-    /// Number of available ERS power-controller modes.
-    pub ers_power_controller_count: i32,
-    /// Length of the track spline in metres (used to normalise car position).
-    pub track_spline_length: f32,
-    /// Track layout/configuration variant as UTF-16, null-terminated.
-    pub track_configuration: [u16; 33],
-    /// Maximum ERS energy capacity in J.
-    pub ers_max_j: f32,
-    /// 1 when the race is timed (rather than lap-based), 0 otherwise.
-    pub is_timed_race: i32,
-    /// 1 when an extra lap is added after time expires (Indianapolis-style), 0 otherwise.
-    pub has_extra_lap: i32,
-    /// Player's car livery/skin name as UTF-16, null-terminated.
-    pub car_skin: [u16; 33],
-    /// Number of grid positions reversed at the start.
-    pub reversed_grid_positions: i32,
-    /// Lap number at which the pit window opens (-1 = no window).
-    pub pit_window_start: i32,
-    /// Lap number at which the pit window closes (-1 = no window).
-    pub pit_window_end: i32,
-    /// 1 when this is an online (multiplayer) session, 0 for offline.
-    pub is_online: i32,
-}
-
-impl Default for SPageFilePhysics {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-impl Default for SPageFileGraphics {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-impl Default for SPageFileStatic {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-// ── Assetto Corsa Evo ─────────────────────────────────────────────────────────
-
-/// Per-tyre state embedded in the AC Evo graphics page.
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
-pub(crate) struct SMEvoTyreState {
-    /// Tyre compound symbol as UTF-16, null-terminated (e.g. "S", "M", "H").
-    pub tyre_compound_symbol: [u16; 33],
-    /// Full tyre compound name as UTF-16, null-terminated (e.g. "Pirelli Soft").
-    pub tyre_compound_name: [u16; 50],
-    /// Short tyre compound abbreviation as UTF-16, null-terminated.
-    pub tyre_compound_short: [u16; 5],
-    /// Tyre compound colour name as UTF-16, null-terminated (e.g. "Red").
-    pub tyre_compound_color: [u16; 10],
-    /// 1 when a wet-weather tyre compound is fitted, 0 for slicks.
-    pub is_wet_tyre: i32,
-    /// Tyre surface temperatures at [inner, middle, outer] positions in °C.
-    pub tyre_surface_temp: [f32; 3],
-    /// Tyre inner-liner temperatures at [inner, middle, outer] positions in °C.
-    pub tyre_inner_temp: [f32; 3],
-    /// Tyre core (carcass) temperature in °C.
-    pub tyre_core_temp: f32,
-    /// Tyre inflation pressure in PSI.
-    pub tyre_pressure: f32,
-    /// Longitudinal slip ratio (dimensionless).
-    pub tyre_slip_ratio: f32,
-    /// Lateral slip angle in radians.
-    pub tyre_slip_angle: f32,
-    /// Normalised combined slip (0.0 = no slip, 1.0+ = losing grip).
-    pub tyre_nd_slip: f32,
-    /// Vertical tyre load in Newtons.
-    pub tyre_load: f32,
-    /// Tyre dirt contamination level, 0.0 (clean) – 1.0 (fully dirty).
-    pub tyre_dirt_level: f32,
-    /// Tyre wear level, 0.0 (new) – 1.0 (fully worn).
-    pub tyre_wear: f32,
-    /// Wheel angular velocity in rad/s.
-    pub tyre_angular_speed: f32,
-    /// Suspension travel in metres.
-    pub suspension_travel: f32,
-    /// Camber angle in radians; negative = leaning inward.
-    pub camber: f32,
-    /// Wheel rim temperature in °C.
-    pub rim_temp: f32,
-    /// Brake disc temperature in °C.
-    pub brake_disc_temp: f32,
-    /// Brake disc wear level, 0.0 (new) – 1.0 (fully worn).
-    pub brake_disc_wear: f32,
-    /// Brake caliper temperature in °C.
-    pub brake_temp: f32,
-}
-
-impl Default for SMEvoTyreState {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-/// Physics page for AC Evo — superset of classic AC physics.
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct SPageFilePhysicsEvo {
-    /// Monotonically increasing counter; increments each physics tick.
     pub packet_id: i32,
-    /// Throttle pedal position, 0.0 (released) – 1.0 (full).
     pub gas: f32,
-    /// Brake pedal position, 0.0 (released) – 1.0 (full).
     pub brake: f32,
-    /// Remaining fuel in litres.
     pub fuel: f32,
-    /// Current gear: -1 = reverse, 0 = neutral, 1–7 = forward gears.
     pub gear: i32,
-    /// Engine speed in RPM.
     pub rpms: i32,
-    /// Steering wheel angle in degrees; positive = right.
     pub steer_angle: f32,
-    /// Vehicle speed in km/h.
     pub speed_kmh: f32,
-    /// Velocity vector in world space (x, y, z), m/s.
     pub velocity: [f32; 3],
-    /// Lateral, vertical, and longitudinal G-forces (x, y, z).
     pub acc_g: [f32; 3],
-    /// Wheel slip ratio per tyre: [FL, FR, RL, RR].
     pub wheel_slip: [f32; 4],
-    /// Vertical load per tyre in Newtons: [FL, FR, RL, RR].
     pub wheel_load: [f32; 4],
-    /// Tyre pressure in PSI per tyre: [FL, FR, RL, RR].
     pub wheels_pressure: [f32; 4],
-    /// Angular velocity of each wheel in rad/s: [FL, FR, RL, RR].
     pub wheel_angular_speed: [f32; 4],
-    /// Tyre wear level 0.0–1.0 per tyre: [FL, FR, RL, RR].
     pub tyre_wear: [f32; 4],
-    /// Tyre dirt contamination level 0.0–1.0 per tyre: [FL, FR, RL, RR].
     pub tyre_dirty_level: [f32; 4],
-    /// Tyre core temperature in °C per tyre: [FL, FR, RL, RR].
     pub tyre_core_temperature: [f32; 4],
-    /// Camber angle in radians per tyre: [FL, FR, RL, RR]. Negative = leaning in.
     pub camber_rad: [f32; 4],
-    /// Suspension travel in metres per corner: [FL, FR, RL, RR].
     pub suspension_travel: [f32; 4],
-    /// DRS state: 1.0 = open, 0.0 = closed.
     pub drs: f32,
-    /// Traction-control intervention level, 0.0–1.0.
     pub tc: f32,
-    /// Car heading in radians relative to north; range −π to π.
     pub heading: f32,
-    /// Pitch angle in radians; positive = nose up.
     pub pitch: f32,
-    /// Roll angle in radians; positive = right side down.
     pub roll: f32,
-    /// Centre-of-gravity height above ground in metres.
     pub cg_height: f32,
-    /// Damage levels for [front, rear, left, right, centre], 0.0–1.0.
     pub car_damage: [f32; 5],
-    /// Number of wheels currently off the track surface.
     pub number_of_tyres_out: i32,
-    /// 1 when pit-lane speed limiter is active, 0 otherwise.
     pub pit_limiter_on: i32,
-    /// ABS intervention level, 0.0–1.0.
     pub abs: f32,
-    /// 1 when auto-shifter is active, 0 otherwise.
+    pub kers_charge: f32,
+    pub kers_input: f32,
     pub auto_shifter_on: i32,
-    /// Front and rear ride heights in metres: [front, rear].
     pub ride_height: [f32; 2],
-    /// Turbocharger boost pressure in bar above atmospheric.
     pub turbo_boost: f32,
-    /// Ballast mass added to the car in kg.
     pub ballast: f32,
-    /// Ambient air density in kg/m³.
     pub air_density: f32,
-    /// Ambient air temperature in °C.
     pub air_temp: f32,
-    /// Track surface temperature in °C.
     pub road_temp: f32,
-    /// Local angular velocity vector (x, y, z) in rad/s.
     pub local_angular_vel: [f32; 3],
-    /// Final force-feedback torque output, Nm.
     pub final_ff: f32,
-    /// Engine brake setting index (sim-defined range).
+    pub performance_meter: f32,
     pub engine_brake: i32,
-    /// Brake disc temperature in °C per corner: [FL, FR, RL, RR].
+    pub ers_recovery_level: i32,
+    pub ers_power_level: i32,
+    pub ers_heat_charging: i32,
+    pub ers_is_charging: i32,
+    pub kers_current_kj: f32,
+    pub drs_available: i32,
+    pub drs_enabled: i32,
     pub brake_temp: [f32; 4],
-    /// Clutch pedal position, 0.0 (disengaged) – 1.0 (engaged).
     pub clutch: f32,
-    /// Tyre inner surface temperature in °C: [FL, FR, RL, RR].
     pub tyre_temp_i: [f32; 4],
-    /// Tyre middle surface temperature in °C: [FL, FR, RL, RR].
     pub tyre_temp_m: [f32; 4],
-    /// Tyre outer surface temperature in °C: [FL, FR, RL, RR].
     pub tyre_temp_o: [f32; 4],
-    /// 1 when the car is driven by the AI, 0 for human player.
     pub is_ai_controlled: i32,
-    /// Brake bias as a fraction of total braking applied to front axle, 0.0–1.0.
+    pub tyre_contact_point: [[f32; 3]; 4],
+    pub tyre_contact_normal: [[f32; 3]; 4],
+    pub tyre_contact_heading: [[f32; 3]; 4],
     pub brake_bias: f32,
-    /// Velocity in the car's local coordinate frame (x, y, z), m/s.
     pub local_velocity: [f32; 3],
-    /// Front brake compound index: 0 = default/soft, higher = harder compounds.
+    pub p2p_activations: i32,
+    pub p2p_status: i32,
+    pub current_max_rpm: i32,
+    pub mz: [f32; 4],
+    pub fx: [f32; 4],
+    pub fy: [f32; 4],
+    pub slip_ratio: [f32; 4],
+    pub slip_angle: [f32; 4],
+    pub tcin_action: i32,
+    pub abs_in_action: i32,
+    pub suspension_damage: [f32; 4],
+    pub tyre_temp: [f32; 4],
+    pub water_temp: f32,
+    pub brake_torque: [f32; 4],
     pub front_brake_compound: i32,
-    /// Rear brake compound index: 0 = default/soft, higher = harder compounds.
     pub rear_brake_compound: i32,
-    /// Brake pad remaining life per corner, 0.0 (gone) – 1.0 (new): [FL, FR, RL, RR].
     pub pad_life: [f32; 4],
-    /// Brake disc remaining life per corner, 0.0 (gone) – 1.0 (new): [FL, FR, RL, RR].
     pub disc_life: [f32; 4],
-    /// 1 when the ignition switch is on, 0 otherwise.
     pub ignition_on: i32,
-    /// 1 when the starter motor is engaged, 0 otherwise.
     pub starter_engine_on: i32,
-    /// 1 when the engine is running, 0 when stalled or off.
     pub is_engine_running: i32,
-    /// Force-feedback vibration component from kerb impacts, 0.0–1.0.
     pub kerb_vibration: f32,
-    /// Force-feedback vibration component from tyre slip, 0.0–1.0.
     pub slip_vibrations: f32,
-    /// Force-feedback vibration component from G-forces, 0.0–1.0.
-    pub g_vibrations: f32,
-    /// Force-feedback vibration component from ABS pulses, 0.0–1.0.
+    pub road_vibrations: f32,
     pub abs_vibrations: f32,
 }
 
-/// Graphics/HUD page for AC Evo — superset of classic AC graphics.
+/// Per-tyre state. Fixed size: 256 bytes.
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoTyreState {
+    pub slip: f32,
+    pub lock: bool,
+    pub tyre_pressure: f32,
+    pub tyre_temperature_c: f32,
+    pub brake_temperature_c: f32,
+    pub brake_pressure: f32,
+    pub tyre_temperature_left: f32,
+    pub tyre_temperature_center: f32,
+    pub tyre_temperature_right: f32,
+    pub tyre_compound_front: [u8; 33],
+    pub tyre_compound_rear: [u8; 33],
+    pub tyre_normalized_pressure: f32,
+    pub tyre_normalized_temperature_left: f32,
+    pub tyre_normalized_temperature_center: f32,
+    pub tyre_normalized_temperature_right: f32,
+    pub brake_normalized_temperature: f32,
+    pub tyre_normalized_temperature_core: f32,
+    pub _pad: [u8; 133],
+}
+
+/// Structural damage per body zone. Fixed size: 128 bytes.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoDamageState {
+    pub damage_front: f32,
+    pub damage_rear: f32,
+    pub damage_left: f32,
+    pub damage_right: f32,
+    pub damage_center: f32,
+    pub damage_suspension_lf: f32,
+    pub damage_suspension_rf: f32,
+    pub damage_suspension_lr: f32,
+    pub damage_suspension_rr: f32,
+    pub _pad: [u8; 92],
+}
+
+/// Pit-stop service action states. Fixed size: 64 bytes.
+/// Values: -1 = will not perform, 0 = completed, 1 = in progress.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoPitInfo {
+    pub damage: i8,
+    pub fuel: i8,
+    pub tyres_lf: i8,
+    pub tyres_rf: i8,
+    pub tyres_lr: i8,
+    pub tyres_rr: i8,
+    pub _pad: [u8; 58],
+}
+
+/// Driver-adjustable electronic aid settings. Fixed size: 128 bytes.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoElectronics {
+    pub tc_level: i8,
+    pub tc_cut_level: i8,
+    pub abs_level: i8,
+    pub esc_level: i8,
+    pub ebb_level: i8,
+    pub brake_bias: f32,
+    pub engine_map_level: i8,
+    pub turbo_level: f32,
+    pub ers_deployment_map: i8,
+    pub ers_recharge_map: f32,
+    pub is_ers_heat_charging_on: bool,
+    pub is_ers_overtake_mode_on: bool,
+    pub is_drs_open: bool,
+    pub diff_power_level: i8,
+    pub diff_coast_level: i8,
+    pub front_bump_damper_level: i8,
+    pub front_rebound_damper_level: i8,
+    pub rear_bump_damper_level: i8,
+    pub rear_rebound_damper_level: i8,
+    pub is_ignition_on: bool,
+    pub is_pitlimiter_on: bool,
+    pub active_performance_mode: i8,
+    pub _pad: [u8; 97],
+}
+
+/// Cockpit lights, display, and wiper states. Fixed size: 128 bytes.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoInstrumentation {
+    pub main_light_stage: i8,
+    pub special_light_stage: i8,
+    pub cockpit_light_stage: i8,
+    pub wiper_level: i8,
+    pub rain_lights: bool,
+    pub direction_light_left: bool,
+    pub direction_light_right: bool,
+    pub flashing_lights: bool,
+    pub warning_lights: bool,
+    pub selected_display_index: i8,
+    pub display_current_page_index: [i8; 16],
+    pub are_headlights_visible: bool,
+    pub _pad: [u8; 101],
+}
+
+/// Session lifecycle and countdown. Fixed size: 256 bytes.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoSessionState {
+    pub phase_name: [u8; 33],
+    pub time_left: [u8; 15],
+    pub time_left_ms: i32,
+    pub wait_time: [u8; 15],
+    pub total_lap: i32,
+    pub current_lap: i32,
+    pub lights_on: i32,
+    pub lights_mode: i32,
+    pub lap_length_km: f32,
+    pub end_session_flag: i32,
+    pub time_to_next_session: [u8; 15],
+    pub disconnected_from_server: bool,
+    pub restart_season_enabled: bool,
+    pub ui_enable_drive: bool,
+    pub ui_enable_setup: bool,
+    pub is_ready_to_next_blinking: bool,
+    pub show_waiting_for_players: bool,
+    pub _pad: [u8; 144],
+}
+
+/// HUD lap timing and delta display. Fixed size: 256 bytes.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoTimingState {
+    pub current_laptime: [u8; 15],
+    pub delta_current: [u8; 15],
+    pub delta_current_p: i32,
+    pub last_laptime: [u8; 15],
+    pub delta_last: [u8; 15],
+    pub delta_last_p: i32,
+    pub best_laptime: [u8; 15],
+    pub ideal_laptime: [u8; 15],
+    pub total_time: [u8; 15],
+    pub is_invalid: bool,
+    pub _pad: [u8; 142],
+}
+
+/// Active driver-assist levels. Fixed size: 64 bytes.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SMEvoAssistsState {
+    pub auto_gear: u8,
+    pub auto_blip: u8,
+    pub auto_clutch: u8,
+    pub auto_clutch_on_start: u8,
+    pub manual_ignition_e_start: u8,
+    pub auto_pit_limiter: u8,
+    pub standing_start_assist: u8,
+    pub auto_steer: f32,
+    pub arcade_stability_control: f32,
+    pub _pad: [u8; 49],
+}
+
+/// Graphics/HUD page for AC Evo. Updated each rendered frame.
+///
+/// Layout: ACE_SharedFileOut_Documentation_v1.md (changelog 2026-04-01).
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct SPageFileGraphicsEvo {
-    /// Monotonically increasing counter; increments each graphics frame.
     pub packet_id: i32,
-    /// Session status: 0 = off, 1 = replay, 2 = live, 3 = paused. Use `AC_STATUS_*` constants.
     pub status: i32,
-    /// Session type index: 0 = practice, 1 = qualify, 2 = race.
-    pub session: i32,
-    /// Current lap time as a UTF-16 string (mm:ss.mmm), null-terminated, max 15 chars.
-    pub current_time: [u16; 15],
-    /// Last completed lap time as a UTF-16 string (mm:ss.mmm), null-terminated.
-    pub last_time: [u16; 15],
-    /// Session best lap time as a UTF-16 string (mm:ss.mmm), null-terminated.
-    pub best_time: [u16; 15],
-    /// Current sector split time as a UTF-16 string, null-terminated.
-    pub split: [u16; 15],
-    /// Number of completed laps.
-    pub completed_laps: i32,
-    /// Current race position (1 = leader).
-    pub position: i32,
-    /// Current lap time in milliseconds.
-    pub i_current_time: i32,
-    /// Last completed lap time in milliseconds.
-    pub i_last_time: i32,
-    /// Session best lap time in milliseconds.
-    pub i_best_time: i32,
-    /// Remaining session time in seconds; -1 if laps-based race.
-    pub session_time_left: f32,
-    /// Total distance travelled this session in metres.
-    pub distance_traveled: f32,
-    /// 1 when the car is inside the pit box, 0 otherwise.
-    pub is_in_pit: i32,
-    /// Index of the current track sector (0-based).
-    pub current_sector_index: i32,
-    /// Last sector time in milliseconds.
-    pub last_sector_time: i32,
-    /// Total number of laps in the race; -1 for timed races.
-    pub number_of_laps: i32,
-    /// Active tyre compound name as UTF-16, null-terminated, max 33 chars.
-    pub tyre_compound: [u16; 33],
-    /// Car position on track spline, 0.0 (start) – 1.0 (finish line).
-    pub normalized_car_position: f32,
-    /// Number of cars currently active on track.
-    pub active_cars: i32,
-    /// World-space coordinates (x, y, z) for up to 60 cars.
-    pub car_coordinates: [[f32; 3]; 60],
-    /// Sim-internal IDs for up to 60 cars (maps to `player_car_id`).
-    pub car_id: [i32; 60],
-    /// Sim-internal ID of the player's car (matches an entry in `car_id`).
-    pub player_car_id: i32,
-    /// Drive-through or stop-go penalty time remaining in seconds.
-    pub penalty_time: f32,
-    /// Current flag being shown: 0 = none, 1 = blue, 2 = yellow, 3 = black, etc.
+    pub focused_car_id_a: u64,
+    pub focused_car_id_b: u64,
+    pub player_car_id_a: u64,
+    pub player_car_id_b: u64,
+    pub rpm: u16,
+    pub is_rpm_limiter_on: bool,
+    pub is_change_up_rpm: bool,
+    pub is_change_down_rpm: bool,
+    pub tc_active: bool,
+    pub abs_active: bool,
+    pub esc_active: bool,
+    pub launch_active: bool,
+    pub is_ignition_on: bool,
+    pub is_engine_running: bool,
+    pub kers_is_charging: bool,
+    pub is_wrong_way: bool,
+    pub is_drs_available: bool,
+    pub battery_is_charging: bool,
+    pub is_max_kj_per_lap_reached: bool,
+    pub is_max_charge_kj_per_lap_reached: bool,
+    pub display_speed_kmh: i16,
+    pub display_speed_mph: i16,
+    pub display_speed_ms: i16,
+    pub pitspeeding_delta: f32,
+    pub gear_int: i16,
+    pub rpm_percent: f32,
+    pub gas_percent: f32,
+    pub brake_percent: f32,
+    pub handbrake_percent: f32,
+    pub clutch_percent: f32,
+    pub steering_percent: f32,
+    pub ffb_strength: f32,
+    pub car_ffb_multiplier: f32,
+    pub water_temperature_percent: f32,
+    pub water_pressure_bar: f32,
+    pub fuel_pressure_bar: f32,
+    pub water_temperature_c: i8,
+    pub air_temperature_c: i8,
+    pub oil_temperature_c: f32,
+    pub oil_pressure_bar: f32,
+    pub exhaust_temperature_c: f32,
+    pub g_forces_x: f32,
+    pub g_forces_y: f32,
+    pub g_forces_z: f32,
+    pub turbo_boost: f32,
+    pub turbo_boost_level: f32,
+    pub turbo_boost_perc: f32,
+    pub steer_degrees: i32,
+    pub current_km: f32,
+    pub total_km: u32,
+    pub total_driving_time_s: u32,
+    pub time_of_day_hours: i32,
+    pub time_of_day_minutes: i32,
+    pub time_of_day_seconds: i32,
+    pub delta_time_ms: i32,
+    pub current_lap_time_ms: i32,
+    pub predicted_lap_time_ms: i32,
+    pub fuel_liter_current_quantity: f32,
+    pub fuel_liter_current_quantity_percent: f32,
+    pub fuel_liter_per_km: f32,
+    pub km_per_fuel_liter: f32,
+    pub current_torque: f32,
+    pub current_bhp: i32,
+    pub tyre_lf: SMEvoTyreState,
+    pub tyre_rf: SMEvoTyreState,
+    pub tyre_lr: SMEvoTyreState,
+    pub tyre_rr: SMEvoTyreState,
+    pub npos: f32,
+    pub kers_charge_perc: f32,
+    pub kers_current_perc: f32,
+    pub control_lock_time: f32,
+    pub car_damage: SMEvoDamageState,
+    pub car_location: i32,
+    pub pit_info: SMEvoPitInfo,
+    pub fuel_liter_used: f32,
+    pub fuel_liter_per_lap: f32,
+    pub laps_possible_with_fuel: f32,
+    pub battery_temperature: f32,
+    pub battery_voltage: f32,
+    pub instantaneous_fuel_liter_per_km: f32,
+    pub instantaneous_km_per_fuel_liter: f32,
+    pub gear_rpm_window: f32,
+    pub instrumentation: SMEvoInstrumentation,
+    pub instrumentation_min_limit: SMEvoInstrumentation,
+    pub instrumentation_max_limit: SMEvoInstrumentation,
+    pub electronics: SMEvoElectronics,
+    pub electronics_min_limit: SMEvoElectronics,
+    pub electronics_max_limit: SMEvoElectronics,
+    pub electronics_is_modifiable: SMEvoElectronics,
+    pub total_lap_count: i32,
+    pub current_pos: u32,
+    pub total_drivers: u32,
+    pub last_laptime_ms: i32,
+    pub best_laptime_ms: i32,
     pub flag: i32,
-    /// Active penalty type index (sim-defined enumeration).
-    pub penalty: i32,
-    /// 1 when the ideal-line driving aid is enabled, 0 otherwise.
-    pub ideal_line_on: i32,
-    /// 1 when the car is in the pit lane (not necessarily in the pit box), 0 otherwise.
-    pub is_in_pit_lane: i32,
-    /// Track surface grip coefficient, 0.0–1.0.
-    pub surface_grip: f32,
-    /// 1 when the mandatory pit stop has been served, 0 otherwise.
-    pub mandatory_pit_done: i32,
-    /// Wind speed in m/s.
-    pub wind_speed: f32,
-    /// Wind direction in radians relative to north.
-    pub wind_direction: f32,
-    /// Active TC level setting (sim-defined integer).
-    pub tc: i32,
-    /// Active TC cut level setting (sim-defined integer).
-    pub tc_cut: i32,
-    /// Engine map setting index.
-    pub engine_map: i32,
-    /// Active ABS level setting (sim-defined integer).
-    pub abs: i32,
-    /// Estimated fuel consumption per lap in litres.
-    pub fuel_xlap: f32,
-    /// 1 when rain lights are on, 0 otherwise.
-    pub rain_lights: i32,
-    /// 1 when hazard/flashing lights are active, 0 otherwise.
-    pub flashing_lights: i32,
-    /// Headlight state index: 0 = off, higher = on/high-beam.
-    pub lights_stage: i32,
-    /// Exhaust gas temperature in °C.
-    pub exhaust_temperature: f32,
-    /// Windscreen wiper level (0 = off, higher = faster).
-    pub wiper_lv: i32,
-    /// Total driver stint time remaining in seconds (championship rules).
-    pub driver_stint_total_time_left: i32,
-    /// Current stint time remaining in seconds.
-    pub driver_stint_time_left: i32,
-    /// 1 when rain tyres are fitted, 0 for slicks.
-    pub rain_tyres: i32,
-    /// Session index within the event (0-based).
-    pub session_index: i32,
-    /// Fuel consumed so far this stint in litres.
-    pub used_fuel: f32,
-    /// Delta lap time vs. reference as UTF-16, null-terminated.
-    pub delta_lap_time: [u16; 15],
-    /// Delta lap time in milliseconds; negative = ahead of reference.
-    pub i_delta_lap_time: i32,
-    /// Estimated lap time based on current pace as UTF-16, null-terminated.
-    pub estimated_lap_time: [u16; 15],
-    /// Estimated lap time in milliseconds.
-    pub i_estimated_lap_time: i32,
-    /// 1 when delta is positive (slower than reference), 0 when negative.
-    pub is_delta_positive: i32,
-    /// Current sector split in milliseconds.
-    pub i_split: i32,
-    /// 1 when current lap is valid (no track-limits violations), 0 otherwise.
-    pub is_valid_lap: i32,
-    /// Estimated number of laps remaining on current fuel load.
+    pub global_flag: i32,
+    pub max_gears: u32,
+    pub engine_type: i32,
+    pub has_kers: bool,
+    pub is_last_lap: bool,
+    pub performance_mode_name: [u8; 33],
+    pub diff_coast_raw_value: f32,
+    pub diff_power_raw_value: f32,
+    pub race_cut_gained_time_ms: i32,
+    pub distance_to_deadline: i32,
+    pub race_cut_current_delta: f32,
+    pub session_state: SMEvoSessionState,
+    pub timing_state: SMEvoTimingState,
+    pub player_ping: i32,
+    pub player_latency: i32,
+    pub player_cpu_usage: i32,
+    pub player_cpu_usage_avg: i32,
+    pub player_qos: i32,
+    pub player_qos_avg: i32,
+    pub player_fps: i32,
+    pub player_fps_avg: i32,
+    pub driver_name: [u8; 33],
+    pub driver_surname: [u8; 33],
+    pub car_model_name: [u8; 33],
+    pub is_in_pit_box: bool,
+    pub is_in_pit_lane: bool,
+    pub is_valid_lap: bool,
+    pub car_coordinates: [[f32; 3]; 60],
+    pub gap_ahead: f32,
+    pub gap_behind: f32,
+    pub active_cars: u8,
+    pub fuel_per_lap: f32,
     pub fuel_estimated_laps: f32,
-    /// Track status description as UTF-16, null-terminated (e.g. "Green", "Fast").
-    pub track_status: [u16; 33],
-    /// Number of mandatory pit stops still to be served.
-    pub missing_mandatory_pits: i32,
-    /// Real-world clock time in seconds since midnight.
-    pub clock: f32,
-    /// 1 when left indicator/direction light is active, 0 otherwise.
-    pub direction_lights_left: i32,
-    /// 1 when right indicator/direction light is active, 0 otherwise.
-    pub direction_lights_right: i32,
-    /// 1 when a global yellow flag is displayed on the whole circuit, 0 otherwise.
-    pub global_yellow: i32,
-    /// 1 when yellow flag is active in sector 1, 0 otherwise.
-    pub global_yellow_1: i32,
-    /// 1 when yellow flag is active in sector 2, 0 otherwise.
-    pub global_yellow_2: i32,
-    /// 1 when yellow flag is active in sector 3, 0 otherwise.
-    pub global_yellow_3: i32,
-    /// 1 when a global white flag is shown, 0 otherwise.
-    pub global_white: i32,
-    /// 1 when a global green flag is shown, 0 otherwise.
-    pub global_green: i32,
-    /// 1 when the chequered flag is shown, 0 otherwise.
-    pub global_chequered: i32,
-    /// 1 when a global red flag is shown, 0 otherwise.
-    pub global_red: i32,
-    /// MFD selected tyre set index.
-    pub mfd_tyre_set: i32,
-    /// Fuel-to-add value set in the MFD pit strategy, in litres.
-    pub mfd_fuel_to_add: f32,
-    /// MFD target tyre pressure for left-front in PSI.
-    pub mfd_tyre_pressure_lf: f32,
-    /// MFD target tyre pressure for right-front in PSI.
-    pub mfd_tyre_pressure_rf: f32,
-    /// MFD target tyre pressure for left-rear in PSI.
-    pub mfd_tyre_pressure_lr: f32,
-    /// MFD target tyre pressure for right-rear in PSI.
-    pub mfd_tyre_pressure_rr: f32,
-    /// Track grip status index: 0 = green, 1 = fast, 2 = optimum, 3 = greasy, 4 = damp, 5 = wet, 6 = flooded.
-    pub track_grip_status: i32,
-    /// Current rain intensity: 0 = none, 1 = drizzle, 2 = light, 3 = medium, 4 = heavy, 5 = thunderstorm.
-    pub rain_intensity: i32,
-    /// Forecast rain intensity in 10 minutes (same scale as `rain_intensity`).
-    pub rain_intensity_in_10min: i32,
-    /// Forecast rain intensity in 30 minutes (same scale as `rain_intensity`).
-    pub rain_intensity_in_30min: i32,
-    /// Index of the currently fitted tyre set.
-    pub current_tyre_set: i32,
-    /// Index of the tyre set planned for the next pit stop strategy.
-    pub strategy_tyre_set: i32,
-    /// Per-tyre detailed state: [FL, FR, RL, RR].
-    pub tyres: [SMEvoTyreState; 4],
-}
-
-/// Static data page for AC Evo — written once when the session loads; does not update during the session.
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
-pub(crate) struct SPageFileStaticEvo {
-    /// Shared-memory plugin version as UTF-16, null-terminated.
-    pub sm_version: [u16; 15],
-    /// Game version as UTF-16, null-terminated.
-    pub ac_version: [u16; 15],
-    /// Total number of sessions in the event.
-    pub number_of_sessions: i32,
-    /// Number of cars in the race.
-    pub num_cars: i32,
-    /// Player's car model identifier as UTF-16, null-terminated.
-    pub car_model: [u16; 33],
-    /// Track identifier as UTF-16, null-terminated.
-    pub track: [u16; 33],
-    /// Player's first name as UTF-16, null-terminated.
-    pub player_name: [u16; 33],
-    /// Player's surname as UTF-16, null-terminated.
-    pub player_surname: [u16; 33],
-    /// Player's nickname/tag as UTF-16, null-terminated.
-    pub player_nick: [u16; 33],
-    /// Number of track sectors.
-    pub sector_count: i32,
-    /// Maximum engine torque in Nm.
-    pub max_torque: f32,
-    /// Maximum engine power in W.
-    pub max_power: f32,
-    /// Rev limiter RPM.
-    pub max_rpm: i32,
-    /// Fuel tank capacity in litres.
+    pub assists_state: SMEvoAssistsState,
     pub max_fuel: f32,
-    /// Maximum suspension travel per corner in metres: [FL, FR, RL, RR].
-    pub suspension_max_travel: [f32; 4],
-    /// Tyre radius per corner in metres: [FL, FR, RL, RR].
-    pub tyre_radius: [f32; 4],
-    /// Maximum turbo boost pressure in bar.
     pub max_turbo_boost: f32,
-    /// 1 when track penalties (cut penalties, etc.) are enforced, 0 otherwise.
-    pub penalties_enabled: i32,
-    /// Fuel-consumption aid multiplier (1.0 = realistic, lower = reduced consumption).
-    pub aid_fuel_rate: f32,
-    /// Tyre-wear aid multiplier (1.0 = realistic, lower = reduced wear).
-    pub aid_tire_rate: f32,
-    /// Mechanical-damage aid multiplier (1.0 = realistic, 0.0 = no damage).
-    pub aid_mechanical_damage: f32,
-    /// 1 when tyre blankets are allowed, 0 otherwise.
-    pub aid_allow_tyre_blankets: i32,
-    /// Stability-control aid level, 0.0 (off) – 1.0 (maximum).
-    pub aid_stability: f32,
-    /// 1 when auto-clutch aid is enabled, 0 otherwise.
-    pub aid_auto_clutch: i32,
-    /// 1 when auto-blip (throttle on downshift) aid is enabled, 0 otherwise.
-    pub aid_auto_blip: i32,
-    /// Lap number at which the pit window opens (-1 = no window).
-    pub pit_window_start: i32,
-    /// Lap number at which the pit window closes (-1 = no window).
-    pub pit_window_end: i32,
-    /// 1 when this is an online (multiplayer) session, 0 for offline.
-    pub is_online: i32,
-    /// Dry-weather tyre compound name as UTF-16, null-terminated.
-    pub dry_tyres_name: [u16; 33],
-    /// Wet-weather tyre compound name as UTF-16, null-terminated.
-    pub wet_tyres_name: [u16; 33],
+    pub use_single_compound: bool,
+    pub car_ids: [[u64; 2]; 60],
 }
 
-impl Default for SPageFilePhysicsEvo {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
+/// Static session metadata for AC Evo — written once at session load.
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SPageFileStaticEvo {
+    pub sm_version: [u8; 15],
+    pub ac_evo_version: [u8; 15],
+    pub session: i32,
+    pub session_name: [u8; 33],
+    pub event_id: u8,
+    pub session_id: u8,
+    pub starting_grip: i32,
+    pub starting_ambient_temperature_c: f32,
+    pub starting_ground_temperature_c: f32,
+    pub is_static_weather: bool,
+    pub is_timed_race: bool,
+    pub is_online: bool,
+    pub number_of_sessions: i32,
+    pub nation: [u8; 33],
+    pub longitude: f32,
+    pub latitude: f32,
+    pub track: [u8; 33],
+    pub track_configuration: [u8; 33],
+    pub track_length_m: f32,
 }
-impl Default for SPageFileGraphicsEvo {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
+
+macro_rules! zeroed_default {
+    ($($t:ty),*) => {
+        $(impl Default for $t {
+            fn default() -> Self {
+                // SAFETY: all fields are primitive numeric types (integers, floats,
+                // fixed-size arrays of the same). Zero is a valid bit-pattern for all of them.
+                unsafe { std::mem::zeroed() }
+            }
+        })*
+    };
 }
-impl Default for SPageFileStaticEvo {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
+zeroed_default!(
+    SPageFilePhysicsEvo,
+    SMEvoTyreState,
+    SMEvoDamageState,
+    SMEvoPitInfo,
+    SMEvoElectronics,
+    SMEvoInstrumentation,
+    SMEvoSessionState,
+    SMEvoTimingState,
+    SMEvoAssistsState,
+    SPageFileGraphicsEvo,
+    SPageFileStaticEvo
+);

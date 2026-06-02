@@ -26,16 +26,9 @@ pub enum SimType {
 ///         println!("rpm={}", frame.rpm);
 ///     }
 ///     Connection::Ac(c) => {
-///         let frame = c.frame();
-///         match &frame {
-///             AcFrame::Classic(f) => {
-///                 println!("{:.0} rpm  gear {}", f.physics.rpms, f.physics.gear);
-///             }
-///             AcFrame::Evo(f) => {
-///                 println!("{:.0} rpm  gear {}", f.physics.rpms, f.physics.gear);
-///                 println!("pad_life: {:?}", f.physics.pad_life);
-///             }
-///         }
+///         let frame = c.frame().unwrap();
+///         println!("{:.0} rpm  gear {}", frame.physics.rpms, frame.physics.gear);
+///         println!("abs={} tc={}", frame.graphics.electronics.abs_level, frame.graphics.electronics.tc_level);
 ///     }
 ///     Connection::Lmu(c) => {
 ///         let frame = c.frame();

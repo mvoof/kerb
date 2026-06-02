@@ -21,7 +21,7 @@ fn main() {
     });
 
     let mut vars: Vec<VarDef> = conn
-        .var_list()
+        .var_list_snapshot()
         .into_iter()
         .map(|v| {
             let type_ = match v.type_name.as_str() {

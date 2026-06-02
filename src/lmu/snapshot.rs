@@ -5,7 +5,13 @@ use std::collections::HashMap;
 /// Extracts the player's telemetry from an [`LmuFrame`] into a flat `HashMap`.
 ///
 /// Returns an empty map when the player's car is not present in the frame.
-pub fn build_snapshot(_f: &LmuFrame) -> HashMap<String, TelemetryValue> {
+pub fn build_snapshot(f: &LmuFrame) -> HashMap<String, TelemetryValue> {
+    if let Some(player) = f.player_telemetry() {
+        let mut serializer = crate::serializer::TelemetrySerializer::new();
+        if serde::Serialize::serialize(player, &mut serializer).is_ok() {
+            return serializer.into_map();
+        }
+    }
     HashMap::new()
 }
 
@@ -502,7 +508,7 @@ const LMU_VEHICLE_TELEMETRY_VARS: &[(&str, &str, &str)] = &[
 ];
 
 /// Returns metadata for every variable in the snapshot.
-pub fn var_list() -> Vec<VarMeta> {
+pub fn var_list_snapshot() -> Vec<VarMeta> {
     LMU_VEHICLE_TELEMETRY_VARS
         .iter()
         .map(|(name, type_name, desc)| VarMeta {

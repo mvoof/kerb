@@ -1,10 +1,7 @@
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
 #[cfg(feature = "ac")]
-use kerb::ac::{
-    connection::{AcClassicFrame, AcFrame},
-    snapshot::build_snapshot as build_ac_snapshot,
-};
+use kerb::ac::snapshot::build_snapshot as build_ac_snapshot;
 
 #[cfg(feature = "lmu")]
 use kerb::lmu::{LmuFrame, snapshot::build_snapshot as build_lmu_snapshot};
@@ -35,36 +32,21 @@ fn bench_string_decoders(c: &mut Criterion) {
     group.finish();
 }
 
-/// Assetto Corsa — frame construction and field access.
+/// Assetto Corsa Evo — frame construction and field access.
 #[cfg(feature = "ac")]
 fn bench_assetto_corsa(c: &mut Criterion) {
-    use kerb::ac::types::{AcPhysicsData, AcStaticData};
+    use kerb::ac::connection::AcFrame;
 
-    let mut group = c.benchmark_group("Assetto Corsa");
+    let mut group = c.benchmark_group("Assetto Corsa Evo");
 
-    // AcGraphicsData contains [[f32;3];60] which has no Default — use zeroed instead
-    let inner = AcClassicFrame {
-        physics: AcPhysicsData::default(),
-        graphics: unsafe { std::mem::zeroed() },
-        static_data: AcStaticData::default(),
-    };
-    let frame = AcFrame::Classic(Box::new(inner.clone()));
+    let frame: AcFrame = unsafe { std::mem::zeroed() };
 
     group.bench_function("Read single field (physics.rpms)", |b| {
-        b.iter(|| black_box(black_box(&inner).physics.rpms))
+        b.iter(|| black_box(black_box(&frame).physics.rpms))
     });
 
-    group.bench_function("Clone frame via Box", |b| {
+    group.bench_function("Clone frame", |b| {
         b.iter(|| black_box(black_box(&frame).clone()))
-    });
-
-    group.bench_function("Match to extract rpms", |b| {
-        b.iter(|| {
-            black_box(match black_box(&frame) {
-                AcFrame::Classic(f) => f.physics.rpms,
-                AcFrame::Evo(f) => f.physics.rpms,
-            })
-        })
     });
 
     group.bench_function("Build snapshot HashMap", |b| {
@@ -79,7 +61,6 @@ fn bench_assetto_corsa(c: &mut Criterion) {
 fn bench_le_mans_ultimate(c: &mut Criterion) {
     let mut group = c.benchmark_group("Le Mans Ultimate");
 
-    // LmuFrame::Default is zeroed — mirrors are safe to default-init
     let frame = LmuFrame::default();
 
     group.bench_function(
@@ -107,7 +88,6 @@ fn bench_le_mans_ultimate(c: &mut Criterion) {
 fn bench_iracing(c: &mut Criterion) {
     let mut group = c.benchmark_group("iRacing");
 
-    // Build a minimal mock SHM buffer: header + 4-byte RPM float + session YAML
     let mut header: irsdk_header = unsafe { std::mem::zeroed() };
     header.ver = 1;
     header.status = 1;
@@ -135,7 +115,7 @@ fn bench_iracing(c: &mut Criterion) {
 
     let mut vars = std::collections::HashMap::new();
     let mut rpm_hdr = irsdk_varHeader {
-        type_: 4, // Float
+        type_: 4,
         offset: 0,
         count: 1,
         count_as_char: 0,
@@ -161,19 +141,22 @@ fn bench_iracing(c: &mut Criterion) {
         b.iter(|| black_box(black_box(&conn).telemetry_snapshot()))
     });
 
-    group.bench_function("session() — cached hot path", |b| {
-        b.iter(|| black_box(black_box(&conn).session()))
+    group.bench_function("session_info() — cached hot path", |b| {
+        b.iter(|| black_box(black_box(&conn).session_info()))
     });
 
     let header_ptr = buf.as_mut_ptr() as *mut irsdk_header;
-    group.bench_function("session() — cold parse (YAML re-parse each call)", |b| {
-        b.iter(|| {
-            unsafe {
-                (*header_ptr).session_info_update += 1;
-            }
-            black_box(black_box(&conn).session())
-        })
-    });
+    group.bench_function(
+        "session_info() — cold parse (YAML re-parse each call)",
+        |b| {
+            b.iter(|| {
+                unsafe {
+                    (*header_ptr).session_info_update += 1;
+                }
+                black_box(black_box(&conn).session_info())
+            })
+        },
+    );
 
     group.finish();
 }

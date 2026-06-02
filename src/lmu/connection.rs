@@ -47,6 +47,7 @@ unsafe fn read_region_consistent<T: Copy>(
         std::alloc::handle_alloc_error(layout);
     }
 
+    let start = std::time::Instant::now();
     let mut retries = 0u32;
     loop {
         // Step 1: read begin; skip the copy if a write is in progress (begin != end).
@@ -55,13 +56,17 @@ unsafe fn read_region_consistent<T: Copy>(
         if begin != end_pre {
             // Write in progress — spin without copying.
             retries += 1;
-            if retries > 10_000 {
-                unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
-                return Err(crate::error::SimError::InvalidHeader(
-                    "Torn read timeout in LMU region".into(),
-                ));
+            if retries.is_multiple_of(1000) {
+                if start.elapsed() > std::time::Duration::from_millis(100) {
+                    unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
+                    return Err(crate::error::SimError::InvalidHeader(
+                        "Torn read timeout in LMU region".into(),
+                    ));
+                }
+                std::thread::yield_now();
+            } else {
+                std::hint::spin_loop();
             }
-            std::hint::spin_loop();
             continue;
         }
 
@@ -77,13 +82,17 @@ unsafe fn read_region_consistent<T: Copy>(
         }
 
         retries += 1;
-        if retries > 10_000 {
-            unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
-            return Err(crate::error::SimError::InvalidHeader(
-                "Torn read timeout in LMU region".into(),
-            ));
+        if retries.is_multiple_of(1000) {
+            if start.elapsed() > std::time::Duration::from_millis(100) {
+                unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
+                return Err(crate::error::SimError::InvalidHeader(
+                    "Torn read timeout in LMU region".into(),
+                ));
+            }
+            std::thread::yield_now();
+        } else {
+            std::hint::spin_loop();
         }
-        std::hint::spin_loop();
     }
 }
 
@@ -130,7 +139,14 @@ impl LmuConnection {
 
             let num = (raw_scoring.scoring_info.num_vehicles as usize).min(RF2_MAX_VEHICLES);
 
-            let mut frame = Box::<LmuFrame>::new(LmuFrame::default());
+            let mut frame = {
+                let layout = std::alloc::Layout::new::<LmuFrame>();
+                let ptr = std::alloc::alloc_zeroed(layout) as *mut LmuFrame;
+                if ptr.is_null() {
+                    std::alloc::handle_alloc_error(layout);
+                }
+                Box::from_raw(ptr)
+            };
 
             for i in 0..num {
                 frame.vehicles_telemetry[i] = LmuVehicleTelemetry::from(raw_telemetry.vehicles[i]);
@@ -157,8 +173,8 @@ impl LmuConnection {
     }
 
     /// Metadata for every field in the player telemetry snapshot.
-    pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
-        crate::lmu::snapshot::var_list()
+    pub fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta> {
+        crate::lmu::snapshot::var_list_snapshot()
     }
 
     /// Returns `true` when the rF2/LMU shared-memory plugin is loaded and writing data.
@@ -169,7 +185,7 @@ impl LmuConnection {
     /// This is `true` even when the game is in the main menu (no session running).
     /// Use [`is_session_started`](Self::is_session_started) to check whether a
     /// driveable session (practice / qualifying / race) is currently active.
-    pub fn is_plugin_active(&self) -> bool {
+    pub(crate) fn is_plugin_active(&self) -> bool {
         unsafe { std::ptr::read_volatile(self.extended.as_ptr() as *const u32) != 0 }
     }
 
@@ -177,10 +193,11 @@ impl LmuConnection {
     ///
     /// Will be `false` while the game is loading or sitting in the main menu even if
     /// [`is_plugin_active`](Self::is_plugin_active) returns `true`.
-    pub fn is_session_started(&self) -> bool {
+    pub(crate) fn is_session_started(&self) -> bool {
         unsafe {
-            let ext = std::ptr::read_unaligned(self.extended.as_ptr() as *const rF2Extended);
-            ext.session_started != 0
+            let offset = std::mem::offset_of!(rF2Extended, session_started);
+            let ptr = self.extended.as_ptr().add(offset);
+            std::ptr::read_volatile(ptr) != 0
         }
     }
 
@@ -189,11 +206,6 @@ impl LmuConnection {
     /// Equivalent to `is_plugin_active() && is_session_started()`.
     pub fn is_connected(&self) -> bool {
         self.is_plugin_active() && self.is_session_started()
-    }
-
-    /// Returns the player's vehicle telemetry, if available.
-    pub fn player_telemetry(&self) -> Option<LmuVehicleTelemetry> {
-        self.frame().ok()?.player_telemetry().cloned()
     }
 
     /// Sleep for up to `timeout_ms` milliseconds.
@@ -208,7 +220,7 @@ impl LmuConnection {
     /// Open the three rF2/LMU shared-memory regions (telemetry, scoring, extended).
     ///
     /// Returns [`SimError::NotConnected`] with a hint message if the plugin DLL is not installed.
-    pub fn connect() -> Result<Self, SimError> {
+    pub(crate) fn connect() -> Result<Self, SimError> {
         let telemetry = SharedMemRegion::open(SHM_TELEMETRY).map_err(|e| {
             SimError::NotConnected(format!(
                 "{}. Is rFactor2SharedMemoryMapPlugin installed in LMU/Plugins/?",

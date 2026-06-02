@@ -1,9 +1,6 @@
 #[cfg(feature = "ac")]
 use kerb::ac::types::{AcPhysicsData, AcStaticData};
 
-#[cfg(feature = "ac-evo")]
-use kerb::ac::types::{AcPhysicsDataEvo, AcStaticDataEvo};
-
 #[cfg(feature = "lmu")]
 use kerb::lmu::types::LmuFrame;
 
@@ -24,25 +21,7 @@ fn physics_struct_size() {
 #[cfg(feature = "ac")]
 #[test]
 fn static_struct_has_track_field() {
-    let s = AcStaticData::default();
-    let _ = s.track;
-}
-
-#[cfg(feature = "ac-evo")]
-#[test]
-fn ac_evo_physics_struct_size() {
-    let size = std::mem::size_of::<AcPhysicsDataEvo>();
-    assert!(
-        size > 100,
-        "AcPhysicsDataEvo is unexpectedly small: {} bytes",
-        size
-    );
-}
-
-#[cfg(feature = "ac-evo")]
-#[test]
-fn ac_evo_static_struct_has_track_field() {
-    let s = AcStaticDataEvo::default();
+    let s: AcStaticData = unsafe { std::mem::zeroed() };
     let _ = s.track;
 }
 
