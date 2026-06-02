@@ -13,7 +13,7 @@ fn main() -> Result<(), SimError> {
     loop {
         match SimConnection::connect() {
             Ok(Connection::Ac(conn)) => {
-                let game = match conn.frame() {
+                let game = match conn.frame()? {
                     AcFrame::Classic(_) => "AC",
                     AcFrame::Evo(_) => "AC Evo",
                 };
@@ -22,7 +22,7 @@ fn main() -> Result<(), SimError> {
                 while conn.is_connected() {
                     conn.wait_for_data(16);
 
-                    let frame = conn.frame();
+                    let frame = conn.frame()?;
 
                     // Common fields — work for both AC and AC Evo
                     let rpms = frame.rpms();

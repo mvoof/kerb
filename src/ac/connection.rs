@@ -2,6 +2,10 @@ use crate::ac::structs::{
     AC_STATUS_LIVE, SPageFileGraphics, SPageFileGraphicsEvo, SPageFilePhysics, SPageFilePhysicsEvo,
     SPageFileStatic, SPageFileStaticEvo,
 };
+use crate::ac::types::{
+    AcGraphicsData, AcGraphicsDataEvo, AcPhysicsData, AcPhysicsDataEvo, AcStaticData,
+    AcStaticDataEvo,
+};
 use crate::error::SimError;
 use crate::shm::SharedMemRegion;
 
@@ -16,35 +20,27 @@ const SHM_EVO_STATIC: &str = "Local\\acevo_pmf_static";
 /// Point-in-time snapshot of the three classic Assetto Corsa shared-memory pages.
 ///
 /// All fields are the player's car only — AC does not expose other cars via SHM.
-///
-/// - `physics` — per-tick physics: inputs, speeds, tyres, damage. See [`SPageFilePhysics`].
-/// - `graphics` — per-frame HUD state: lap times, position, flags, fuel. See [`SPageFileGraphics`].
-/// - `static_data` — session constants written at load: car model, track, aids. See [`SPageFileStatic`].
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug, serde::Serialize)]
 pub struct AcClassicFrame {
     /// Physics page — per-tick data: inputs, RPM, speed, tyres, damage.
-    pub physics: SPageFilePhysics,
+    pub physics: crate::ac::types::AcPhysicsData,
     /// Graphics/HUD page — per-frame data: lap times, race position, flags, pit state.
-    pub graphics: SPageFileGraphics,
+    pub graphics: crate::ac::types::AcGraphicsData,
     /// Static page — written once at session load: car model, track, aids, limits.
-    pub static_data: SPageFileStatic,
+    pub static_data: crate::ac::types::AcStaticData,
 }
 
 /// Point-in-time snapshot of the three AC Evo shared-memory pages.
 ///
 /// All fields are the player's car only — AC Evo does not expose other cars via SHM.
-///
-/// - `physics` — per-tick physics including Evo-specific fields (pad/disc life, engine state, vibrations). See [`SPageFilePhysicsEvo`].
-/// - `graphics` — per-frame HUD state with Evo extensions (rain forecast, delta, tyre detail). See [`SPageFileGraphicsEvo`].
-/// - `static_data` — session constants including wet/dry tyre names. See [`SPageFileStaticEvo`].
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug, serde::Serialize)]
 pub struct AcEvoFrame {
     /// Physics page — per-tick data including Evo-only fields (brake compound, pad/disc life, engine state).
-    pub physics: SPageFilePhysicsEvo,
+    pub physics: crate::ac::types::AcPhysicsDataEvo,
     /// Graphics/HUD page — per-frame data including Evo-only fields (rain forecast, delta, per-tyre detail).
-    pub graphics: SPageFileGraphicsEvo,
+    pub graphics: crate::ac::types::AcGraphicsDataEvo,
     /// Static page — written once at session load; includes wet/dry tyre compound names.
-    pub static_data: SPageFileStaticEvo,
+    pub static_data: crate::ac::types::AcStaticDataEvo,
 }
 
 /// Point-in-time snapshot from either Assetto Corsa or Assetto Corsa Evo.
@@ -53,7 +49,7 @@ pub struct AcEvoFrame {
 /// Match on the variant to access game-specific fields:
 ///
 /// ```ignore
-/// let frame = conn.frame();
+/// let frame = conn.frame()?;
 ///
 /// // Common fields — work for both AC and AC Evo
 /// println!("{:.0} rpm  gear {}", frame.rpms(), frame.gear());
@@ -63,11 +59,10 @@ pub struct AcEvoFrame {
 ///     println!("pad_life: {:?}", f.physics.pad_life);
 /// }
 /// ```
-#[derive(Clone, Copy, Debug)]
-#[allow(clippy::large_enum_variant)]
+#[derive(Clone, Debug, serde::Serialize)]
 pub enum AcFrame {
-    Classic(AcClassicFrame),
-    Evo(AcEvoFrame),
+    Classic(Box<AcClassicFrame>),
+    Evo(Box<AcEvoFrame>),
 }
 
 impl AcFrame {
@@ -198,10 +193,10 @@ impl AcFrame {
             AcFrame::Evo(f) => f.graphics.i_best_time,
         }
     }
-    pub fn is_in_pit(&self) -> i32 {
+    pub fn is_in_pit(&self) -> bool {
         match self {
-            AcFrame::Classic(f) => f.graphics.is_in_pit,
-            AcFrame::Evo(f) => f.graphics.is_in_pit,
+            AcFrame::Classic(f) => f.graphics.is_in_pit != 0,
+            AcFrame::Evo(f) => f.graphics.is_in_pit != 0,
         }
     }
     pub fn session_time_left(&self) -> f32 {
@@ -271,63 +266,45 @@ impl AcConnection {
     /// Read a point-in-time snapshot from the connected game.
     ///
     /// Returns [`AcFrame::Classic`] or [`AcFrame::Evo`] depending on which game was detected at
-    /// [`connect`](AcConnection::connect) time. Use the common accessor methods
-    /// (`rpms()`, `speed_kmh()`, `gear()`, etc.) for fields shared by both variants.
-    /// Match on the variant to access game-specific fields.
-    ///
-    /// **Packed-field rule:** Always copy struct fields to local variables before using them in
-    /// expressions — taking a reference to an unaligned packed field is a compile error.
-    pub fn frame(&self) -> AcFrame {
+    /// [`connect`](AcConnection::connect) time.
+    pub fn frame(&self) -> Result<AcFrame, SimError> {
         unsafe {
             match &self.variant {
-                AcShmVariant::Classic {
-                    physics,
-                    graphics,
-                    static_data,
-                } => AcFrame::Classic(AcClassicFrame {
-                    physics: std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysics),
-                    graphics: std::ptr::read_unaligned(
-                        graphics.as_ptr() as *const SPageFileGraphics
-                    ),
-                    static_data: std::ptr::read_unaligned(
-                        static_data.as_ptr() as *const SPageFileStatic
-                    ),
-                }),
-                AcShmVariant::Evo {
-                    physics,
-                    graphics,
-                    static_data,
-                } => AcFrame::Evo(AcEvoFrame {
-                    physics: std::ptr::read_unaligned(
-                        physics.as_ptr() as *const SPageFilePhysicsEvo
-                    ),
-                    graphics: std::ptr::read_unaligned(
-                        graphics.as_ptr() as *const SPageFileGraphicsEvo
-                    ),
-                    static_data: std::ptr::read_unaligned(
-                        static_data.as_ptr() as *const SPageFileStaticEvo
-                    ),
-                }),
+                AcShmVariant::Classic { physics, graphics, static_data } => {
+                    let raw_p = std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysics);
+                    let raw_g = std::ptr::read_unaligned(graphics.as_ptr() as *const SPageFileGraphics);
+                    let raw_s = std::ptr::read_unaligned(static_data.as_ptr() as *const SPageFileStatic);
+                    Ok(AcFrame::Classic(Box::new(AcClassicFrame {
+                        physics: AcPhysicsData::from(raw_p),
+                        graphics: AcGraphicsData::from(raw_g),
+                        static_data: AcStaticData::from(raw_s),
+                    })))
+                }
+                AcShmVariant::Evo { physics, graphics, static_data } => {
+                    let raw_p = std::ptr::read_unaligned(physics.as_ptr() as *const SPageFilePhysicsEvo);
+                    let raw_g = std::ptr::read_unaligned(graphics.as_ptr() as *const SPageFileGraphicsEvo);
+                    let raw_s = std::ptr::read_unaligned(static_data.as_ptr() as *const SPageFileStaticEvo);
+                    Ok(AcFrame::Evo(Box::new(AcEvoFrame {
+                        physics: AcPhysicsDataEvo::from(raw_p),
+                        graphics: AcGraphicsDataEvo::from(raw_g),
+                        static_data: AcStaticDataEvo::from(raw_s),
+                    })))
+                }
             }
         }
     }
 
     /// All telemetry variables as a flat `HashMap<String, TelemetryValue>`.
-    ///
-    /// Keys are field names from `SPageFilePhysics` / `SPageFilePhysicsEvo` (and their
-    /// graphics/static counterparts). Scope: **player's car only**.
-    ///
-    /// Use [`save_telemetry_snapshot`](crate::save_telemetry_snapshot) to dump to a text file
-    /// for field discovery.
     pub fn telemetry_snapshot(
         &self,
     ) -> std::collections::HashMap<String, crate::types::TelemetryValue> {
-        crate::ac::snapshot::build_snapshot(&self.frame())
+        match self.frame() {
+            Ok(frame) => crate::ac::snapshot::build_snapshot(&frame),
+            Err(_) => std::collections::HashMap::new(),
+        }
     }
 
     /// Metadata for every field exposed in the telemetry snapshot.
-    ///
-    /// Returns one [`VarMeta`](crate::types::VarMeta) per field with name, type, unit, and description.
     pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
         crate::ac::snapshot::var_list()
     }
@@ -352,9 +329,9 @@ impl AcConnection {
 
     /// Sleep for up to `timeout_ms` milliseconds.
     ///
-    /// AC does not expose a data-ready event, so this is a simple sleep capped at 16 ms
-    /// (one ~60 Hz frame). Call in your polling loop to avoid busy-waiting.
+    /// AC does not expose a data-ready event, so this is a simple sleep.
+    /// Call in your polling loop to avoid busy-waiting.
     pub fn wait_for_data(&self, timeout_ms: u32) {
-        std::thread::sleep(std::time::Duration::from_millis(timeout_ms.min(16) as u64));
+        std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
     }
 }

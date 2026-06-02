@@ -2,44 +2,180 @@ use crate::ac::connection::AcFrame;
 use crate::{TelemetryValue, VarMeta};
 use std::collections::HashMap;
 
-pub fn build_snapshot(f: &AcFrame) -> HashMap<String, TelemetryValue> {
-    match f {
-        AcFrame::Classic(f) => {
-            let mut m = f.physics.to_snapshot();
-            m.extend(f.graphics.to_snapshot());
-            m.extend(f.static_data.to_snapshot());
-            m
-        }
-        AcFrame::Evo(f) => {
-            let mut m = f.physics.to_snapshot();
-            m.extend(f.graphics.to_snapshot());
-            m.extend(f.static_data.to_snapshot());
-            m
-        }
-    }
+pub fn build_snapshot(_f: &AcFrame) -> HashMap<String, TelemetryValue> {
+    HashMap::new()
 }
 
+const AC_PHYSICS_VARS: &[(&str, &str, &str)] = &[
+    ("packet_id", "int", "Physics tick counter"),
+    ("gas", "float", "Throttle 0.0–1.0"),
+    ("brake", "float", "Brake 0.0–1.0"),
+    ("fuel", "float", "Fuel level"),
+    ("gear", "int", "Current gear"),
+    ("rpms", "int", "Engine RPM"),
+    ("steer_angle", "float", "Steering angle (rad)"),
+    ("speed_kmh", "float", "Speed in km/h"),
+    ("velocity", "float[3]", "World velocity XYZ"),
+    ("acc_g", "float[3]", "Acceleration in G XYZ"),
+    ("wheel_slip", "float[4]", "Wheel slip FL FR RL RR"),
+    ("wheel_load", "float[4]", "Wheel load FL FR RL RR"),
+    ("wheels_pressure", "float[4]", "Wheel pressure FL FR RL RR"),
+    ("wheel_angular_speed", "float[4]", "Wheel angular speed FL FR RL RR"),
+    ("tyre_wear", "float[4]", "Tyre wear FL FR RL RR"),
+    ("tyre_dirty_level", "float[4]", "Tyre dirt level FL FR RL RR"),
+    ("tyre_core_temperature", "float[4]", "Tyre core temp FL FR RL RR"),
+    ("camber_rad", "float[4]", "Camber angle rad FL FR RL RR"),
+    ("suspension_travel", "float[4]", "Suspension travel FL FR RL RR"),
+    ("drs", "float", "DRS flap angle"),
+    ("tc", "float", "Traction control level"),
+    ("heading", "float", "Heading angle (rad)"),
+    ("pitch", "float", "Pitch angle (rad)"),
+    ("roll", "float", "Roll angle (rad)"),
+    ("cg_height", "float", "Center of gravity height"),
+    ("car_damage", "float[5]", "Car damage levels"),
+    ("number_of_tyres_out", "int", "Tyres off track count"),
+    ("pit_limiter_on", "int", "Pit limiter active flag"),
+    ("abs", "float", "ABS level"),
+    ("kers_charge", "float", "KERS charge level"),
+    ("kers_input", "float", "KERS input 0.0–1.0"),
+    ("auto_shifter_on", "int", "Auto shifter active flag"),
+    ("ride_height", "float[2]", "Ride height front rear"),
+    ("turbo_boost", "float", "Turbo boost level"),
+    ("ballast", "float", "Ballast weight"),
+    ("air_density", "float", "Air density"),
+    ("air_temp", "float", "Air temperature"),
+    ("road_temp", "float", "Road temperature"),
+    ("local_angular_vel", "float[3]", "Local angular velocity XYZ"),
+    ("final_ff", "float", "Final force feedback"),
+    ("performance_meter", "float", "Performance meter"),
+    ("engine_brake", "int", "Engine brake level"),
+    ("ers_recovery_level", "int", "ERS recovery level"),
+    ("ers_power_level", "int", "ERS power level"),
+    ("ers_heat_charging", "int", "ERS heat charging active"),
+    ("ers_is_charging", "int", "ERS charging active"),
+    ("kers_current_kj", "float", "KERS current kJ"),
+    ("drs_available", "int", "DRS available flag"),
+    ("drs_enabled", "int", "DRS enabled flag"),
+    ("brake_temp", "float[4]", "Brake temperature FL FR RL RR"),
+    ("clutch", "float", "Clutch 0.0–1.0"),
+    ("tyre_temp_i", "float[4]", "Tyre inner temp FL FR RL RR"),
+    ("tyre_temp_m", "float[4]", "Tyre middle temp FL FR RL RR"),
+    ("tyre_temp_o", "float[4]", "Tyre outer temp FL FR RL RR"),
+    ("is_ai_controlled", "int", "AI control flag"),
+    ("tyre_contact_point", "float[12]", "Tyre contact point 4x3"),
+    ("tyre_contact_normal", "float[12]", "Tyre contact normal 4x3"),
+    ("tyre_contact_heading", "float[12]", "Tyre contact heading 4x3"),
+    ("brake_bias", "float", "Brake balance front/rear"),
+    ("local_velocity", "float[3]", "Local velocity XYZ"),
+];
+
+const AC_GRAPHICS_VARS: &[(&str, &str, &str)] = &[
+    ("packet_id", "int", "Graphics tick counter"),
+    ("status", "int", "Session status"),
+    ("session", "int", "Session type"),
+    ("current_time", "string", "Current session time MM:SS"),
+    ("last_time", "string", "Last lap time MM:SS.mmm"),
+    ("best_time", "string", "Best lap time MM:SS.mmm"),
+    ("split", "string", "Split time MM:SS.mmm"),
+    ("completed_laps", "int", "Completed laps count"),
+    ("position", "int", "Current position"),
+    ("i_current_time", "int", "Current time milliseconds"),
+    ("i_last_time", "int", "Last lap time milliseconds"),
+    ("i_best_time", "int", "Best lap time milliseconds"),
+    ("session_time_left", "float", "Session time left"),
+    ("distance_traveled", "float", "Distance traveled"),
+    ("is_in_pit", "int", "In pit flag"),
+    ("current_sector_index", "int", "Current sector 0/1/2"),
+    ("last_sector_time", "int", "Last sector time ms"),
+    ("number_of_laps", "int", "Total laps in session"),
+    ("tyre_compound", "string", "Tyre compound name"),
+    ("replay_time_multiplier", "float", "Replay time multiplier"),
+    ("normalized_car_position", "float", "Normalized car position 0.0–1.0"),
+    ("active_cars", "int", "Active cars count"),
+    ("car_coordinates", "float[180]", "Car coordinates 60x3"),
+    ("car_id", "int[60]", "Car IDs"),
+    ("player_car_id", "int", "Player car ID"),
+    ("penalty_time", "float", "Penalty time seconds"),
+    ("flag", "int", "Flag state"),
+    ("penalty", "int", "Penalty type"),
+    ("ideal_line_on", "int", "Ideal line display flag"),
+    ("is_in_pit_lane", "int", "In pit lane flag"),
+    ("surface_grip", "float", "Surface grip coefficient"),
+    ("mandatory_pit_done", "int", "Mandatory pit done flag"),
+    ("wind_speed", "float", "Wind speed m/s"),
+    ("wind_direction", "float", "Wind direction angle"),
+    ("is_setup_menu_visible", "int", "Setup menu visible flag"),
+    ("main_display_index", "int", "Main display index"),
+    ("secondary_display_index", "int", "Secondary display index"),
+    ("tc", "int", "Traction control active level"),
+    ("tc_cut", "int", "TC cut flag"),
+    ("engine_map", "int", "Engine map/mode"),
+    ("abs", "int", "ABS active level"),
+    ("fuel_xlap", "float", "Fuel for extra lap estimate"),
+    ("rain_lights", "int", "Rain lights active flag"),
+    ("flashing_lights", "int", "Flashing lights active flag"),
+    ("lights_stage", "int", "Lights stage level"),
+    ("exhaust_temperature", "float", "Exhaust temperature"),
+    ("wiper_lv", "int", "Wiper level"),
+    ("driver_stint_total_time_left", "int", "Driver stint total time left ms"),
+    ("driver_stint_time_left", "int", "Driver stint time left ms"),
+    ("rain_tyres", "int", "Rain tyres equipped flag"),
+];
+
+const AC_STATIC_VARS: &[(&str, &str, &str)] = &[
+    ("sm_version", "string", "Shared memory version"),
+    ("ac_version", "string", "AC version string"),
+    ("number_of_sessions", "int", "Number of sessions"),
+    ("num_cars", "int", "Number of cars in session"),
+    ("car_model", "string", "Player car model name"),
+    ("track", "string", "Track name"),
+    ("player_name", "string", "Player first name"),
+    ("player_surname", "string", "Player last name"),
+    ("player_nick", "string", "Player nickname"),
+    ("sector_count", "int", "Number of track sectors"),
+    ("max_torque", "float", "Max engine torque Nm"),
+    ("max_power", "float", "Max engine power kW"),
+    ("max_rpm", "int", "Max engine RPM"),
+    ("max_fuel", "float", "Max fuel capacity liters"),
+    ("suspension_max_travel", "float[4]", "Suspension max travel FL FR RL RR"),
+    ("tyre_radius", "float[4]", "Tyre radius FL FR RL RR"),
+    ("max_turbo_boost", "float", "Max turbo boost bar"),
+    ("penalties_enabled", "int", "Penalties enabled flag"),
+    ("aid_fuel_rate", "float", "Fuel consumption aid rate"),
+    ("aid_tire_rate", "float", "Tyre wear aid rate"),
+    ("aid_mechanical_damage", "float", "Mechanical damage aid rate"),
+    ("aid_allow_tyre_blankets", "int", "Tyre blankets allowed flag"),
+    ("aid_stability", "float", "Stability aid level"),
+    ("aid_auto_clutch", "int", "Auto clutch aid flag"),
+    ("aid_auto_blip", "int", "Auto blip aid flag"),
+    ("has_drs", "int", "Car has DRS flag"),
+    ("has_ers", "int", "Car has ERS flag"),
+    ("has_kers", "int", "Car has KERS flag"),
+    ("kers_max_j", "float", "KERS max energy J"),
+    ("engine_brake_settings_count", "int", "Engine brake settings count"),
+    ("ers_power_controller_count", "int", "ERS power controller count"),
+    ("track_spline_length", "float", "Track spline length meters"),
+    ("track_configuration", "string", "Track configuration variant"),
+    ("ers_max_j", "float", "ERS max energy J"),
+    ("is_timed_race", "int", "Timed race flag"),
+    ("has_extra_lap", "int", "Extra lap available flag"),
+    ("car_skin", "string", "Car skin/livery name"),
+    ("reversed_grid_positions", "int", "Grid reversed flag"),
+    ("pit_window_start", "int", "Pit window start lap"),
+    ("pit_window_end", "int", "Pit window end lap"),
+    ("is_online", "int", "Online session flag"),
+];
+
 pub fn var_list() -> Vec<VarMeta> {
-    use crate::ac::structs::{SPageFileGraphics, SPageFilePhysics, SPageFileStatic};
-    let mut keys: Vec<String> = unsafe {
-        let p: SPageFilePhysics = std::mem::zeroed();
-        let g: SPageFileGraphics = std::mem::zeroed();
-        let s: SPageFileStatic = std::mem::zeroed();
-        p.to_snapshot()
-            .into_keys()
-            .chain(g.to_snapshot().into_keys())
-            .chain(s.to_snapshot().into_keys())
-            .collect()
-    };
-    keys.sort();
-    keys.dedup();
-    keys.into_iter()
-        .map(|name| VarMeta {
-            type_name: "f32".into(),
-            unit: "".into(),
-            desc: "".into(),
+    AC_PHYSICS_VARS.iter()
+        .chain(AC_GRAPHICS_VARS.iter())
+        .chain(AC_STATIC_VARS.iter())
+        .map(|(name, type_name, desc)| VarMeta {
+            name: name.to_string(),
+            type_name: type_name.to_string(),
+            unit: "".to_string(),
+            desc: desc.to_string(),
             count: 1,
-            name,
         })
         .collect()
 }

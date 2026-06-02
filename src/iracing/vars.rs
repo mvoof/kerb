@@ -1977,4 +1977,10 @@ impl IracingFrame {
             },
         }
     }
+
+    /// Build a frame by reading each variable directly from the connection.
+    /// Single-pass: no intermediate HashMap allocation.
+    pub(crate) fn from_connection(conn: &crate::iracing::connection::IRsdkConnection) -> Self {
+        Self::from_vars(&conn.read_all_variables())
+    }
 }

@@ -1,6 +1,7 @@
 use crate::error::SimError;
 
 /// Identifies a specific simulator for use with [`SimConnection::connect_to`].
+#[non_exhaustive]
 pub enum SimType {
     #[cfg(feature = "iracing")]
     IRacing,
@@ -42,6 +43,7 @@ pub enum SimType {
 ///     }
 /// }
 /// ```
+#[non_exhaustive]
 pub enum Connection {
     #[cfg(feature = "iracing")]
     IRacing(crate::iracing::connection::IRsdkConnection),

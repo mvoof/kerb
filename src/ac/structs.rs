@@ -14,7 +14,7 @@ pub const AC_STATUS_PAUSE: i32 = 3;
 /// Physics telemetry page — updated every simulation tick.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SPageFilePhysics {
+pub(crate) struct SPageFilePhysics {
     /// Monotonically increasing counter; increments each physics tick.
     pub packet_id: i32,
     /// Throttle pedal position, 0.0 (released) – 1.0 (full).
@@ -140,7 +140,7 @@ pub struct SPageFilePhysics {
 /// Graphics/HUD page — updated each rendered frame.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SPageFileGraphics {
+pub(crate) struct SPageFileGraphics {
     /// Monotonically increasing counter; increments each graphics frame.
     pub packet_id: i32,
     /// Session status: 0 = off, 1 = replay, 2 = live, 3 = paused. Use `AC_STATUS_*` constants.
@@ -246,7 +246,7 @@ pub struct SPageFileGraphics {
 /// Static data page — written once when a session loads; does not update during the session.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SPageFileStatic {
+pub(crate) struct SPageFileStatic {
     /// Shared-memory plugin version as UTF-16, null-terminated.
     pub sm_version: [u16; 15],
     /// Assetto Corsa game version as UTF-16, null-terminated.
@@ -351,30 +351,13 @@ impl Default for SPageFileStatic {
     }
 }
 
-impl SPageFileStatic {
-    pub fn track_name(&self) -> String {
-        let t = self.track;
-        String::from_utf16_lossy(&t[..t.iter().position(|&x| x == 0).unwrap_or(33)]).to_string()
-    }
-    pub fn car_model_name(&self) -> String {
-        let c = self.car_model;
-        String::from_utf16_lossy(&c[..c.iter().position(|&x| x == 0).unwrap_or(33)]).to_string()
-    }
-    pub fn player_full_name(&self) -> String {
-        let n = self.player_name;
-        let s = self.player_surname;
-        let first = String::from_utf16_lossy(&n[..n.iter().position(|&x| x == 0).unwrap_or(33)]);
-        let last = String::from_utf16_lossy(&s[..s.iter().position(|&x| x == 0).unwrap_or(33)]);
-        format!("{} {}", first, last)
-    }
-}
 
 // ── Assetto Corsa Evo ─────────────────────────────────────────────────────────
 
 /// Per-tyre state embedded in the AC Evo graphics page.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SMEvoTyreState {
+pub(crate) struct SMEvoTyreState {
     /// Tyre compound symbol as UTF-16, null-terminated (e.g. "S", "M", "H").
     pub tyre_compound_symbol: [u16; 33],
     /// Full tyre compound name as UTF-16, null-terminated (e.g. "Pirelli Soft").
@@ -430,7 +413,7 @@ impl Default for SMEvoTyreState {
 /// Physics page for AC Evo — superset of classic AC physics.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SPageFilePhysicsEvo {
+pub(crate) struct SPageFilePhysicsEvo {
     /// Monotonically increasing counter; increments each physics tick.
     pub packet_id: i32,
     /// Throttle pedal position, 0.0 (released) – 1.0 (full).
@@ -552,7 +535,7 @@ pub struct SPageFilePhysicsEvo {
 /// Graphics/HUD page for AC Evo — superset of classic AC graphics.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SPageFileGraphicsEvo {
+pub(crate) struct SPageFileGraphicsEvo {
     /// Monotonically increasing counter; increments each graphics frame.
     pub packet_id: i32,
     /// Session status: 0 = off, 1 = replay, 2 = live, 3 = paused. Use `AC_STATUS_*` constants.
@@ -722,7 +705,7 @@ pub struct SPageFileGraphicsEvo {
 /// Static data page for AC Evo — written once when the session loads; does not update during the session.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct SPageFileStaticEvo {
+pub(crate) struct SPageFileStaticEvo {
     /// Shared-memory plugin version as UTF-16, null-terminated.
     pub sm_version: [u16; 15],
     /// Game version as UTF-16, null-terminated.

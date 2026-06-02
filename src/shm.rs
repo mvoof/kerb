@@ -50,6 +50,18 @@ impl SharedMemRegion {
     pub fn as_ptr(&self) -> *const u8 {
         self.view.Value as *const u8
     }
+
+    /// Create a mock `SharedMemRegion` pointing to an externally-owned buffer (for tests only).
+    ///
+    /// # Safety
+    /// The caller must ensure `ptr` is valid for the lifetime of the returned value.
+    #[doc(hidden)]
+    pub unsafe fn new_mock(ptr: *mut std::ffi::c_void) -> Self {
+        Self {
+            h_map: 0 as _,
+            view: MEMORY_MAPPED_VIEW_ADDRESS { Value: ptr },
+        }
+    }
 }
 
 /// Unmaps the view and closes the file-mapping handle on drop.

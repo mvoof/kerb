@@ -11,7 +11,7 @@ fn main() -> Result<(), SimError> {
             Ok(Connection::IRacing(conn)) => {
                 println!("Connected to iRacing");
 
-                if let Some(session) = conn.session_info() {
+                if let Some(session) = conn.session() {
                     let track = session
                         .get_value("WeekendInfo.TrackDisplayName")
                         .unwrap_or_else(|| "Unknown".into());
@@ -22,7 +22,7 @@ fn main() -> Result<(), SimError> {
                 while conn.is_connected() {
                     conn.wait_for_data(100);
 
-                    let frame = conn.frame();
+                    let frame = conn.frame()?;
 
                     let gear = match frame.gear {
                         -1 => "R".to_string(),

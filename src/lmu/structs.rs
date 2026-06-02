@@ -7,10 +7,11 @@ use kerb_derive::Snapshot;
 /// Maximum number of vehicles the shared-memory buffers can hold.
 pub const RF2_MAX_VEHICLES: usize = 128;
 
+
 /// Per-wheel physics data (suspension, tyre temps, wear, forces, etc.).
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default, Snapshot)]
-pub struct rF2Wheel {
+pub(crate) struct rF2Wheel {
     /// Suspension deflection (compression) in metres; positive = compressed.
     pub suspension_deflection: f64,
     /// Ride height at this corner in metres.
@@ -75,7 +76,7 @@ pub struct rF2Wheel {
 /// Only valid for vehicles present in `rF2Telemetry::vehicles[..header.num_vehicles]`.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Snapshot)]
-pub struct rF2VehicleTelemetry {
+pub(crate) struct rF2VehicleTelemetry {
     /// Unique vehicle ID — matches `rF2VehicleScoring::id` for the same car.
     pub id: i32,
     /// Physics time step in seconds for this update.
@@ -217,7 +218,7 @@ pub struct rF2VehicleTelemetry {
 /// Header preceding the vehicle-telemetry array in shared memory.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
-pub struct rF2TelemetryHeader {
+pub(crate) struct rF2TelemetryHeader {
     /// Version counter written before the update begins; compare with `version_update_end` to detect torn reads.
     pub version_update_begin: u32,
     /// Version counter written after the update completes; equals `version_update_begin` when data is consistent.
@@ -235,7 +236,7 @@ pub struct rF2TelemetryHeader {
 /// Top-level telemetry region: header + fixed-size array of vehicle telemetry.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2Telemetry {
+pub(crate) struct rF2Telemetry {
     /// Version and size metadata; `num_vehicles` gives the count of valid entries.
     pub header: rF2TelemetryHeader,
     /// Per-vehicle telemetry data; only `vehicles[0..header.num_vehicles]` are valid.
@@ -258,7 +259,7 @@ impl Default for rF2VehicleTelemetry {
 /// Updated at ~2 Hz. Only valid for vehicles in `rF2Scoring::vehicles[..header.num_vehicles]`.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2VehicleScoring {
+pub(crate) struct rF2VehicleScoring {
     /// Unique vehicle ID — matches `rF2VehicleTelemetry::id` for cross-referencing.
     pub id: i32,
     /// Driver name (ASCII, null-terminated, max 32 bytes).
@@ -368,7 +369,7 @@ pub struct rF2VehicleScoring {
 /// Session-wide scoring info: track, weather, session type, and flag state.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2ScoringInfo {
+pub(crate) struct rF2ScoringInfo {
     /// Track name (ASCII, null-terminated, max 64 bytes).
     pub track_name: [u8; 64],
     /// Session type: 0 = test day, 1 = practice, 2 = qualify, 3 = warm-up, 4 = race.
@@ -444,7 +445,7 @@ impl Default for rF2ScoringInfo {
 /// Header preceding the scoring-info and vehicle-scoring array.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
-pub struct rF2ScoringHeader {
+pub(crate) struct rF2ScoringHeader {
     /// Version counter written before the update begins; compare with `version_update_end` to detect torn reads.
     pub version_update_begin: u32,
     /// Version counter written after the update completes; equals `version_update_begin` when consistent.
@@ -464,7 +465,7 @@ pub struct rF2ScoringHeader {
 /// Top-level scoring region: header + session info + vehicle-scoring array.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2Scoring {
+pub(crate) struct rF2Scoring {
     /// Version and size metadata; `num_vehicles` gives the count of valid entries.
     pub header: rF2ScoringHeader,
     /// Session-wide data: track name, weather, session type, flag state.
@@ -488,7 +489,7 @@ impl Default for rF2VehicleScoring {
 /// Extended plugin/session metadata: plugin status, session started flag, and physics timing.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2Extended {
+pub(crate) struct rF2Extended {
     /// Version counter written at the start of each shared-memory update cycle.
     pub version_update_begin: u32,
     /// Version counter written at the end of each update cycle; equals `version_update_begin` when consistent.
@@ -520,10 +521,3 @@ impl Default for rF2Extended {
     }
 }
 
-/// Converts a null-terminated byte buffer (as stored in rF2 structs) to a `String`.
-///
-/// Non-UTF-8 bytes are replaced with the Unicode replacement character.
-pub fn parse_rf2_str(bytes: &[u8]) -> String {
-    let len = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
-    String::from_utf8_lossy(&bytes[..len]).into_owned()
-}
