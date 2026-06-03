@@ -5,4 +5,4 @@ edition = "2024"
 publish = false
 
 [dependencies]
-kerb = { path = "..", features = ["iracing", "ac", "lmu"] }
+kerb = { path = "..", features = ["iracing", "ac-evo", "lmu"] }

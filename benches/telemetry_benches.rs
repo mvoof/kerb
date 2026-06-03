@@ -1,7 +1,7 @@
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
-#[cfg(feature = "ac")]
-use kerb::ac::snapshot::build_snapshot as build_ac_snapshot;
+#[cfg(feature = "ac-evo")]
+use kerb::ac_evo::snapshot::build_snapshot as build_ac_snapshot;
 
 #[cfg(feature = "lmu")]
 use kerb::lmu::{LmuFrame, snapshot::build_snapshot as build_lmu_snapshot};
@@ -33,13 +33,13 @@ fn bench_string_decoders(c: &mut Criterion) {
 }
 
 /// Assetto Corsa Evo — frame construction and field access.
-#[cfg(feature = "ac")]
+#[cfg(feature = "ac-evo")]
 fn bench_assetto_corsa(c: &mut Criterion) {
-    use kerb::ac::connection::AcFrame;
+    use kerb::ac_evo::connection::AcEvoFrame;
 
     let mut group = c.benchmark_group("Assetto Corsa Evo");
 
-    let frame: AcFrame = unsafe { std::mem::zeroed() };
+    let frame: AcEvoFrame = unsafe { std::mem::zeroed() };
 
     group.bench_function("Read single field (physics.rpms)", |b| {
         b.iter(|| black_box(black_box(&frame).physics.rpms))
@@ -234,7 +234,7 @@ fn bench_iracing(c: &mut Criterion) {
 fn run_all_benches(c: &mut Criterion) {
     bench_string_decoders(c);
 
-    #[cfg(feature = "ac")]
+    #[cfg(feature = "ac-evo")]
     bench_assetto_corsa(c);
 
     #[cfg(feature = "lmu")]

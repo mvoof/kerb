@@ -1,8 +1,8 @@
-use crate::ac::connection::AcFrame;
+use crate::ac_evo::connection::AcEvoFrame;
 use crate::{TelemetryValue, VarMeta};
 use std::collections::HashMap;
 
-pub fn build_snapshot(f: &AcFrame) -> HashMap<String, TelemetryValue> {
+pub fn build_snapshot(f: &AcEvoFrame) -> HashMap<String, TelemetryValue> {
     let mut serializer = crate::serializer::TelemetrySerializer::new();
     let _ = serde::Serialize::serialize(&f.physics, &mut serializer);
     let _ = serde::Serialize::serialize(&f.graphics, &mut serializer);

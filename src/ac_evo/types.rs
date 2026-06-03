@@ -3,7 +3,7 @@
 //! These are safe, non-packed copies of the raw `SPageFile*` and `SMEvo*` structs.
 //! `[u8; N]` string fields are wrapped in [`SimString<N>`].
 
-use crate::ac::structs::{
+use crate::ac_evo::structs::{
     SMEvoAssistsState, SMEvoDamageState, SMEvoElectronics, SMEvoInstrumentation, SMEvoPitInfo,
     SMEvoSessionState, SMEvoTimingState, SMEvoTyreState, SPageFileGraphicsEvo, SPageFilePhysicsEvo,
     SPageFileStaticEvo,

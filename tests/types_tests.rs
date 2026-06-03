@@ -24,12 +24,12 @@ fn var_meta_fields() {
     assert_eq!(m.name, "RPM");
 }
 
-#[cfg(feature = "ac")]
+#[cfg(feature = "ac-evo")]
 #[test]
 fn test_ac_snapshot_non_empty() {
-    use kerb::ac::connection::AcFrame;
-    use kerb::ac::snapshot::build_snapshot;
-    let frame: AcFrame = unsafe { std::mem::zeroed() };
+    use kerb::ac_evo::connection::AcEvoFrame;
+    use kerb::ac_evo::snapshot::build_snapshot;
+    let frame: AcEvoFrame = unsafe { std::mem::zeroed() };
     let snap = build_snapshot(&frame);
     assert!(!snap.is_empty());
     assert!(snap.contains_key("packet_id"));

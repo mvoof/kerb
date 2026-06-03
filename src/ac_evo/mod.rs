@@ -7,5 +7,5 @@ pub mod structs;
 #[doc(hidden)]
 pub mod types;
 
-pub use connection::{AcConnection, AcFrame};
+pub use connection::{AcEvoConnection, AcEvoFrame};
 pub use types::*;

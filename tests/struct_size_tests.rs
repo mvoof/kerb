@@ -1,5 +1,5 @@
-#[cfg(feature = "ac")]
-use kerb::ac::types::{AcPhysicsData, AcStaticData};
+#[cfg(feature = "ac-evo")]
+use kerb::ac_evo::types::{AcPhysicsData, AcStaticData};
 
 #[cfg(feature = "lmu")]
 use kerb::lmu::types::LmuFrame;
@@ -7,7 +7,7 @@ use kerb::lmu::types::LmuFrame;
 #[cfg(feature = "iracing")]
 use kerb::iracing::structs::irsdk_header;
 
-#[cfg(feature = "ac")]
+#[cfg(feature = "ac-evo")]
 #[test]
 fn physics_struct_size() {
     let size = std::mem::size_of::<AcPhysicsData>();
@@ -18,7 +18,7 @@ fn physics_struct_size() {
     );
 }
 
-#[cfg(feature = "ac")]
+#[cfg(feature = "ac-evo")]
 #[test]
 fn static_struct_has_track_field() {
     let s: AcStaticData = unsafe { std::mem::zeroed() };

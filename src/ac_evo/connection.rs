@@ -1,7 +1,7 @@
-use crate::ac::structs::{
+use crate::ac_evo::structs::{
     AC_STATUS_LIVE, SPageFileGraphicsEvo, SPageFilePhysicsEvo, SPageFileStaticEvo,
 };
-use crate::ac::types::{AcGraphicsData, AcPhysicsData, AcStaticData};
+use crate::ac_evo::types::{AcGraphicsData, AcPhysicsData, AcStaticData};
 use crate::error::SimError;
 use crate::shm::SharedMemRegion;
 
@@ -11,7 +11,7 @@ const SHM_STATIC: &str = "Local\\acevo_pmf_static";
 
 /// Point-in-time snapshot of the three AC Evo shared-memory pages.
 #[derive(Clone, Debug, serde::Serialize)]
-pub struct AcFrame {
+pub struct AcEvoFrame {
     /// Physics page — per-tick vehicle dynamics data.
     pub physics: AcPhysicsData,
     /// Graphics/HUD page — per-frame data: lap times, position, electronics.
@@ -21,13 +21,13 @@ pub struct AcFrame {
 }
 
 /// Live connection to Assetto Corsa Evo.
-pub struct AcConnection {
+pub struct AcEvoConnection {
     physics: SharedMemRegion,
     graphics: SharedMemRegion,
     static_data: SharedMemRegion,
 }
 
-impl AcConnection {
+impl AcEvoConnection {
     /// Connect to AC Evo shared memory (`acevo_pmf_*`).
     ///
     /// Returns [`SimError::NotConnected`] if AC Evo is not running.
@@ -43,7 +43,7 @@ impl AcConnection {
     }
 
     /// Read a point-in-time snapshot from AC Evo shared memory.
-    pub fn frame(&self) -> Result<AcFrame, SimError> {
+    pub fn frame(&self) -> Result<AcEvoFrame, SimError> {
         unsafe {
             let raw_p =
                 std::ptr::read_unaligned(self.physics.as_ptr() as *const SPageFilePhysicsEvo);
@@ -51,7 +51,7 @@ impl AcConnection {
                 std::ptr::read_unaligned(self.graphics.as_ptr() as *const SPageFileGraphicsEvo);
             let raw_s =
                 std::ptr::read_unaligned(self.static_data.as_ptr() as *const SPageFileStaticEvo);
-            Ok(AcFrame {
+            Ok(AcEvoFrame {
                 physics: AcPhysicsData::from(raw_p),
                 graphics: AcGraphicsData::from(raw_g),
                 static_data: AcStaticData::from(raw_s),
@@ -64,7 +64,7 @@ impl AcConnection {
         &self,
     ) -> std::collections::HashMap<String, crate::types::TelemetryValue> {
         match self.frame() {
-            Ok(frame) => crate::ac::snapshot::build_snapshot(&frame),
+            Ok(frame) => crate::ac_evo::snapshot::build_snapshot(&frame),
             Err(_) => std::collections::HashMap::new(),
         }
     }

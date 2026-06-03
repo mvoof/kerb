@@ -1,4 +1,4 @@
-#[cfg(any(feature = "iracing", feature = "ac", feature = "lmu"))]
+#[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 use crate::error::SimError;
 
 /// Decode a byte slice from Windows-1252 (CP-1252) into a Rust `String`.
@@ -14,9 +14,8 @@ pub fn decode_cp1252(bytes: &[u8]) -> String {
 /// Implemented by every connection type that can produce a telemetry snapshot.
 ///
 /// Allows [`save_telemetry_snapshot`] and [`save_var_list_snapshot`] to accept any
-/// connection directly — `&IRsdkConnection`, `&LmuConnection`, `&AcConnection`,
-/// `&AcEvoConnection`, or `&Connection`.
-#[cfg(any(feature = "iracing", feature = "ac", feature = "lmu"))]
+/// connection directly — `&IRsdkConnection`, `&LmuConnection`, `&AcEvoConnection`, or `&Connection`.
+#[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 pub trait HasSnapshot {
     fn telemetry_snapshot(&self)
     -> std::collections::HashMap<String, crate::types::TelemetryValue>;
@@ -47,9 +46,9 @@ impl_has_snapshot!(
     |s: &crate::iracing::connection::IRsdkConnection| s.var_list_snapshot()
 );
 impl_has_snapshot!(
-    "ac",
-    crate::ac::connection::AcConnection,
-    |_s: &crate::ac::connection::AcConnection| crate::ac::snapshot::var_list_snapshot()
+    "ac-evo",
+    crate::ac_evo::connection::AcEvoConnection,
+    |_s: &crate::ac_evo::connection::AcEvoConnection| crate::ac_evo::snapshot::var_list_snapshot()
 );
 impl_has_snapshot!(
     "lmu",
@@ -57,7 +56,7 @@ impl_has_snapshot!(
     |_s: &crate::lmu::connection::LmuConnection| crate::lmu::snapshot::var_list_snapshot()
 );
 
-#[cfg(any(feature = "iracing", feature = "ac", feature = "lmu"))]
+#[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 impl HasSnapshot for crate::connection::Connection {
     fn telemetry_snapshot(
         &self,
@@ -67,8 +66,8 @@ impl HasSnapshot for crate::connection::Connection {
         match self {
             #[cfg(feature = "iracing")]
             Connection::IRacing(c) => c.telemetry_snapshot(),
-            #[cfg(feature = "ac")]
-            Connection::Ac(c) => c.telemetry_snapshot(),
+            #[cfg(feature = "ac-evo")]
+            Connection::AcEvo(c) => c.telemetry_snapshot(),
             #[cfg(feature = "lmu")]
             Connection::Lmu(c) => c.telemetry_snapshot(),
         }
@@ -80,8 +79,8 @@ impl HasSnapshot for crate::connection::Connection {
         match self {
             #[cfg(feature = "iracing")]
             Connection::IRacing(c) => c.var_list_snapshot(),
-            #[cfg(feature = "ac")]
-            Connection::Ac(c) => c.var_list_snapshot(),
+            #[cfg(feature = "ac-evo")]
+            Connection::AcEvo(c) => c.var_list_snapshot(),
             #[cfg(feature = "lmu")]
             Connection::Lmu(c) => c.var_list_snapshot(),
         }
@@ -104,7 +103,7 @@ impl HasSnapshot for crate::connection::Connection {
 ///     kerb::save_telemetry_snapshot(&conn, "lmu_snapshot.txt")?;
 /// }
 /// ```
-#[cfg(any(feature = "iracing", feature = "ac", feature = "lmu"))]
+#[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 pub fn save_telemetry_snapshot(conn: &impl HasSnapshot, path: &str) -> Result<(), SimError> {
     let snap = conn.telemetry_snapshot();
 
@@ -126,7 +125,7 @@ pub fn save_telemetry_snapshot(conn: &impl HasSnapshot, path: &str) -> Result<()
 /// sorted alphabetically.
 ///
 /// Accepts any connection type directly — see [`save_telemetry_snapshot`].
-#[cfg(any(feature = "iracing", feature = "ac", feature = "lmu"))]
+#[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 pub fn save_var_list_snapshot(conn: &impl HasSnapshot, path: &str) -> Result<(), SimError> {
     let mut vars = conn.var_list_snapshot();
     vars.sort_by(|a, b| a.name.cmp(&b.name));

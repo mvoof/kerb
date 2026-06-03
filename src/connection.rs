@@ -5,8 +5,8 @@ use crate::error::SimError;
 pub enum SimType {
     #[cfg(feature = "iracing")]
     IRacing,
-    #[cfg(feature = "ac")]
-    Ac,
+    #[cfg(feature = "ac-evo")]
+    AcEvo,
     #[cfg(feature = "lmu")]
     Lmu,
 }
@@ -16,7 +16,7 @@ pub enum SimType {
 /// # Example
 ///
 /// ```ignore
-/// use kerb::{SimConnection, Connection, ac::connection::AcFrame};
+/// use kerb::{SimConnection, Connection, ac_evo::connection::AcEvoFrame};
 ///
 /// let conn = SimConnection::connect().expect("no sim running");
 /// match conn {
@@ -25,7 +25,7 @@ pub enum SimType {
 ///         let frame = c.frame();
 ///         println!("rpm={}", frame.rpm);
 ///     }
-///     Connection::Ac(c) => {
+///     Connection::AcEvo(c) => {
 ///         let frame = c.frame().unwrap();
 ///         println!("{:.0} rpm  gear {}", frame.physics.rpms, frame.physics.gear);
 ///         println!("abs={} tc={}", frame.graphics.electronics.abs_level, frame.graphics.electronics.tc_level);
@@ -42,8 +42,8 @@ pub enum SimType {
 pub enum Connection {
     #[cfg(feature = "iracing")]
     IRacing(crate::iracing::connection::IRsdkConnection),
-    #[cfg(feature = "ac")]
-    Ac(crate::ac::connection::AcConnection),
+    #[cfg(feature = "ac-evo")]
+    AcEvo(crate::ac_evo::connection::AcEvoConnection),
     #[cfg(feature = "lmu")]
     Lmu(crate::lmu::connection::LmuConnection),
 }
@@ -64,9 +64,9 @@ impl SimConnection {
                 return Ok(Connection::IRacing(c));
             }
         }
-        #[cfg(feature = "ac")]
-        if let Ok(c) = crate::ac::connection::AcConnection::connect() {
-            return Ok(Connection::Ac(c));
+        #[cfg(feature = "ac-evo")]
+        if let Ok(c) = crate::ac_evo::connection::AcEvoConnection::connect() {
+            return Ok(Connection::AcEvo(c));
         }
         #[cfg(feature = "lmu")]
         if let Ok(c) = crate::lmu::connection::LmuConnection::connect() {
@@ -82,8 +82,10 @@ impl SimConnection {
             SimType::IRacing => {
                 crate::iracing::connection::IRsdkConnection::connect().map(Connection::IRacing)
             }
-            #[cfg(feature = "ac")]
-            SimType::Ac => crate::ac::connection::AcConnection::connect().map(Connection::Ac),
+            #[cfg(feature = "ac-evo")]
+            SimType::AcEvo => {
+                crate::ac_evo::connection::AcEvoConnection::connect().map(Connection::AcEvo)
+            }
             #[cfg(feature = "lmu")]
             SimType::Lmu => crate::lmu::connection::LmuConnection::connect().map(Connection::Lmu),
         }

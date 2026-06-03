@@ -8,7 +8,7 @@ fn main() -> Result<(), SimError> {
 
     loop {
         match SimConnection::connect() {
-            Ok(Connection::Ac(conn)) => {
+            Ok(Connection::AcEvo(conn)) => {
                 println!("Connected to AC Evo");
 
                 while conn.is_connected() {

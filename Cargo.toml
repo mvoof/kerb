@@ -9,9 +9,8 @@ keywords = ["iracing", "telemetry", "sim-racing", "assetto-corsa"]
 categories = ["game-development"]
 
 [features]
-default = ["iracing", "ac", "lmu"]
+default = ["iracing", "ac-evo", "lmu"]
 iracing = ["dep:windows-sys", "dep:serde_yaml"]
-ac = ["dep:windows-sys"]
 ac-evo = ["dep:windows-sys"]
 lmu = ["dep:windows-sys"]
 
