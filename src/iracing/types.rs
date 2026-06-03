@@ -14,336 +14,667 @@ pub struct IracingOffset {
 /// Cached shared memory offsets for all iRacing telemetry variables.
 #[derive(Debug, Clone)]
 pub struct IracingOffsets {
+    /// Density of air at start/finish line [kg/m^3]
     pub air_density: Option<IracingOffset>,
+    /// Pressure of air at start/finish line [Pa]
     pub air_pressure: Option<IracingOffset>,
+    /// Temperature of air at start/finish line [C]
     pub air_temp: Option<IracingOffset>,
+    /// 0=brake released to 1=max pedal force [%]
     pub brake: Option<IracingOffset>,
+    /// true if abs is currently reducing brake force pressure
     pub brake_ab_sactive: Option<IracingOffset>,
+    /// Raw brake input 0=brake released to 1=max pedal force [%]
     pub brake_raw: Option<IracingOffset>,
+    /// Active camera number
     pub cam_camera_number: Option<IracingOffset>,
+    /// State of camera system [irsdk_CameraState]
     pub cam_camera_state: Option<IracingOffset>,
+    /// Active camera's focus car index
     pub cam_car_idx: Option<IracingOffset>,
+    /// Active camera group number
     pub cam_group_number: Option<IracingOffset>,
+    /// Distance to first car in front of player in meters [m]
     pub car_dist_ahead: Option<IracingOffset>,
+    /// Distance to first car behind player in meters [m]
     pub car_dist_behind: Option<IracingOffset>,
+    /// Cars best lap number
     pub car_idx_best_lap_num: Option<IracingOffset>,
+    /// Cars best lap time [s]
     pub car_idx_best_lap_time: Option<IracingOffset>,
+    /// Cars class id by car index
     pub car_idx_class: Option<IracingOffset>,
+    /// Cars class position in race by car index
     pub car_idx_class_position: Option<IracingOffset>,
+    /// Estimated time to reach current location on track [s]
     pub car_idx_est_time: Option<IracingOffset>,
+    /// Race time behind leader or fastest lap time otherwise [s]
     pub car_idx_f2time: Option<IracingOffset>,
+    /// How many fast repairs each car has used
     pub car_idx_fast_repairs_used: Option<IracingOffset>,
+    /// -1=reverse  0=neutral  1..n=current gear by car index
     pub car_idx_gear: Option<IracingOffset>,
+    /// Laps started by car index
     pub car_idx_lap: Option<IracingOffset>,
+    /// Laps completed by car index
     pub car_idx_lap_completed: Option<IracingOffset>,
+    /// Percentage distance around lap by car index [%]
     pub car_idx_lap_dist_pct: Option<IracingOffset>,
+    /// Cars last lap time [s]
     pub car_idx_last_lap_time: Option<IracingOffset>,
+    /// On pit road between the cones by car index
     pub car_idx_on_pit_road: Option<IracingOffset>,
+    /// Push2Pass count of usage (or remaining in Race)
     pub car_idx_p2p_count: Option<IracingOffset>,
+    /// Push2Pass active or not
     pub car_idx_p2p_status: Option<IracingOffset>,
+    /// Pacing status flags for each car [irsdk_PaceFlags]
     pub car_idx_pace_flags: Option<IracingOffset>,
+    /// What line cars are pacing in  or -1 if not pacing
     pub car_idx_pace_line: Option<IracingOffset>,
+    /// What row cars are pacing in  or -1 if not pacing
     pub car_idx_pace_row: Option<IracingOffset>,
+    /// Cars position in race by car index
     pub car_idx_position: Option<IracingOffset>,
+    /// Cars Qual tire compound
     pub car_idx_qual_tire_compound: Option<IracingOffset>,
+    /// Cars Qual tire compound is locked-in
     pub car_idx_qual_tire_compound_locked: Option<IracingOffset>,
+    /// Engine rpm by car index [revs/min]
     pub car_idx_rpm: Option<IracingOffset>,
+    /// Session flags for each player [irsdk_Flags]
     pub car_idx_session_flags: Option<IracingOffset>,
+    /// Steering wheel angle by car index [rad]
     pub car_idx_steer: Option<IracingOffset>,
+    /// Cars current tire compound
     pub car_idx_tire_compound: Option<IracingOffset>,
+    /// Track surface type by car index [irsdk_TrkLoc]
     pub car_idx_track_surface: Option<IracingOffset>,
+    /// Track surface material type by car index [irsdk_TrkSurf]
     pub car_idx_track_surface_material: Option<IracingOffset>,
+    /// Notify if car is to the left or right of driver [irsdk_CarLeftRight]
     pub car_left_right: Option<IracingOffset>,
+    /// Communications average latency [s]
     pub chan_avg_latency: Option<IracingOffset>,
+    /// Communications server clock skew [s]
     pub chan_clock_skew: Option<IracingOffset>,
+    /// Communications latency [s]
     pub chan_latency: Option<IracingOffset>,
+    /// Partner communications quality [%]
     pub chan_partner_quality: Option<IracingOffset>,
+    /// Communications quality [%]
     pub chan_quality: Option<IracingOffset>,
+    /// 0=disengaged to 1=fully engaged [%]
     pub clutch: Option<IracingOffset>,
+    /// Raw clutch input 0=disengaged to 1=fully engaged [%]
     pub clutch_raw: Option<IracingOffset>,
+    /// Percent of available time bg thread took with a 1 sec avg [%]
     pub cpu_usage_bg: Option<IracingOffset>,
+    /// Percent of available time fg thread took with a 1 sec avg [%]
     pub cpu_usage_fg: Option<IracingOffset>,
+    /// Number of team drivers who have run a stint
     pub dc_drivers_so_far: Option<IracingOffset>,
+    /// Status of driver change lap requirements
     pub dc_lap_status: Option<IracingOffset>,
+    /// Default units for the user interface 0 = english 1 = metric
     pub display_units: Option<IracingOffset>,
+    /// Driver activated flag
     pub driver_marker: Option<IracingOffset>,
+    /// Engine0Engine rpm [revs/min]
     pub engine0_rpm: Option<IracingOffset>,
+    /// Bitfield for warning lights [irsdk_EngineWarnings]
     pub engine_warnings: Option<IracingOffset>,
+    /// Indicate action the reset key will take 0 enter 1 exit 2 reset
     pub enter_exit_reset: Option<IracingOffset>,
+    /// How many fast repairs left  255 is unlimited
     pub fast_repair_available: Option<IracingOffset>,
+    /// How many fast repairs used so far
     pub fast_repair_used: Option<IracingOffset>,
+    /// Fog level at start/finish line [%]
     pub fog_level: Option<IracingOffset>,
+    /// Average frames per second [fps]
     pub frame_rate: Option<IracingOffset>,
+    /// How many front tire sets are remaining  255 is unlimited
     pub front_tire_sets_available: Option<IracingOffset>,
+    /// How many front tire sets used so far
     pub front_tire_sets_used: Option<IracingOffset>,
+    /// Liters of fuel remaining [l]
     pub fuel_level: Option<IracingOffset>,
+    /// Percent fuel remaining [%]
     pub fuel_level_pct: Option<IracingOffset>,
+    /// Engine fuel pressure [bar]
     pub fuel_press: Option<IracingOffset>,
+    /// Engine fuel used instantaneous [kg/h]
     pub fuel_use_per_hour: Option<IracingOffset>,
+    /// -1=reverse  0=neutral  1..n=current gear
     pub gear: Option<IracingOffset>,
+    /// Percent of available time gpu took with a 1 sec avg [%]
     pub gpu_usage: Option<IracingOffset>,
+    /// Raw handbrake input 0=handbrake released to 1=max force [%]
     pub handbrake_raw: Option<IracingOffset>,
+    /// 0=disk based telemetry file not being written  1=being written
     pub is_disk_logging_active: Option<IracingOffset>,
+    /// 0=disk based telemetry turned off  1=turned on
     pub is_disk_logging_enabled: Option<IracingOffset>,
+    /// 1=Garage screen is visible
     pub is_garage_visible: Option<IracingOffset>,
+    /// 1=Car in garage physics running
     pub is_in_garage: Option<IracingOffset>,
+    /// 1=Car on track physics running with player in car
     pub is_on_track: Option<IracingOffset>,
+    /// 1=Car on track physics running
     pub is_on_track_car: Option<IracingOffset>,
+    /// 0=replay not playing  1=replay playing
     pub is_replay_playing: Option<IracingOffset>,
+    /// How many left front tires are remaining  255 is unlimited
     pub lf_tires_available: Option<IracingOffset>,
+    /// How many left front tires used so far
     pub lf_tires_used: Option<IracingOffset>,
+    /// LF brake line pressure [bar]
     pub l_fbrake_line_press: Option<IracingOffset>,
+    /// LF tire cold pressure  as set in the garage [kPa]
     pub l_fcold_pressure: Option<IracingOffset>,
+    /// LF distance tire traveled since being placed on car [m]
     pub l_fodometer: Option<IracingOffset>,
+    /// LF shock deflection [m]
     pub l_fshock_defl: Option<IracingOffset>,
+    /// LF shock deflection at 360 Hz [m]
     pub l_fshock_defl_st: Option<IracingOffset>,
+    /// LF shock velocity [m/s]
     pub l_fshock_vel: Option<IracingOffset>,
+    /// LF shock velocity at 360 Hz [m/s]
     pub l_fshock_vel_st: Option<IracingOffset>,
+    /// LF tire left carcass temperature [C]
     pub l_ftemp_cl: Option<IracingOffset>,
+    /// LF tire middle carcass temperature [C]
     pub l_ftemp_cm: Option<IracingOffset>,
+    /// LF tire right carcass temperature [C]
     pub l_ftemp_cr: Option<IracingOffset>,
+    /// LF tire left percent tread remaining [%]
     pub l_fwear_l: Option<IracingOffset>,
+    /// LF tire middle percent tread remaining [%]
     pub l_fwear_m: Option<IracingOffset>,
+    /// LF tire right percent tread remaining [%]
     pub l_fwear_r: Option<IracingOffset>,
+    /// How many left rear tires are remaining  255 is unlimited
     pub lr_tires_available: Option<IracingOffset>,
+    /// How many left rear tires used so far
     pub lr_tires_used: Option<IracingOffset>,
+    /// LR brake line pressure [bar]
     pub l_rbrake_line_press: Option<IracingOffset>,
+    /// LR tire cold pressure  as set in the garage [kPa]
     pub l_rcold_pressure: Option<IracingOffset>,
+    /// LR distance tire traveled since being placed on car [m]
     pub l_rodometer: Option<IracingOffset>,
+    /// LR shock deflection [m]
     pub l_rshock_defl: Option<IracingOffset>,
+    /// LR shock deflection at 360 Hz [m]
     pub l_rshock_defl_st: Option<IracingOffset>,
+    /// LR shock velocity [m/s]
     pub l_rshock_vel: Option<IracingOffset>,
+    /// LR shock velocity at 360 Hz [m/s]
     pub l_rshock_vel_st: Option<IracingOffset>,
+    /// LR tire left carcass temperature [C]
     pub l_rtemp_cl: Option<IracingOffset>,
+    /// LR tire middle carcass temperature [C]
     pub l_rtemp_cm: Option<IracingOffset>,
+    /// LR tire right carcass temperature [C]
     pub l_rtemp_cr: Option<IracingOffset>,
+    /// LR tire left percent tread remaining [%]
     pub l_rwear_l: Option<IracingOffset>,
+    /// LR tire middle percent tread remaining [%]
     pub l_rwear_m: Option<IracingOffset>,
+    /// LR tire right percent tread remaining [%]
     pub l_rwear_r: Option<IracingOffset>,
+    /// Laps started count
     pub lap: Option<IracingOffset>,
+    /// Players best lap number
     pub lap_best_lap: Option<IracingOffset>,
+    /// Players best lap time [s]
     pub lap_best_lap_time: Option<IracingOffset>,
+    /// Player last lap in best N average lap time
     pub lap_best_n_lap_lap: Option<IracingOffset>,
+    /// Player best N average lap time [s]
     pub lap_best_n_lap_time: Option<IracingOffset>,
+    /// Laps completed count
     pub lap_completed: Option<IracingOffset>,
+    /// Estimate of players current lap time as shown in F3 box [s]
     pub lap_current_lap_time: Option<IracingOffset>,
+    /// Delta time for best lap [s]
     pub lap_delta_to_best_lap: Option<IracingOffset>,
+    /// Rate of change of delta time for best lap [s/s]
     pub lap_delta_to_best_lap_dd: Option<IracingOffset>,
+    /// Delta time for best lap is valid
     pub lap_delta_to_best_lap_ok: Option<IracingOffset>,
+    /// Delta time for optimal lap [s]
     pub lap_delta_to_optimal_lap: Option<IracingOffset>,
+    /// Rate of change of delta time for optimal lap [s/s]
     pub lap_delta_to_optimal_lap_dd: Option<IracingOffset>,
+    /// Delta time for optimal lap is valid
     pub lap_delta_to_optimal_lap_ok: Option<IracingOffset>,
+    /// Delta time for session best lap [s]
     pub lap_delta_to_session_best_lap: Option<IracingOffset>,
+    /// Rate of change of delta time for session best lap [s/s]
     pub lap_delta_to_session_best_lap_dd: Option<IracingOffset>,
+    /// Delta time for session best lap is valid
     pub lap_delta_to_session_best_lap_ok: Option<IracingOffset>,
+    /// Delta time for session last lap [s]
     pub lap_delta_to_session_lastl_lap: Option<IracingOffset>,
+    /// Rate of change of delta time for session last lap [s/s]
     pub lap_delta_to_session_lastl_lap_dd: Option<IracingOffset>,
+    /// Delta time for session last lap is valid
     pub lap_delta_to_session_lastl_lap_ok: Option<IracingOffset>,
+    /// Delta time for session optimal lap [s]
     pub lap_delta_to_session_optimal_lap: Option<IracingOffset>,
+    /// Rate of change of delta time for session optimal lap [s/s]
     pub lap_delta_to_session_optimal_lap_dd: Option<IracingOffset>,
+    /// Delta time for session optimal lap is valid
     pub lap_delta_to_session_optimal_lap_ok: Option<IracingOffset>,
+    /// Meters traveled from S/F this lap [m]
     pub lap_dist: Option<IracingOffset>,
+    /// Percentage distance around lap [%]
     pub lap_dist_pct: Option<IracingOffset>,
+    /// Player num consecutive clean laps completed for N average
     pub lap_las_n_lap_seq: Option<IracingOffset>,
+    /// Players last lap time [s]
     pub lap_last_lap_time: Option<IracingOffset>,
+    /// Player last N average lap time [s]
     pub lap_last_n_lap_time: Option<IracingOffset>,
+    /// Lateral acceleration (including gravity) [m/s^2]
     pub lat_accel: Option<IracingOffset>,
+    /// Lateral acceleration (including gravity) at 360 Hz [m/s^2]
     pub lat_accel_st: Option<IracingOffset>,
+    /// How many left tire sets are remaining  255 is unlimited
     pub left_tire_sets_available: Option<IracingOffset>,
+    /// How many left tire sets used so far
     pub left_tire_sets_used: Option<IracingOffset>,
+    /// True if the car_num texture will be loaded
     pub load_num_textures: Option<IracingOffset>,
+    /// Longitudinal acceleration (including gravity) [m/s^2]
     pub long_accel: Option<IracingOffset>,
+    /// Longitudinal acceleration (including gravity) at 360 Hz [m/s^2]
     pub long_accel_st: Option<IracingOffset>,
+    /// Engine manifold pressure [bar]
     pub manifold_press: Option<IracingOffset>,
+    /// Hybrid manual boost state
     pub manual_boost: Option<IracingOffset>,
+    /// Hybrid manual no boost state
     pub manual_no_boost: Option<IracingOffset>,
+    /// Memory page faults per second
     pub mem_page_fault_sec: Option<IracingOffset>,
+    /// Memory soft page faults per second
     pub mem_soft_page_fault_sec: Option<IracingOffset>,
+    /// Engine oil level [l]
     pub oil_level: Option<IracingOffset>,
+    /// Engine oil pressure [bar]
     pub oil_press: Option<IracingOffset>,
+    /// Engine oil temperature [C]
     pub oil_temp: Option<IracingOffset>,
+    /// True if it is ok to reload car textures at this time
     pub ok_to_reload_textures: Option<IracingOffset>,
+    /// Is the player car on pit road between the cones
     pub on_pit_road: Option<IracingOffset>,
+    /// Push2Pass count of usage (or remaining in Race) on your car
     pub p2p_count: Option<IracingOffset>,
+    /// Push2Pass active or not on your car
     pub p2p_status: Option<IracingOffset>,
+    /// Are we pacing or not [irsdk_PaceMode]
     pub pace_mode: Option<IracingOffset>,
+    /// Time left for optional repairs if repairs are active [s]
     pub pit_opt_repair_left: Option<IracingOffset>,
+    /// Time left for mandatory pit repairs if repairs are active [s]
     pub pit_repair_left: Option<IracingOffset>,
+    /// Bitfield of pit service checkboxes [irsdk_PitSvFlags]
     pub pit_sv_flags: Option<IracingOffset>,
+    /// Pit service fuel add amount [l or kWh]
     pub pit_sv_fuel: Option<IracingOffset>,
+    /// Pit service left front tire pressure [kPa]
     pub pit_sv_lfp: Option<IracingOffset>,
+    /// Pit service left rear tire pressure [kPa]
     pub pit_sv_lrp: Option<IracingOffset>,
+    /// Pit service right front tire pressure [kPa]
     pub pit_sv_rfp: Option<IracingOffset>,
+    /// Pit service right rear tire pressure [kPa]
     pub pit_sv_rrp: Option<IracingOffset>,
+    /// Pit service pending tire compound
     pub pit_sv_tire_compound: Option<IracingOffset>,
+    /// Pitch orientation [rad]
     pub pitch: Option<IracingOffset>,
+    /// Pitch rate [rad/s]
     pub pitch_rate: Option<IracingOffset>,
+    /// Pitch rate at 360 Hz [rad/s]
     pub pitch_rate_st: Option<IracingOffset>,
+    /// True if pit stop is allowed for the current player
     pub pits_open: Option<IracingOffset>,
+    /// Is the player getting pit stop service
     pub pitstop_active: Option<IracingOffset>,
+    /// Player car class id
     pub player_car_class: Option<IracingOffset>,
+    /// Players class position in race
     pub player_car_class_position: Option<IracingOffset>,
+    /// Teams current drivers incident count for this session
     pub player_car_driver_incident_count: Option<IracingOffset>,
+    /// Players dry tire set limit
     pub player_car_dry_tire_set_limit: Option<IracingOffset>,
+    /// Players carIdx
     pub player_car_idx: Option<IracingOffset>,
+    /// Players car is properly in their pitstall
     pub player_car_in_pit_stall: Option<IracingOffset>,
+    /// Players own incident count for this session
     pub player_car_my_incident_count: Option<IracingOffset>,
+    /// Players car pit service status bits [irsdk_PitSvStatus]
     pub player_car_pit_sv_status: Option<IracingOffset>,
+    /// Players position in race
     pub player_car_position: Option<IracingOffset>,
+    /// Players power adjust [%]
     pub player_car_power_adjust: Option<IracingOffset>,
+    /// Shift light blink rpm [revs/min]
     pub player_car_sl_blink_rpm: Option<IracingOffset>,
+    /// Shift light first light rpm [revs/min]
     pub player_car_sl_first_rpm: Option<IracingOffset>,
+    /// Shift light last light rpm [revs/min]
     pub player_car_sl_last_rpm: Option<IracingOffset>,
+    /// Shift light shift rpm [revs/min]
     pub player_car_sl_shift_rpm: Option<IracingOffset>,
+    /// Players team incident count for this session
     pub player_car_team_incident_count: Option<IracingOffset>,
+    /// Players car is being towed if time is greater than zero [s]
     pub player_car_tow_time: Option<IracingOffset>,
+    /// Players weight penalty [kg]
     pub player_car_weight_penalty: Option<IracingOffset>,
+    /// Players car number of fast repairs used
     pub player_fast_repairs_used: Option<IracingOffset>,
+    /// Log incidents that the player recieved [irsdk_IncidentFlags]
     pub player_incidents: Option<IracingOffset>,
+    /// Players car current tire compound
     pub player_tire_compound: Option<IracingOffset>,
+    /// Players car track surface type [irsdk_TrkLoc]
     pub player_track_surface: Option<IracingOffset>,
+    /// Players car track surface material type [irsdk_TrkSurf]
     pub player_track_surface_material: Option<IracingOffset>,
+    /// Precipitation at start/finish line [%]
     pub precipitation: Option<IracingOffset>,
+    /// Push to pass button state
     pub push_to_pass: Option<IracingOffset>,
+    /// Push to talk button state
     pub push_to_talk: Option<IracingOffset>,
+    /// How many right front tires are remaining  255 is unlimited
     pub rf_tires_available: Option<IracingOffset>,
+    /// How many right front tires used so far
     pub rf_tires_used: Option<IracingOffset>,
+    /// RF brake line pressure [bar]
     pub r_fbrake_line_press: Option<IracingOffset>,
+    /// RF tire cold pressure  as set in the garage [kPa]
     pub r_fcold_pressure: Option<IracingOffset>,
+    /// RF distance tire traveled since being placed on car [m]
     pub r_fodometer: Option<IracingOffset>,
+    /// RF shock deflection [m]
     pub r_fshock_defl: Option<IracingOffset>,
+    /// RF shock deflection at 360 Hz [m]
     pub r_fshock_defl_st: Option<IracingOffset>,
+    /// RF shock velocity [m/s]
     pub r_fshock_vel: Option<IracingOffset>,
+    /// RF shock velocity at 360 Hz [m/s]
     pub r_fshock_vel_st: Option<IracingOffset>,
+    /// RF tire left carcass temperature [C]
     pub r_ftemp_cl: Option<IracingOffset>,
+    /// RF tire middle carcass temperature [C]
     pub r_ftemp_cm: Option<IracingOffset>,
+    /// RF tire right carcass temperature [C]
     pub r_ftemp_cr: Option<IracingOffset>,
+    /// RF tire left percent tread remaining [%]
     pub r_fwear_l: Option<IracingOffset>,
+    /// RF tire middle percent tread remaining [%]
     pub r_fwear_m: Option<IracingOffset>,
+    /// RF tire right percent tread remaining [%]
     pub r_fwear_r: Option<IracingOffset>,
+    /// Engine rpm [revs/min]
     pub rpm: Option<IracingOffset>,
+    /// How many right rear tires are remaining  255 is unlimited
     pub rr_tires_available: Option<IracingOffset>,
+    /// How many right rear tires used so far
     pub rr_tires_used: Option<IracingOffset>,
+    /// RR brake line pressure [bar]
     pub r_rbrake_line_press: Option<IracingOffset>,
+    /// RR tire cold pressure  as set in the garage [kPa]
     pub r_rcold_pressure: Option<IracingOffset>,
+    /// RR distance tire traveled since being placed on car [m]
     pub r_rodometer: Option<IracingOffset>,
+    /// RR shock deflection [m]
     pub r_rshock_defl: Option<IracingOffset>,
+    /// RR shock deflection at 360 Hz [m]
     pub r_rshock_defl_st: Option<IracingOffset>,
+    /// RR shock velocity [m/s]
     pub r_rshock_vel: Option<IracingOffset>,
+    /// RR shock velocity at 360 Hz [m/s]
     pub r_rshock_vel_st: Option<IracingOffset>,
+    /// RR tire left carcass temperature [C]
     pub r_rtemp_cl: Option<IracingOffset>,
+    /// RR tire middle carcass temperature [C]
     pub r_rtemp_cm: Option<IracingOffset>,
+    /// RR tire right carcass temperature [C]
     pub r_rtemp_cr: Option<IracingOffset>,
+    /// RR tire left percent tread remaining [%]
     pub r_rwear_l: Option<IracingOffset>,
+    /// RR tire middle percent tread remaining [%]
     pub r_rwear_m: Option<IracingOffset>,
+    /// RR tire right percent tread remaining [%]
     pub r_rwear_r: Option<IracingOffset>,
+    /// Laps completed in race
     pub race_laps: Option<IracingOffset>,
+    /// The car index of the current person speaking on the radio
     pub radio_transmit_car_idx: Option<IracingOffset>,
+    /// The frequency index of the current person speaking on the radio
     pub radio_transmit_frequency_idx: Option<IracingOffset>,
+    /// The radio index of the current person speaking on the radio
     pub radio_transmit_radio_idx: Option<IracingOffset>,
+    /// How many rear tire sets are remaining  255 is unlimited
     pub rear_tire_sets_available: Option<IracingOffset>,
+    /// How many rear tire sets used so far
     pub rear_tire_sets_used: Option<IracingOffset>,
+    /// Relative Humidity at start/finish line [%]
     pub relative_humidity: Option<IracingOffset>,
+    /// Integer replay frame number (60 per second)
     pub replay_frame_num: Option<IracingOffset>,
+    /// Integer replay frame number from end of tape
     pub replay_frame_num_end: Option<IracingOffset>,
+    /// 0=not slow motion  1=replay is in slow motion
     pub replay_play_slow_motion: Option<IracingOffset>,
+    /// Replay playback speed
     pub replay_play_speed: Option<IracingOffset>,
+    /// Replay session number
     pub replay_session_num: Option<IracingOffset>,
+    /// Seconds since replay session start [s]
     pub replay_session_time: Option<IracingOffset>,
+    /// How many right tire sets are remaining  255 is unlimited
     pub right_tire_sets_available: Option<IracingOffset>,
+    /// How many right tire sets used so far
     pub right_tire_sets_used: Option<IracingOffset>,
+    /// Roll orientation [rad]
     pub roll: Option<IracingOffset>,
+    /// Roll rate [rad/s]
     pub roll_rate: Option<IracingOffset>,
+    /// Roll rate at 360 Hz [rad/s]
     pub roll_rate_st: Option<IracingOffset>,
+    /// Session flags [irsdk_Flags]
     pub session_flags: Option<IracingOffset>,
+    /// Joker laps remaining to be taken
     pub session_joker_laps_remain: Option<IracingOffset>,
+    /// Old laps left till session ends use SessionLapsRemainEx
     pub session_laps_remain: Option<IracingOffset>,
+    /// New improved laps left till session ends
     pub session_laps_remain_ex: Option<IracingOffset>,
+    /// Total number of laps in session
     pub session_laps_total: Option<IracingOffset>,
+    /// Session number
     pub session_num: Option<IracingOffset>,
+    /// Player is currently completing a joker lap
     pub session_on_joker_lap: Option<IracingOffset>,
+    /// Session state [irsdk_SessionState]
     pub session_state: Option<IracingOffset>,
+    /// Current update number
     pub session_tick: Option<IracingOffset>,
+    /// Seconds since session start [s]
     pub session_time: Option<IracingOffset>,
+    /// Time of day in seconds [s]
     pub session_time_of_day: Option<IracingOffset>,
+    /// Seconds left till session ends [s]
     pub session_time_remain: Option<IracingOffset>,
+    /// Total number of seconds in session [s]
     pub session_time_total: Option<IracingOffset>,
+    /// Session ID
     pub session_unique_id: Option<IracingOffset>,
+    /// RPM of shifter grinding noise [RPM]
     pub shift_grind_rpm: Option<IracingOffset>,
+    /// DEPRECATED use DriverCarSLBlinkRPM instead [%]
     pub shift_indicator_pct: Option<IracingOffset>,
+    /// Friction torque applied to gears when shifting or grinding [%]
     pub shift_power_pct: Option<IracingOffset>,
+    /// Log inputs from the players shifter control
     pub shifter: Option<IracingOffset>,
+    /// Skies (0=clear/1=p cloudy/2=m cloudy/3=overcast)
     pub skies: Option<IracingOffset>,
+    /// Sun angle above horizon in radians [rad]
     pub solar_altitude: Option<IracingOffset>,
+    /// Sun angle clockwise from north in radians [rad]
     pub solar_azimuth: Option<IracingOffset>,
+    /// GPS vehicle speed [m/s]
     pub speed: Option<IracingOffset>,
+    /// Force feedback is enabled
     pub steering_ffb_enabled: Option<IracingOffset>,
+    /// Steering wheel angle [rad]
     pub steering_wheel_angle: Option<IracingOffset>,
+    /// Steering wheel max angle [rad]
     pub steering_wheel_angle_max: Option<IracingOffset>,
+    /// Force feedback limiter strength limits impacts and oscillation [%]
     pub steering_wheel_limiter: Option<IracingOffset>,
+    /// Value of strength or max force slider in Nm for FFB [N*m]
     pub steering_wheel_max_force_nm: Option<IracingOffset>,
+    /// Force feedback % max damping [%]
     pub steering_wheel_pct_damper: Option<IracingOffset>,
+    /// Force feedback % max intensity [%]
     pub steering_wheel_pct_intensity: Option<IracingOffset>,
+    /// Force feedback % max smoothing [%]
     pub steering_wheel_pct_smoothing: Option<IracingOffset>,
+    /// Force feedback % max torque on steering shaft unsigned [%]
     pub steering_wheel_pct_torque: Option<IracingOffset>,
+    /// Force feedback % max torque on steering shaft signed [%]
     pub steering_wheel_pct_torque_sign: Option<IracingOffset>,
+    /// Force feedback % max torque on steering shaft signed stops [%]
     pub steering_wheel_pct_torque_sign_stops: Option<IracingOffset>,
+    /// Peak torque mapping to direct input units for FFB [N*m]
     pub steering_wheel_peak_force_nm: Option<IracingOffset>,
+    /// Output torque on steering shaft [N*m]
     pub steering_wheel_torque: Option<IracingOffset>,
+    /// Output torque on steering shaft at 360 Hz [N*m]
     pub steering_wheel_torque_st: Option<IracingOffset>,
+    /// True if steering wheel force is using linear mode
     pub steering_wheel_use_linear: Option<IracingOffset>,
+    /// 0=off throttle to 1=full throttle [%]
     pub throttle: Option<IracingOffset>,
+    /// Raw throttle input 0=off throttle to 1=full throttle [%]
     pub throttle_raw: Option<IracingOffset>,
+    /// Players LF Tire Sound rumblestrip pitch [Hz]
     pub tire_lf_rumble_pitch: Option<IracingOffset>,
+    /// Players LR Tire Sound rumblestrip pitch [Hz]
     pub tire_lr_rumble_pitch: Option<IracingOffset>,
+    /// Players RF Tire Sound rumblestrip pitch [Hz]
     pub tire_rf_rumble_pitch: Option<IracingOffset>,
+    /// Players RR Tire Sound rumblestrip pitch [Hz]
     pub tire_rr_rumble_pitch: Option<IracingOffset>,
+    /// How many tire sets are remaining  255 is unlimited
     pub tire_sets_available: Option<IracingOffset>,
+    /// How many tire sets used so far
     pub tire_sets_used: Option<IracingOffset>,
+    /// Deprecated  set to TrackTempCrew [C]
     pub track_temp: Option<IracingOffset>,
+    /// Temperature of track measured by crew around track [C]
     pub track_temp_crew: Option<IracingOffset>,
+    /// How wet is the average track surface [irsdk_TrackWetness]
     pub track_wetness: Option<IracingOffset>,
+    /// X velocity [m/s]
     pub velocity_x: Option<IracingOffset>,
+    /// X velocity [m/s at 360 Hz]
     pub velocity_x_st: Option<IracingOffset>,
+    /// Y velocity [m/s]
     pub velocity_y: Option<IracingOffset>,
+    /// Y velocity [m/s at 360 Hz]
     pub velocity_y_st: Option<IracingOffset>,
+    /// Z velocity [m/s]
     pub velocity_z: Option<IracingOffset>,
+    /// Z velocity [m/s at 360 Hz]
     pub velocity_z_st: Option<IracingOffset>,
+    /// Vertical acceleration (including gravity) [m/s^2]
     pub vert_accel: Option<IracingOffset>,
+    /// Vertical acceleration (including gravity) at 360 Hz [m/s^2]
     pub vert_accel_st: Option<IracingOffset>,
+    /// True if video currently being captured
     pub vid_cap_active: Option<IracingOffset>,
+    /// True if video capture system is enabled
     pub vid_cap_enabled: Option<IracingOffset>,
+    /// Engine voltage [V]
     pub voltage: Option<IracingOffset>,
+    /// Engine coolant level [l]
     pub water_level: Option<IracingOffset>,
+    /// Engine coolant temp [C]
     pub water_temp: Option<IracingOffset>,
+    /// The steward says rain tires can be used
     pub weather_declared_wet: Option<IracingOffset>,
+    /// Wind direction at start/finish line [rad]
     pub wind_dir: Option<IracingOffset>,
+    /// Wind velocity at start/finish line [m/s]
     pub wind_vel: Option<IracingOffset>,
+    /// Yaw orientation [rad]
     pub yaw: Option<IracingOffset>,
+    /// Yaw orientation relative to north [rad]
     pub yaw_north: Option<IracingOffset>,
+    /// Yaw rate [rad/s]
     pub yaw_rate: Option<IracingOffset>,
+    /// Yaw rate at 360 Hz [rad/s]
     pub yaw_rate_st: Option<IracingOffset>,
+    /// In car abs adjustment
     pub dc_abs: Option<IracingOffset>,
+    /// In car brake bias adjustment
     pub dc_brake_bias: Option<IracingOffset>,
+    /// In car headlight flash control active
     pub dc_headlight_flash: Option<IracingOffset>,
+    /// Track if pit speed limiter system is enabled
     pub dc_pit_speed_limiter_toggle: Option<IracingOffset>,
+    /// In car trigger car starter
     pub dc_starter: Option<IracingOffset>,
+    /// In car turn wipers on or off
     pub dc_toggle_windshield_wipers: Option<IracingOffset>,
+    /// In car traction control adjustment
     pub dc_traction_control: Option<IracingOffset>,
+    /// In car momentarily turn on wipers
     pub dc_trigger_windshield_wipers: Option<IracingOffset>,
+    /// Pitstop fast repair set
     pub dp_fast_repair: Option<IracingOffset>,
+    /// Pitstop fuel add amount [kg]
     pub dp_fuel_add_kg: Option<IracingOffset>,
+    /// Pitstop auto fill fuel next stop flag
     pub dp_fuel_auto_fill_active: Option<IracingOffset>,
+    /// Pitstop auto fill fuel system enabled
     pub dp_fuel_auto_fill_enabled: Option<IracingOffset>,
+    /// Pitstop fuel fill flag
     pub dp_fuel_fill: Option<IracingOffset>,
+    /// Pitstop lf tire change request
     pub dp_lf_tire_change: Option<IracingOffset>,
+    /// Pitstop lf tire cold pressure adjustment [Pa]
     pub dp_lf_tire_cold_press: Option<IracingOffset>,
+    /// Pitstop lr tire change request
     pub dp_lr_tire_change: Option<IracingOffset>,
+    /// Pitstop lr tire cold pressure adjustment [Pa]
     pub dp_lr_tire_cold_press: Option<IracingOffset>,
+    /// Pitstop rf tire change request
     pub dp_rf_tire_change: Option<IracingOffset>,
+    /// Pitstop rf cold tire pressure adjustment [Pa]
     pub dp_rf_tire_cold_press: Option<IracingOffset>,
+    /// Pitstop rr tire change request
     pub dp_rr_tire_change: Option<IracingOffset>,
+    /// Pitstop rr cold tire pressure adjustment [Pa]
     pub dp_rr_tire_cold_press: Option<IracingOffset>,
+    /// Pitstop windshield tearoff
     pub dp_windshield_tearoff: Option<IracingOffset>,
 }
 
@@ -2478,132 +2809,108 @@ impl IracingFrame {
             },
             car_idx_best_lap_num: match offsets.car_idx_best_lap_num {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_best_lap_time: match offsets.car_idx_best_lap_time {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_class: match offsets.car_idx_class {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_class_position: match offsets.car_idx_class_position {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_est_time: match offsets.car_idx_est_time {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_f2time: match offsets.car_idx_f2time {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_fast_repairs_used: match offsets.car_idx_fast_repairs_used {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_gear: match offsets.car_idx_gear {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_lap: match offsets.car_idx_lap {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_lap_completed: match offsets.car_idx_lap_completed {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_lap_dist_pct: match offsets.car_idx_lap_dist_pct {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_last_lap_time: match offsets.car_idx_last_lap_time {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -2613,7 +2920,7 @@ impl IracingFrame {
                     let ptr = buf.add(off.offset);
                     let mut vec = Vec::with_capacity(off.count);
                     for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)) != 0);
+                        vec.push(*ptr.add(idx) != 0);
                     }
                     vec
                 },
@@ -2621,11 +2928,9 @@ impl IracingFrame {
             },
             car_idx_p2p_count: match offsets.car_idx_p2p_count {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -2635,7 +2940,7 @@ impl IracingFrame {
                     let ptr = buf.add(off.offset);
                     let mut vec = Vec::with_capacity(off.count);
                     for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)) != 0);
+                        vec.push(*ptr.add(idx) != 0);
                     }
                     vec
                 },
@@ -2643,55 +2948,45 @@ impl IracingFrame {
             },
             car_idx_pace_flags: match offsets.car_idx_pace_flags {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_pace_line: match offsets.car_idx_pace_line {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_pace_row: match offsets.car_idx_pace_row {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_position: match offsets.car_idx_position {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_qual_tire_compound: match offsets.car_idx_qual_tire_compound {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -2701,7 +2996,7 @@ impl IracingFrame {
                     let ptr = buf.add(off.offset);
                     let mut vec = Vec::with_capacity(off.count);
                     for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)) != 0);
+                        vec.push(*ptr.add(idx) != 0);
                     }
                     vec
                 },
@@ -2709,66 +3004,54 @@ impl IracingFrame {
             },
             car_idx_rpm: match offsets.car_idx_rpm {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_session_flags: match offsets.car_idx_session_flags {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_steer: match offsets.car_idx_steer {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_tire_compound: match offsets.car_idx_tire_compound {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_track_surface: match offsets.car_idx_track_surface {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
             },
             car_idx_track_surface_material: match offsets.car_idx_track_surface_material {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const i32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const i32;
+                    let mut vec = vec![0i32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3017,11 +3300,9 @@ impl IracingFrame {
             },
             l_fshock_defl_st: match offsets.l_fshock_defl_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3034,11 +3315,9 @@ impl IracingFrame {
             },
             l_fshock_vel_st: match offsets.l_fshock_vel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3117,11 +3396,9 @@ impl IracingFrame {
             },
             l_rshock_defl_st: match offsets.l_rshock_defl_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3134,11 +3411,9 @@ impl IracingFrame {
             },
             l_rshock_vel_st: match offsets.l_rshock_vel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3339,11 +3614,9 @@ impl IracingFrame {
             },
             lat_accel_st: match offsets.lat_accel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3372,11 +3645,9 @@ impl IracingFrame {
             },
             long_accel_st: match offsets.long_accel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3517,11 +3788,9 @@ impl IracingFrame {
             },
             pitch_rate_st: match offsets.pitch_rate_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3716,11 +3985,9 @@ impl IracingFrame {
             },
             r_fshock_defl_st: match offsets.r_fshock_defl_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3733,11 +4000,9 @@ impl IracingFrame {
             },
             r_fshock_vel_st: match offsets.r_fshock_vel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3822,11 +4087,9 @@ impl IracingFrame {
             },
             r_rshock_defl_st: match offsets.r_rshock_defl_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3839,11 +4102,9 @@ impl IracingFrame {
             },
             r_rshock_vel_st: match offsets.r_rshock_vel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -3986,11 +4247,9 @@ impl IracingFrame {
             },
             roll_rate_st: match offsets.roll_rate_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -4204,11 +4463,9 @@ impl IracingFrame {
             },
             steering_wheel_torque_st: match offsets.steering_wheel_torque_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -4291,11 +4548,9 @@ impl IracingFrame {
             },
             velocity_x_st: match offsets.velocity_x_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -4308,11 +4563,9 @@ impl IracingFrame {
             },
             velocity_y_st: match offsets.velocity_y_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -4325,11 +4578,9 @@ impl IracingFrame {
             },
             velocity_z_st: match offsets.velocity_z_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -4342,11 +4593,9 @@ impl IracingFrame {
             },
             vert_accel_st: match offsets.vert_accel_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),
@@ -4413,11 +4662,9 @@ impl IracingFrame {
             },
             yaw_rate_st: match offsets.yaw_rate_st {
                 Some(ref off) => unsafe {
-                    let ptr = buf.add(off.offset) as *const f32;
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }
+                    let src = buf.add(off.offset) as *const f32;
+                    let mut vec = vec![0.0f32; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 },
                 None => Vec::new(),

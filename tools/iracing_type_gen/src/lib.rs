@@ -63,13 +63,6 @@ fn rust_type(type_: &str, count: u32) -> String {
 
 fn raw_extract_expr(type_: &str, count: u32, field_name: &str) -> String {
     if count > 1 {
-        let (cast, _default) = match type_ {
-            "f32" => ("as *const f32", "0.0"),
-            "f64" => ("as *const f64", "0.0"),
-            "bool" => ("", "false"),
-            _ => ("as *const i32", "0"),
-        };
-
         if type_ == "bool" {
             format!(
                 r#"match offsets.{} {{
@@ -77,7 +70,7 @@ fn raw_extract_expr(type_: &str, count: u32, field_name: &str) -> String {
                     let ptr = buf.add(off.offset);
                     let mut vec = Vec::with_capacity(off.count);
                     for idx in 0..off.count {{
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)) != 0);
+                        vec.push(*ptr.add(idx) != 0);
                     }}
                     vec
                 }},
@@ -86,19 +79,22 @@ fn raw_extract_expr(type_: &str, count: u32, field_name: &str) -> String {
                 field_name
             )
         } else {
+            let (cast, default) = match type_ {
+                "f32" => ("as *const f32", "0.0f32"),
+                "f64" => ("as *const f64", "0.0f64"),
+                _ => ("as *const i32", "0i32"),
+            };
             format!(
                 r#"match offsets.{} {{
                 Some(ref off) => unsafe {{
-                    let ptr = buf.add(off.offset) {};
-                    let mut vec = Vec::with_capacity(off.count);
-                    for idx in 0..off.count {{
-                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
-                    }}
+                    let src = buf.add(off.offset) {};
+                    let mut vec = vec![{}; off.count];
+                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
                     vec
                 }},
                 None => Vec::new(),
             }}"#,
-                field_name, cast
+                field_name, cast, default
             )
         }
     } else {

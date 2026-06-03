@@ -42,8 +42,9 @@ desc = "Lap distance pct per car"
 "#;
     let output = generate(toml);
     assert!(output.contains("pub car_idx_lap_dist_pct: Vec<f32>,"));
-    assert!(output.contains("read_unaligned"));
+    assert!(output.contains("copy_nonoverlapping"));
     assert!(output.contains("as *const f32"));
+    assert!(output.contains("vec![0.0f32;"));
 }
 
 #[test]

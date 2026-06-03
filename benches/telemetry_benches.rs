@@ -9,7 +9,7 @@ use kerb::lmu::{LmuFrame, snapshot::build_snapshot as build_lmu_snapshot};
 #[cfg(feature = "iracing")]
 use kerb::iracing::{
     connection::IRsdkConnection,
-    types::{irsdk_header, irsdk_varHeader},
+    structs::{irsdk_header, irsdk_varHeader},
 };
 
 use kerb::decode_cp1252;
@@ -157,6 +157,76 @@ fn bench_iracing(c: &mut Criterion) {
             })
         },
     );
+
+    group.finish();
+
+    // Benchmark with array fields (car_idx_* count=64) — exercises
+    // the copy_nonoverlapping path that replaced per-element read_unaligned loops.
+    let mut group = c.benchmark_group("iRacing array fields");
+
+    let array_count: usize = 64;
+    let mut array_buf = vec![0u8; hz + array_count * 4 * 6];
+    unsafe {
+        std::ptr::copy_nonoverlapping(
+            &header as *const irsdk_header as *const u8,
+            array_buf.as_mut_ptr(),
+            hz,
+        );
+        for i in 0..array_count {
+            let v: f32 = 1000.0 + i as f32;
+            std::ptr::copy_nonoverlapping(
+                &v as *const f32 as *const u8,
+                array_buf.as_mut_ptr().add(hz + i * 4),
+                4,
+            );
+        }
+    }
+
+    let mut offset_cursor = 0i32;
+    let mut array_vars: std::collections::HashMap<String, irsdk_varHeader> =
+        std::collections::HashMap::new();
+
+    for (name, type_) in &[
+        ("CarIdxLapDistPct", 4i32),
+        ("CarIdxEstTime", 4),
+        ("CarIdxLap", 2),
+        ("CarIdxPosition", 2),
+    ] {
+        let mut h = irsdk_varHeader {
+            type_: *type_,
+            offset: offset_cursor,
+            count: array_count as i32,
+            count_as_char: 0,
+            pad: [0; 3],
+            name: [0; 32],
+            desc: [0; 64],
+            unit: [0; 32],
+        };
+        let nb = name.len().min(31);
+        h.name[..nb].copy_from_slice(name.as_bytes());
+        array_vars.insert(name.to_string(), h);
+        offset_cursor += array_count as i32 * 4;
+    }
+
+    let mut bool_var = irsdk_varHeader {
+        type_: 1,
+        offset: offset_cursor,
+        count: array_count as i32,
+        count_as_char: 0,
+        pad: [0; 3],
+        name: [0; 32],
+        desc: [0; 64],
+        unit: [0; 32],
+    };
+    bool_var.name[..15].copy_from_slice(b"CarIdxOnPitRoad");
+    array_vars.insert("CarIdxOnPitRoad".to_string(), bool_var);
+
+    let array_conn =
+        unsafe { IRsdkConnection::new_mock(array_buf.as_mut_ptr() as *mut _, array_vars) };
+
+    group.bench_function("frame() — 4xf32[64] + 2xi32[64] + 1xbool[64]", |b| {
+        b.iter(|| black_box(black_box(&array_conn).frame()))
+    });
 
     group.finish();
 }
