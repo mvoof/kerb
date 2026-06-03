@@ -6,8 +6,11 @@ use crate::error::SimError;
 /// iRacing stores all shared-memory strings in CP-1252. Use this wherever
 /// raw bytes from iRacing shared memory are converted to `String`.
 pub fn decode_cp1252(bytes: &[u8]) -> String {
+    if bytes.iter().all(|&b| b < 0x80) {
+        // SAFETY: all bytes are valid ASCII, which is a subset of UTF-8
+        return unsafe { String::from_utf8_unchecked(bytes.to_vec()) };
+    }
     let (decoded, _, _) = encoding_rs::WINDOWS_1252.decode(bytes);
-
     decoded.into_owned()
 }
 
@@ -110,10 +113,11 @@ pub fn save_telemetry_snapshot(conn: &impl HasSnapshot, path: &str) -> Result<()
     let mut entries: Vec<_> = snap.iter().collect();
     entries.sort_by_key(|(k, _)| k.as_str());
 
-    let mut out = String::new();
+    use std::fmt::Write as _;
+    let mut out = String::with_capacity(entries.len() * 48);
 
     for (k, v) in entries {
-        out.push_str(&format!("{:<32} {}\n", k, v));
+        writeln!(out, "{:<32} {}", k, v).ok();
     }
 
     std::fs::write(path, out)?;
@@ -130,7 +134,8 @@ pub fn save_var_list_snapshot(conn: &impl HasSnapshot, path: &str) -> Result<(),
     let mut vars = conn.var_list_snapshot();
     vars.sort_by(|a, b| a.name.cmp(&b.name));
 
-    let mut out = String::new();
+    use std::fmt::Write as _;
+    let mut out = String::with_capacity(vars.len() * 80);
 
     for v in vars {
         let count_str = if v.count > 1 {
@@ -139,10 +144,12 @@ pub fn save_var_list_snapshot(conn: &impl HasSnapshot, path: &str) -> Result<(),
             String::new()
         };
 
-        out.push_str(&format!(
-            "{:<32} {}{:<12} {:<16} {}\n",
+        writeln!(
+            out,
+            "{:<32} {}{:<12} {:<16} {}",
             v.name, v.type_name, count_str, v.unit, v.desc
-        ));
+        )
+        .ok();
     }
 
     std::fs::write(path, out)?;

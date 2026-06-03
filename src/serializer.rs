@@ -24,8 +24,8 @@ impl ser::Error for SerializerError {
 }
 
 enum PathElement {
-    Field(String),
-    Index(usize),
+    Field,
+    Index,
 }
 
 pub struct TelemetrySerializer {
@@ -33,6 +33,8 @@ pub struct TelemetrySerializer {
     path_stack: Vec<PathElement>,
     seq_stack: Vec<Vec<TelemetryValue>>,
     current_seq_indices: Vec<usize>,
+    current_key: String,
+    key_lengths: Vec<usize>,
 }
 
 impl Default for TelemetrySerializer {
@@ -48,6 +50,8 @@ impl TelemetrySerializer {
             path_stack: Vec::new(),
             seq_stack: Vec::new(),
             current_seq_indices: Vec::new(),
+            current_key: String::new(),
+            key_lengths: Vec::new(),
         }
     }
 
@@ -62,33 +66,38 @@ impl TelemetrySerializer {
         let last_index = self
             .path_stack
             .iter()
-            .rposition(|x| matches!(x, PathElement::Index(_)));
+            .rposition(|x| matches!(x, PathElement::Index));
         if let Some(idx) = last_index {
             let has_field_after = self.path_stack[idx + 1..]
                 .iter()
-                .any(|x| matches!(x, PathElement::Field(_)));
+                .any(|x| matches!(x, PathElement::Field));
             !has_field_after
         } else {
             true
         }
     }
 
-    fn current_key_string(&self) -> String {
-        let mut key = String::new();
-        for (i, elem) in self.path_stack.iter().enumerate() {
-            match elem {
-                PathElement::Field(name) => {
-                    if i > 0 {
-                        key.push('.');
-                    }
-                    key.push_str(name);
-                }
-                PathElement::Index(idx) => {
-                    key.push_str(&format!("[{}]", idx));
-                }
-            }
+    fn push_field_key(&mut self, name: &str) {
+        self.key_lengths.push(self.current_key.len());
+        if !self.current_key.is_empty() {
+            self.current_key.push('.');
         }
-        key
+        self.current_key.push_str(name);
+        self.path_stack.push(PathElement::Field);
+    }
+
+    fn push_index_key(&mut self, idx: usize) {
+        use std::fmt::Write as _;
+        self.key_lengths.push(self.current_key.len());
+        write!(self.current_key, "[{}]", idx).ok();
+        self.path_stack.push(PathElement::Index);
+    }
+
+    fn pop_key(&mut self) {
+        if let Some(len) = self.key_lengths.pop() {
+            self.current_key.truncate(len);
+        }
+        self.path_stack.pop();
     }
 }
 
@@ -109,7 +118,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::Bool(v));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::Bool(v));
         }
         Ok(())
@@ -129,7 +138,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::Int(v));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::Int(v));
         }
         Ok(())
@@ -145,7 +154,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::Char(v));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::Char(v));
         }
         Ok(())
@@ -161,7 +170,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::BitField(v));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::BitField(v));
         }
         Ok(())
@@ -177,7 +186,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::Float(v));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::Float(v));
         }
         Ok(())
@@ -189,7 +198,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::Double(v));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::Double(v));
         }
         Ok(())
@@ -205,7 +214,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 last.push(TelemetryValue::String(v.to_string()));
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map.insert(key, TelemetryValue::String(v.to_string()));
         }
         Ok(())
@@ -220,7 +229,7 @@ impl ser::Serializer for &mut TelemetrySerializer {
                 }
             }
         } else {
-            let key = self.current_key_string();
+            let key = self.current_key.clone();
             self.map
                 .insert(key, TelemetryValue::String(crate::decode_cp1252(&vec)));
         }
@@ -331,9 +340,9 @@ impl ser::SerializeSeq for &mut TelemetrySerializer {
 
     fn serialize_element<T: ?Sized + Serialize>(&mut self, value: &T) -> Result<(), Self::Error> {
         let index = self.current_seq_indices.last().copied().unwrap_or(0);
-        self.path_stack.push(PathElement::Index(index));
+        self.push_index_key(index);
         let res = value.serialize(&mut **self);
-        self.path_stack.pop();
+        self.pop_key();
 
         if let Some(idx) = self.current_seq_indices.last_mut() {
             *idx += 1;
@@ -347,7 +356,7 @@ impl ser::SerializeSeq for &mut TelemetrySerializer {
             if let Some(last) = self.seq_stack.last_mut() {
                 last.extend(seq);
             } else {
-                let key = self.current_key_string();
+                let key = self.current_key.clone();
                 if !seq.is_empty() {
                     match &seq[0] {
                         TelemetryValue::Bool(_) => {
@@ -420,9 +429,9 @@ impl ser::SerializeStruct for &mut TelemetrySerializer {
         key: &'static str,
         value: &T,
     ) -> Result<(), Self::Error> {
-        self.path_stack.push(PathElement::Field(key.to_string()));
+        self.push_field_key(key);
         let res = value.serialize(&mut **self);
-        self.path_stack.pop();
+        self.pop_key();
         res
     }
 
@@ -437,9 +446,9 @@ impl ser::SerializeTuple for &mut TelemetrySerializer {
 
     fn serialize_element<T: ?Sized + Serialize>(&mut self, value: &T) -> Result<(), Self::Error> {
         let index = self.current_seq_indices.last().copied().unwrap_or(0);
-        self.path_stack.push(PathElement::Index(index));
+        self.push_index_key(index);
         let res = value.serialize(&mut **self);
-        self.path_stack.pop();
+        self.pop_key();
 
         if let Some(idx) = self.current_seq_indices.last_mut() {
             *idx += 1;
@@ -458,9 +467,9 @@ impl ser::SerializeTupleStruct for &mut TelemetrySerializer {
 
     fn serialize_field<T: ?Sized + Serialize>(&mut self, value: &T) -> Result<(), Self::Error> {
         let index = self.current_seq_indices.last().copied().unwrap_or(0);
-        self.path_stack.push(PathElement::Index(index));
+        self.push_index_key(index);
         let res = value.serialize(&mut **self);
-        self.path_stack.pop();
+        self.pop_key();
 
         if let Some(idx) = self.current_seq_indices.last_mut() {
             *idx += 1;

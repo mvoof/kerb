@@ -513,8 +513,8 @@ pub fn var_list_snapshot() -> Vec<VarMeta> {
         .iter()
         .map(|(name, type_name, desc)| VarMeta {
             name: name.to_string(),
-            type_name: type_name.to_string(),
-            unit: "".to_string(),
+            type_name,
+            unit: String::new(),
             desc: desc.to_string(),
             count: 1,
         })

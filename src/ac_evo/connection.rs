@@ -72,9 +72,8 @@ impl AcEvoConnection {
     /// Returns `true` when AC Evo is in a live driving session.
     pub fn is_connected(&self) -> bool {
         unsafe {
-            let status =
-                std::ptr::read_unaligned(self.graphics.as_ptr() as *const SPageFileGraphicsEvo)
-                    .status;
+            let offset = std::mem::offset_of!(SPageFileGraphicsEvo, status);
+            let status = std::ptr::read_unaligned(self.graphics.as_ptr().add(offset) as *const i32);
             status == AC_STATUS_LIVE
         }
     }

@@ -1,4 +1,5 @@
 use serde::ser::Serializer;
+use std::fmt::Write as _;
 
 /// Fixed-length ASCII/CP-1252 string read from simulator shared memory.
 ///
@@ -30,29 +31,53 @@ impl<const N: usize> SimString<N> {
         let len = self.0.iter().position(|&b| b == 0).unwrap_or(N);
         crate::decode_cp1252(&self.0[..len])
     }
+
+    fn write_decoded(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let len = self.0.iter().position(|&b| b == 0).unwrap_or(N);
+        let bytes = &self.0[..len];
+        if bytes.iter().all(|&b| b < 0x80) {
+            // SAFETY: all bytes are valid ASCII, a subset of UTF-8
+            return f.write_str(unsafe { std::str::from_utf8_unchecked(bytes) });
+        }
+        f.write_str(&crate::decode_cp1252(bytes))
+    }
 }
 
 impl<const N: usize> std::fmt::Display for SimString<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.to_string_lossy())
+        self.write_decoded(f)
     }
 }
 
 impl<const N: usize> std::fmt::Debug for SimString<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.to_string_lossy())
+        f.write_char('"')?;
+        self.write_decoded(f)?;
+        f.write_char('"')
     }
 }
 
 impl<const N: usize> PartialEq<&str> for SimString<N> {
     fn eq(&self, other: &&str) -> bool {
-        self.to_string_lossy() == *other
+        let len = self.0.iter().position(|&b| b == 0).unwrap_or(N);
+        let bytes = &self.0[..len];
+        if bytes.iter().all(|&b| b < 0x80) {
+            return bytes == other.as_bytes();
+        }
+        crate::decode_cp1252(bytes) == *other
     }
 }
 
 impl<const N: usize> serde::Serialize for SimString<N> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.to_string_lossy())
+        let len = self.0.iter().position(|&b| b == 0).unwrap_or(N);
+        let bytes = &self.0[..len];
+        if bytes.iter().all(|&b| b < 0x80) {
+            // SAFETY: all bytes are valid ASCII, a subset of UTF-8
+            serializer.serialize_str(unsafe { std::str::from_utf8_unchecked(bytes) })
+        } else {
+            serializer.serialize_str(&crate::decode_cp1252(bytes))
+        }
     }
 }
 
@@ -98,19 +123,36 @@ impl<const N: usize> SimStringU16<N> {
 
 impl<const N: usize> std::fmt::Display for SimStringU16<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.to_string_lossy())
+        let len = self.0.iter().position(|&c| c == 0).unwrap_or(N);
+        let units = &self.0[..len];
+        if units.iter().all(|&c| c < 0x80) {
+            // All code units are ASCII — write directly without allocating
+            for &c in units {
+                f.write_char(c as u8 as char)?;
+            }
+            return Ok(());
+        }
+        f.write_str(&String::from_utf16_lossy(units))
     }
 }
 
 impl<const N: usize> std::fmt::Debug for SimStringU16<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.to_string_lossy())
+        f.write_char('"')?;
+        std::fmt::Display::fmt(self, f)?;
+        f.write_char('"')
     }
 }
 
 impl<const N: usize> PartialEq<&str> for SimStringU16<N> {
     fn eq(&self, other: &&str) -> bool {
-        self.to_string_lossy() == *other
+        let len = self.0.iter().position(|&c| c == 0).unwrap_or(N);
+        let units = &self.0[..len];
+        if units.iter().all(|&c| c < 0x80) && other.is_ascii() {
+            return units.len() == other.len()
+                && units.iter().zip(other.bytes()).all(|(&u, b)| u == b as u16);
+        }
+        String::from_utf16_lossy(units) == *other
     }
 }
 

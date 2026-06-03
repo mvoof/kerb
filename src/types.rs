@@ -93,7 +93,7 @@ impl std::fmt::Display for TelemetryValue {
 #[derive(Debug, Clone)]
 pub struct VarMeta {
     pub name: String,
-    pub type_name: String,
+    pub type_name: &'static str,
     pub unit: String,
     pub desc: String,
     pub count: u32,

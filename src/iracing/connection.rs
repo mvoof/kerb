@@ -116,10 +116,9 @@ impl IRsdkConnection {
     /// Returns `true` when the iRacing sim is actively broadcasting telemetry (status bit 0).
     pub fn is_connected(&self) -> bool {
         unsafe {
-            let shared_mem = self.shm.as_ptr();
-            let header = std::ptr::read_unaligned(shared_mem as *const irsdk_header);
-
-            (header.status & 1) != 0
+            let offset = std::mem::offset_of!(irsdk_header, status);
+            let status = std::ptr::read_unaligned(self.shm.as_ptr().add(offset) as *const i32);
+            (status & 1) != 0
         }
     }
 
@@ -144,14 +143,11 @@ impl IRsdkConnection {
     pub(crate) fn session_info_update(&self) -> i32 {
         unsafe {
             let shared_mem = self.shm.as_ptr();
-
             if shared_mem.is_null() {
                 return -1;
             }
-
-            let header = std::ptr::read_unaligned(shared_mem as *const irsdk_header);
-
-            header.session_info_update
+            let offset = std::mem::offset_of!(irsdk_header, session_info_update);
+            std::ptr::read_unaligned(shared_mem.add(offset) as *const i32)
         }
     }
 
@@ -306,7 +302,7 @@ impl IRsdkConnection {
 
     /// Snapshot every known variable from the latest data buffer into a map.
     pub(crate) fn read_all_variables(&self) -> HashMap<String, TelemetryValue> {
-        let mut map = HashMap::new();
+        let mut map = HashMap::with_capacity(self.vars.len());
 
         for name in self.vars.keys() {
             if let Some(val) = self.read_variable(name) {
@@ -381,7 +377,7 @@ impl IRsdkConnection {
 
                 crate::types::VarMeta {
                     name: name.clone(),
-                    type_name: type_name.to_string(),
+                    type_name,
                     unit,
                     desc,
                     count: hdr.count as u32,
