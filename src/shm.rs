@@ -1,6 +1,7 @@
 use windows_sys::Win32::Foundation::{CloseHandle, FALSE, GetLastError, HANDLE};
 use windows_sys::Win32::System::Memory::{
-    FILE_MAP_READ, MEMORY_MAPPED_VIEW_ADDRESS, MapViewOfFile, OpenFileMappingW, UnmapViewOfFile,
+    FILE_MAP_READ, MEM_COMMIT, MEMORY_BASIC_INFORMATION, MEMORY_MAPPED_VIEW_ADDRESS, MapViewOfFile,
+    OpenFileMappingW, UnmapViewOfFile, VirtualQuery,
 };
 
 /// RAII wrapper around a Windows shared-memory file mapping.
@@ -49,6 +50,34 @@ impl SharedMemRegion {
     /// Return a raw pointer to the start of the mapped view.
     pub fn as_ptr(&self) -> *const u8 {
         self.view.Value as *const u8
+    }
+
+    /// Return the size of the mapped region in bytes via `VirtualQuery`.
+    pub fn len(&self) -> usize {
+        unsafe {
+            let mut info: MEMORY_BASIC_INFORMATION = std::mem::zeroed();
+            let ret = VirtualQuery(
+                self.view.Value,
+                &mut info,
+                std::mem::size_of::<MEMORY_BASIC_INFORMATION>(),
+            );
+            if ret == 0 || info.State != MEM_COMMIT {
+                return 0;
+            }
+            info.RegionSize
+        }
+    }
+
+    /// Create a mock `SharedMemRegion` pointing to an externally-owned buffer (for tests only).
+    ///
+    /// # Safety
+    /// The caller must ensure `ptr` is valid for the lifetime of the returned value.
+    #[doc(hidden)]
+    pub unsafe fn new_mock(ptr: *mut std::ffi::c_void) -> Self {
+        Self {
+            h_map: 0 as _,
+            view: MEMORY_MAPPED_VIEW_ADDRESS { Value: ptr },
+        }
     }
 }
 

@@ -1,33 +1,3 @@
-/// Primitive type tag for a telemetry variable.
-///
-/// Discriminant values match the iRacing SDK constants so we can transmute
-/// directly from the header without a lookup table.
-#[repr(i32)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VarType {
-    Char = 0,
-    Bool = 1,
-    Int = 2,
-    BitField = 3,
-    Float = 4,
-    Double = 5,
-}
-
-impl VarType {
-    /// Convert a raw `i32` discriminant back into a [`VarType`], returning `None` for unknown values.
-    pub fn from_i32(val: i32) -> Option<Self> {
-        match val {
-            0 => Some(VarType::Char),
-            1 => Some(VarType::Bool),
-            2 => Some(VarType::Int),
-            3 => Some(VarType::BitField),
-            4 => Some(VarType::Float),
-            5 => Some(VarType::Double),
-            _ => None,
-        }
-    }
-}
-
 /// A typed telemetry reading — scalars and fixed-length arrays.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TelemetryValue {
@@ -123,7 +93,7 @@ impl std::fmt::Display for TelemetryValue {
 #[derive(Debug, Clone)]
 pub struct VarMeta {
     pub name: String,
-    pub type_name: String,
+    pub type_name: &'static str,
     pub unit: String,
     pub desc: String,
     pub count: u32,

@@ -2,15 +2,13 @@
 //! plugin layout byte-for-byte. Field order and sizes must match the C definitions
 //! in `rF2SharedMemoryPlugin` exactly — do not reorder or add padding.
 
-use kerb_derive::Snapshot;
-
 /// Maximum number of vehicles the shared-memory buffers can hold.
 pub const RF2_MAX_VEHICLES: usize = 128;
 
 /// Per-wheel physics data (suspension, tyre temps, wear, forces, etc.).
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Default, Snapshot)]
-pub struct rF2Wheel {
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct rF2Wheel {
     /// Suspension deflection (compression) in metres; positive = compressed.
     pub suspension_deflection: f64,
     /// Ride height at this corner in metres.
@@ -74,8 +72,8 @@ pub struct rF2Wheel {
 /// Per-vehicle telemetry: engine, driver inputs, aerodynamics, wheels, position and orientation.
 /// Only valid for vehicles present in `rF2Telemetry::vehicles[..header.num_vehicles]`.
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Snapshot)]
-pub struct rF2VehicleTelemetry {
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct rF2VehicleTelemetry {
     /// Unique vehicle ID — matches `rF2VehicleScoring::id` for the same car.
     pub id: i32,
     /// Physics time step in seconds for this update.
@@ -215,19 +213,20 @@ pub struct rF2VehicleTelemetry {
 }
 
 /// Header preceding the vehicle-telemetry array in shared memory.
+///
+/// Actual layout (rF2MappedBufferVersionBlock + rF2MappedBufferHeaderWithSize + mNumVehicles):
+///   offset  0: version_update_begin (u32)
+///   offset  4: version_update_end   (u32)
+///   offset  8: bytes_updated_hint   (i32)
+///   offset 12: num_vehicles         (i32)
+///   offset 16: vehicles array begins
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
-pub struct rF2TelemetryHeader {
-    /// Version counter written before the update begins; compare with `version_update_end` to detect torn reads.
+pub(crate) struct rF2TelemetryHeader {
     pub version_update_begin: u32,
-    /// Version counter written after the update completes; equals `version_update_begin` when data is consistent.
     pub version_update_end: u32,
-    /// Size of this header struct in bytes.
-    pub bytes_in_version: i32,
-    /// Size of this header in bytes.
-    pub bytes_in_header: i32,
-    /// Size of a single `rF2VehicleTelemetry` entry in bytes.
-    pub bytes_in_vehicle_telemetry: i32,
+    /// Hint: how many bytes of the vehicles array were updated this tick.
+    pub bytes_updated_hint: i32,
     /// Number of valid vehicle entries in the `rF2Telemetry::vehicles` array.
     pub num_vehicles: i32,
 }
@@ -235,30 +234,18 @@ pub struct rF2TelemetryHeader {
 /// Top-level telemetry region: header + fixed-size array of vehicle telemetry.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2Telemetry {
+pub(crate) struct rF2Telemetry {
     /// Version and size metadata; `num_vehicles` gives the count of valid entries.
     pub header: rF2TelemetryHeader,
     /// Per-vehicle telemetry data; only `vehicles[0..header.num_vehicles]` are valid.
     pub vehicles: [rF2VehicleTelemetry; RF2_MAX_VEHICLES],
 }
 
-impl Default for rF2Telemetry {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-impl Default for rF2VehicleTelemetry {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
 /// Per-vehicle scoring data: position, lap times, sector splits, pit state, and flags.
 /// Updated at ~2 Hz. Only valid for vehicles in `rF2Scoring::vehicles[..header.num_vehicles]`.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2VehicleScoring {
+pub(crate) struct rF2VehicleScoring {
     /// Unique vehicle ID — matches `rF2VehicleTelemetry::id` for cross-referencing.
     pub id: i32,
     /// Driver name (ASCII, null-terminated, max 32 bytes).
@@ -293,6 +280,8 @@ pub struct rF2VehicleScoring {
     pub cur_sector1: f64,
     /// Current sectors 1+2 time in progress in seconds; 0 if not in sector 2.
     pub cur_sector2: f64,
+    /// Third timing value in this group (placeholder for plugin field at offset 192).
+    pub _cur_sector3: f64,
     /// Number of pit stops taken so far.
     pub num_pitstops: i16,
     /// Number of active penalties (drive-through, stop-go, etc.).
@@ -362,13 +351,13 @@ pub struct rF2VehicleScoring {
     /// Best lap's sectors 1+2 time in seconds.
     pub best_lap_sector2: f32,
     #[doc(hidden)]
-    pub _expansion: [u8; 48],
+    pub _expansion: [u8; 40],
 }
 
 /// Session-wide scoring info: track, weather, session type, and flag state.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2ScoringInfo {
+pub(crate) struct rF2ScoringInfo {
     /// Track name (ASCII, null-terminated, max 64 bytes).
     pub track_name: [u8; 64],
     /// Session type: 0 = test day, 1 = practice, 2 = qualify, 3 = warm-up, 4 = race.
@@ -381,8 +370,8 @@ pub struct rF2ScoringInfo {
     pub max_laps: i32,
     /// Total lap distance in metres (track length).
     pub lap_dist: f64,
-    /// Results file name (ASCII, null-terminated, max 64 bytes).
-    pub result_name: [u8; 64],
+    /// Opaque pointer (mResultsStream) — 8 bytes on 64-bit plugin.
+    pub _results_stream_ptr: [u8; 8],
     /// Number of vehicles currently in the session.
     pub num_vehicles: i32,
     /// Game phase: 0 = before session, 1 = reconnaissance laps, 2 = grid walk, 3 = formation lap, 4 = starting, 5 = green, 6 = full course yellow, 7 = session stopped, 8 = session over.
@@ -435,36 +424,26 @@ pub struct rF2ScoringInfo {
     pub _expansion: [u8; 200],
 }
 
-impl Default for rF2ScoringInfo {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
 /// Header preceding the scoring-info and vehicle-scoring array.
+///
+/// Actual layout (rF2MappedBufferVersionBlock + rF2MappedBufferHeaderWithSize):
+///   offset  0: version_update_begin (u32)
+///   offset  4: version_update_end   (u32)
+///   offset  8: bytes_updated_hint   (i32)
+///   offset 12: rF2ScoringInfo begins (num_vehicles is inside scoring_info)
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
-pub struct rF2ScoringHeader {
-    /// Version counter written before the update begins; compare with `version_update_end` to detect torn reads.
+pub(crate) struct rF2ScoringHeader {
     pub version_update_begin: u32,
-    /// Version counter written after the update completes; equals `version_update_begin` when consistent.
     pub version_update_end: u32,
-    /// Size of this header struct in bytes.
-    pub bytes_in_version: i32,
-    /// Size of this header in bytes.
-    pub bytes_in_header: i32,
-    /// Size of `rF2ScoringInfo` in bytes.
-    pub bytes_in_scoring_info: i32,
-    /// Size of a single `rF2VehicleScoring` entry in bytes.
-    pub bytes_in_vehicle_scoring: i32,
-    /// Number of valid vehicle entries in the `rF2Scoring::vehicles` array.
-    pub num_vehicles: i32,
+    /// Hint: how many bytes of the scoring region were updated this tick.
+    pub bytes_updated_hint: i32,
 }
 
 /// Top-level scoring region: header + session info + vehicle-scoring array.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
-pub struct rF2Scoring {
+pub(crate) struct rF2Scoring {
     /// Version and size metadata; `num_vehicles` gives the count of valid entries.
     pub header: rF2ScoringHeader,
     /// Session-wide data: track name, weather, session type, flag state.
@@ -473,57 +452,80 @@ pub struct rF2Scoring {
     pub vehicles: [rF2VehicleScoring; RF2_MAX_VEHICLES],
 }
 
-impl Default for rF2Scoring {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-impl Default for rF2VehicleScoring {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
-    }
-}
-
-/// Extended plugin/session metadata: plugin status, session started flag, and physics timing.
+/// Extended plugin/session metadata: plugin status, session started flag.
+///
+/// Mirrors the C++ `rF2Extended` layout from rF2SharedMemoryMapPlugin with
+/// `#pragma pack(4)`. Key offsets (verified against live SHM dump, v3.7.15.1):
+///
+///   offset     0: version_update_begin  (u32)
+///   offset     4: version_update_end    (u32)
+///   offset     8: version               ([u8; 12]) e.g. "3.7.15.1"
+///   offset    20: is64bit               (u8)  = 1 on 64-bit plugin
+///   offset 21-23: _pad_physics          ([u8; 3]) alignment padding
+///   offset    24: _physics              ([u8; 40]) rF2PhysicsOptions
+///   offset    64: _tracked_damages      ([u8; 8192]) rF2TrackedDamage[512]
+///   offset  8256: in_realtime_fc        (u8)  = 1 when player is driving
+///   offset  8257: _multimedia_thread    (u8)
+///   offset  8258: _simulation_thread    (u8)
+///   offset  8259: session_started       (u8)  = 1 when session active
 #[repr(C, packed)]
-#[derive(Debug, Clone, Copy)]
-pub struct rF2Extended {
+#[derive(Clone, Copy)]
+pub(crate) struct rF2Extended {
     /// Version counter written at the start of each shared-memory update cycle.
     pub version_update_begin: u32,
     /// Version counter written at the end of each update cycle; equals `version_update_begin` when consistent.
     pub version_update_end: u32,
-    /// Size of the version header in bytes (for forward-compatibility checks).
-    pub bytes_in_version: i32,
-    /// Total size of this struct in bytes as reported by the plugin.
-    pub bytes_in_extended: i32,
-    /// Offset from the physics centre of mass to the graphics origin (x, y, z) in metres.
-    pub physics_to_graphics_offset: [f32; 3],
-    /// 1 when the rF2/LMU shared-memory plugin is loaded and active, 0 otherwise.
-    pub is_plugin_enabled: u8,
-    /// 1 when direct memory access mode is enabled in the plugin, 0 otherwise.
-    pub direct_memory_access_enabled: u8,
+    /// Plugin version string (ASCII, null-padded), e.g. "3.7.15.1".
+    pub version: [u8; 12],
+    /// 1 when the plugin binary is 64-bit (always 1 in modern LMU).
+    pub is64bit: u8,
     #[doc(hidden)]
-    pub _padding: [u8; 2],
-    /// 1 when a session has started (past the loading screen), 0 otherwise.
-    /// Used by `LmuConnection::is_connected()` to confirm live data.
+    pub _pad_physics: [u8; 3],
+    #[doc(hidden)]
+    pub _physics: [u8; 40],
+    #[doc(hidden)]
+    pub _tracked_damages: [u8; 8192],
+    /// 1 when the player is in realtime driving (on track), 0 in menus/garage.
+    pub in_realtime_fc: u8,
+    #[doc(hidden)]
+    pub _multimedia_thread: u8,
+    #[doc(hidden)]
+    pub _simulation_thread: u8,
+    /// 1 when a practice/qualifying/race session has started.
     pub session_started: u8,
-    /// Average physics thread execution time in milliseconds (performance metric).
-    pub phys_avg_thread_time_ms: f64,
-    #[doc(hidden)]
-    pub _expansion: [u8; 508],
 }
 
-impl Default for rF2Extended {
-    fn default() -> Self {
-        unsafe { std::mem::zeroed() }
+macro_rules! zeroed_default {
+    ($($t:ty),*) => {
+        $(impl Default for $t {
+            fn default() -> Self {
+                // SAFETY: all fields are primitive numeric types (integers, floats,
+                // fixed-size arrays of the same). Zero is a valid bit-pattern for all of them.
+                unsafe { std::mem::zeroed() }
+            }
+        })*
+    };
+}
+zeroed_default!(
+    rF2Telemetry,
+    rF2VehicleTelemetry,
+    rF2ScoringInfo,
+    rF2Scoring,
+    rF2VehicleScoring,
+    rF2Extended
+);
+
+impl std::fmt::Debug for rF2Extended {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let begin =
+            unsafe { std::ptr::read_unaligned(std::ptr::addr_of!(self.version_update_begin)) };
+        let end = unsafe { std::ptr::read_unaligned(std::ptr::addr_of!(self.version_update_end)) };
+        f.debug_struct("rF2Extended")
+            .field("version_update_begin", &begin)
+            .field("version_update_end", &end)
+            .field("is64bit", &self.is64bit)
+            .field("in_realtime_fc", &self.in_realtime_fc)
+            .field("session_started", &self.session_started)
+            .finish()
     }
-}
-
-/// Converts a null-terminated byte buffer (as stored in rF2 structs) to a `String`.
-///
-/// Non-UTF-8 bytes are replaced with the Unicode replacement character.
-pub fn parse_rf2_str(bytes: &[u8]) -> String {
-    let len = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
-    String::from_utf8_lossy(&bytes[..len]).into_owned()
 }

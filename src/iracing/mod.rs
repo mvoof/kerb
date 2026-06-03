@@ -1,8 +1,11 @@
+#[doc(hidden)]
 pub mod connection;
-pub mod session;
+pub(crate) mod session;
+#[doc(hidden)]
+pub mod structs;
+#[doc(hidden)]
 pub mod types;
-pub mod vars;
 
 pub use connection::IRsdkConnection;
 pub use session::IracingSession;
-pub use vars::IracingFrame;
+pub use types::IracingFrame;

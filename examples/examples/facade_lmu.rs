@@ -14,15 +14,17 @@ fn main() -> Result<(), SimError> {
                 while conn.is_connected() {
                     conn.wait_for_data(16);
 
-                    let frame = conn.frame();
+                    let frame = match conn.frame() {
+                        Ok(f) => f,
+                        Err(_) => continue,
+                    };
 
-                    let player = frame.player_telemetry();
-                    let rpm = player.engine_rpm;
-                    let gear = player.gear;
-
-                    print!("\r{:.0} rpm  gear {}", rpm, gear);
-
-                    let _ = io::stdout().flush();
+                    if let Some(player) = frame.player_telemetry() {
+                        let rpm = player.engine_rpm;
+                        let gear = player.gear;
+                        print!("\r{:.0} rpm  gear {}", rpm, gear);
+                        let _ = io::stdout().flush();
+                    }
                 }
 
                 println!("\nDisconnected.");
@@ -30,15 +32,12 @@ fn main() -> Result<(), SimError> {
 
             Ok(_) => {
                 eprintln!("A different sim connected — expected LMU.");
-
                 break Ok(());
             }
 
             Err(e) => {
                 print!("\r{e}");
-
                 let _ = io::stdout().flush();
-
                 std::thread::sleep(std::time::Duration::from_secs(2));
             }
         }

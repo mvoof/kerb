@@ -1,31 +1,522 @@
-use crate::lmu::connection::LmuFrame;
+use crate::lmu::types::LmuFrame;
 use crate::{TelemetryValue, VarMeta};
 use std::collections::HashMap;
 
 /// Extracts the player's telemetry from an [`LmuFrame`] into a flat `HashMap`.
 ///
-/// All fields from `rF2VehicleTelemetry` are included automatically via the
-/// `#[derive(Snapshot)]` macro — no manual field list needed.
+/// Returns an empty map when the player's car is not present in the frame.
 pub fn build_snapshot(f: &LmuFrame) -> HashMap<String, TelemetryValue> {
-    f.player_telemetry().to_snapshot()
+    if let Some(player) = f.player_telemetry() {
+        let mut serializer = crate::serializer::TelemetrySerializer::new();
+        if serde::Serialize::serialize(player, &mut serializer).is_ok() {
+            return serializer.into_map();
+        }
+    }
+    HashMap::new()
 }
 
+const LMU_VEHICLE_TELEMETRY_VARS: &[(&str, &str, &str)] = &[
+    ("id", "int", "Vehicle ID"),
+    ("delta_time", "double", "Delta time since last update s"),
+    ("elapsed_time", "double", "Elapsed session time s"),
+    ("lap_number", "int", "Current lap number"),
+    ("lap_start_et", "double", "Lap start elapsed time s"),
+    ("vehicle_name", "string", "Vehicle name"),
+    ("track_name", "string", "Track name"),
+    ("pos", "double[3]", "Position XYZ m"),
+    ("local_vel", "double[3]", "Local velocity XYZ m/s"),
+    ("local_accel", "double[3]", "Local acceleration XYZ m/s²"),
+    ("ori", "double[9]", "Orientation matrix 3x3"),
+    ("local_rot", "double[3]", "Local rotation XYZ rad/s"),
+    (
+        "local_rot_accel",
+        "double[3]",
+        "Local rotation accel XYZ rad/s²",
+    ),
+    ("gear", "int", "Current gear"),
+    ("engine_rpm", "double", "Engine RPM"),
+    ("engine_water_temp", "double", "Engine water temperature C"),
+    ("engine_oil_temp", "double", "Engine oil temperature C"),
+    ("clutch_rpm", "double", "Clutch RPM"),
+    (
+        "unfiltered_throttle",
+        "double",
+        "Raw throttle input 0.0–1.0",
+    ),
+    ("unfiltered_brake", "double", "Raw brake input 0.0–1.0"),
+    (
+        "unfiltered_steering",
+        "double",
+        "Raw steering input -1.0–1.0",
+    ),
+    ("unfiltered_clutch", "double", "Raw clutch input 0.0–1.0"),
+    ("filtered_throttle", "double", "Filtered throttle 0.0–1.0"),
+    ("filtered_brake", "double", "Filtered brake 0.0–1.0"),
+    ("filtered_steering", "double", "Filtered steering -1.0–1.0"),
+    ("filtered_clutch", "double", "Filtered clutch 0.0–1.0"),
+    (
+        "steering_shaft_torque",
+        "double",
+        "Steering shaft torque Nm",
+    ),
+    (
+        "front3rd_deflection",
+        "double",
+        "Front 3rd suspension deflection m",
+    ),
+    (
+        "rear3rd_deflection",
+        "double",
+        "Rear 3rd suspension deflection m",
+    ),
+    ("front_wing_height", "double", "Front wing height m"),
+    ("front_ride_height", "double", "Front ride height m"),
+    ("rear_ride_height", "double", "Rear ride height m"),
+    ("drag", "double", "Aerodynamic drag N"),
+    ("front_downforce", "double", "Front downforce N"),
+    ("rear_downforce", "double", "Rear downforce N"),
+    ("fuel", "double", "Fuel quantity liters"),
+    ("engine_max_rpm", "double", "Max engine RPM"),
+    ("scheduled_stops", "int", "Scheduled pit stops"),
+    ("overheating", "int", "Engine overheating flag"),
+    ("detached", "int", "Detached flag"),
+    ("headlights", "int", "Headlights state"),
+    ("dent_severity", "int[8]", "Dent severity per part"),
+    ("last_impact_et", "double", "Last impact elapsed time s"),
+    ("last_impact_magnitude", "double", "Last impact magnitude"),
+    ("last_impact_pos", "double[3]", "Last impact position XYZ"),
+    ("engine_torque", "double", "Engine torque Nm"),
+    ("current_sector", "int", "Current sector 0/1/2"),
+    ("speed_limiter", "int", "Speed limiter active flag"),
+    ("max_gears", "int", "Max available gears"),
+    (
+        "front_tire_compound_index",
+        "int",
+        "Front tyre compound index",
+    ),
+    (
+        "rear_tire_compound_index",
+        "int",
+        "Rear tyre compound index",
+    ),
+    ("fuel_capacity", "double", "Fuel capacity liters"),
+    ("front_flap_activated", "int", "Front flap active flag"),
+    ("rear_flap_activated", "int", "Rear flap active flag"),
+    ("rear_flap_legal_status", "int", "Rear flap legal status"),
+    ("ignition_starter", "int", "Ignition/starter state"),
+    (
+        "front_tire_compound_name",
+        "string",
+        "Front tyre compound name",
+    ),
+    (
+        "rear_tire_compound_name",
+        "string",
+        "Rear tyre compound name",
+    ),
+    (
+        "speed_limiter_available",
+        "int",
+        "Speed limiter available flag",
+    ),
+    ("anti_stall_activated", "int", "Anti-stall active flag"),
+    (
+        "visual_steering_wheel_range",
+        "float",
+        "Visual steering wheel range deg",
+    ),
+    ("rear_brake_bias", "double", "Rear brake balance ratio"),
+    ("turbo_boost_pressure", "double", "Turbo boost pressure bar"),
+    (
+        "physics_to_graphics_offset",
+        "float[3]",
+        "Physics to graphics offset XYZ",
+    ),
+    (
+        "physical_steering_wheel_range",
+        "float",
+        "Physical steering wheel range deg",
+    ),
+    (
+        "wheels[0].suspension_deflection",
+        "double",
+        "FL suspension deflection m",
+    ),
+    ("wheels[0].ride_height", "double", "FL ride height m"),
+    ("wheels[0].susp_force", "double", "FL suspension force N"),
+    ("wheels[0].brake_temp", "double", "FL brake temperature C"),
+    (
+        "wheels[0].brake_pressure",
+        "double",
+        "FL brake pressure bar",
+    ),
+    ("wheels[0].rotation", "double", "FL rotation rad/s"),
+    (
+        "wheels[0].lateral_patch_vel",
+        "double",
+        "FL lateral patch velocity m/s",
+    ),
+    (
+        "wheels[0].longitudinal_patch_vel",
+        "double",
+        "FL longitudinal patch velocity m/s",
+    ),
+    (
+        "wheels[0].lateral_ground_vel",
+        "double",
+        "FL lateral ground velocity m/s",
+    ),
+    (
+        "wheels[0].longitudinal_ground_vel",
+        "double",
+        "FL longitudinal ground velocity m/s",
+    ),
+    ("wheels[0].camber", "double", "FL camber rad"),
+    ("wheels[0].lateral_force", "double", "FL lateral force N"),
+    (
+        "wheels[0].longitudinal_force",
+        "double",
+        "FL longitudinal force N",
+    ),
+    ("wheels[0].tire_load", "double", "FL tyre load N"),
+    ("wheels[0].grip_fract", "double", "FL grip fraction 0.0–1.0"),
+    ("wheels[0].pressure", "double", "FL tyre pressure bar"),
+    ("wheels[0].temperature[0]", "double", "FL tyre temp left C"),
+    (
+        "wheels[0].temperature[1]",
+        "double",
+        "FL tyre temp center C",
+    ),
+    ("wheels[0].temperature[2]", "double", "FL tyre temp right C"),
+    ("wheels[0].wear", "double", "FL tyre wear 0.0–1.0"),
+    ("wheels[0].terrain_name", "string", "FL terrain type"),
+    ("wheels[0].surface_type", "int", "FL surface type"),
+    ("wheels[0].flat", "int", "FL flat tyre flag"),
+    ("wheels[0].detached", "int", "FL detached flag"),
+    (
+        "wheels[0].static_unbalance",
+        "int",
+        "FL static unbalance flag",
+    ),
+    (
+        "wheels[0].vertical_tire_deflection",
+        "double",
+        "FL vertical tyre deflection m",
+    ),
+    (
+        "wheels[0].wheel_ylocation",
+        "double",
+        "FL wheel Y location m",
+    ),
+    ("wheels[0].toe", "double", "FL toe angle rad"),
+    (
+        "wheels[0].tire_carcass_temperature",
+        "double",
+        "FL tyre carcass temp C",
+    ),
+    (
+        "wheels[0].tire_inner_layer_temperature[0]",
+        "double",
+        "FL tyre inner temp 1 C",
+    ),
+    (
+        "wheels[0].tire_inner_layer_temperature[1]",
+        "double",
+        "FL tyre inner temp 2 C",
+    ),
+    (
+        "wheels[0].tire_inner_layer_temperature[2]",
+        "double",
+        "FL tyre inner temp 3 C",
+    ),
+    (
+        "wheels[1].suspension_deflection",
+        "double",
+        "FR suspension deflection m",
+    ),
+    ("wheels[1].ride_height", "double", "FR ride height m"),
+    ("wheels[1].susp_force", "double", "FR suspension force N"),
+    ("wheels[1].brake_temp", "double", "FR brake temperature C"),
+    (
+        "wheels[1].brake_pressure",
+        "double",
+        "FR brake pressure bar",
+    ),
+    ("wheels[1].rotation", "double", "FR rotation rad/s"),
+    (
+        "wheels[1].lateral_patch_vel",
+        "double",
+        "FR lateral patch velocity m/s",
+    ),
+    (
+        "wheels[1].longitudinal_patch_vel",
+        "double",
+        "FR longitudinal patch velocity m/s",
+    ),
+    (
+        "wheels[1].lateral_ground_vel",
+        "double",
+        "FR lateral ground velocity m/s",
+    ),
+    (
+        "wheels[1].longitudinal_ground_vel",
+        "double",
+        "FR longitudinal ground velocity m/s",
+    ),
+    ("wheels[1].camber", "double", "FR camber rad"),
+    ("wheels[1].lateral_force", "double", "FR lateral force N"),
+    (
+        "wheels[1].longitudinal_force",
+        "double",
+        "FR longitudinal force N",
+    ),
+    ("wheels[1].tire_load", "double", "FR tyre load N"),
+    ("wheels[1].grip_fract", "double", "FR grip fraction 0.0–1.0"),
+    ("wheels[1].pressure", "double", "FR tyre pressure bar"),
+    ("wheels[1].temperature[0]", "double", "FR tyre temp left C"),
+    (
+        "wheels[1].temperature[1]",
+        "double",
+        "FR tyre temp center C",
+    ),
+    ("wheels[1].temperature[2]", "double", "FR tyre temp right C"),
+    ("wheels[1].wear", "double", "FR tyre wear 0.0–1.0"),
+    ("wheels[1].terrain_name", "string", "FR terrain type"),
+    ("wheels[1].surface_type", "int", "FR surface type"),
+    ("wheels[1].flat", "int", "FR flat tyre flag"),
+    ("wheels[1].detached", "int", "FR detached flag"),
+    (
+        "wheels[1].static_unbalance",
+        "int",
+        "FR static unbalance flag",
+    ),
+    (
+        "wheels[1].vertical_tire_deflection",
+        "double",
+        "FR vertical tyre deflection m",
+    ),
+    (
+        "wheels[1].wheel_ylocation",
+        "double",
+        "FR wheel Y location m",
+    ),
+    ("wheels[1].toe", "double", "FR toe angle rad"),
+    (
+        "wheels[1].tire_carcass_temperature",
+        "double",
+        "FR tyre carcass temp C",
+    ),
+    (
+        "wheels[1].tire_inner_layer_temperature[0]",
+        "double",
+        "FR tyre inner temp 1 C",
+    ),
+    (
+        "wheels[1].tire_inner_layer_temperature[1]",
+        "double",
+        "FR tyre inner temp 2 C",
+    ),
+    (
+        "wheels[1].tire_inner_layer_temperature[2]",
+        "double",
+        "FR tyre inner temp 3 C",
+    ),
+    (
+        "wheels[2].suspension_deflection",
+        "double",
+        "RL suspension deflection m",
+    ),
+    ("wheels[2].ride_height", "double", "RL ride height m"),
+    ("wheels[2].susp_force", "double", "RL suspension force N"),
+    ("wheels[2].brake_temp", "double", "RL brake temperature C"),
+    (
+        "wheels[2].brake_pressure",
+        "double",
+        "RL brake pressure bar",
+    ),
+    ("wheels[2].rotation", "double", "RL rotation rad/s"),
+    (
+        "wheels[2].lateral_patch_vel",
+        "double",
+        "RL lateral patch velocity m/s",
+    ),
+    (
+        "wheels[2].longitudinal_patch_vel",
+        "double",
+        "RL longitudinal patch velocity m/s",
+    ),
+    (
+        "wheels[2].lateral_ground_vel",
+        "double",
+        "RL lateral ground velocity m/s",
+    ),
+    (
+        "wheels[2].longitudinal_ground_vel",
+        "double",
+        "RL longitudinal ground velocity m/s",
+    ),
+    ("wheels[2].camber", "double", "RL camber rad"),
+    ("wheels[2].lateral_force", "double", "RL lateral force N"),
+    (
+        "wheels[2].longitudinal_force",
+        "double",
+        "RL longitudinal force N",
+    ),
+    ("wheels[2].tire_load", "double", "RL tyre load N"),
+    ("wheels[2].grip_fract", "double", "RL grip fraction 0.0–1.0"),
+    ("wheels[2].pressure", "double", "RL tyre pressure bar"),
+    ("wheels[2].temperature[0]", "double", "RL tyre temp left C"),
+    (
+        "wheels[2].temperature[1]",
+        "double",
+        "RL tyre temp center C",
+    ),
+    ("wheels[2].temperature[2]", "double", "RL tyre temp right C"),
+    ("wheels[2].wear", "double", "RL tyre wear 0.0–1.0"),
+    ("wheels[2].terrain_name", "string", "RL terrain type"),
+    ("wheels[2].surface_type", "int", "RL surface type"),
+    ("wheels[2].flat", "int", "RL flat tyre flag"),
+    ("wheels[2].detached", "int", "RL detached flag"),
+    (
+        "wheels[2].static_unbalance",
+        "int",
+        "RL static unbalance flag",
+    ),
+    (
+        "wheels[2].vertical_tire_deflection",
+        "double",
+        "RL vertical tyre deflection m",
+    ),
+    (
+        "wheels[2].wheel_ylocation",
+        "double",
+        "RL wheel Y location m",
+    ),
+    ("wheels[2].toe", "double", "RL toe angle rad"),
+    (
+        "wheels[2].tire_carcass_temperature",
+        "double",
+        "RL tyre carcass temp C",
+    ),
+    (
+        "wheels[2].tire_inner_layer_temperature[0]",
+        "double",
+        "RL tyre inner temp 1 C",
+    ),
+    (
+        "wheels[2].tire_inner_layer_temperature[1]",
+        "double",
+        "RL tyre inner temp 2 C",
+    ),
+    (
+        "wheels[2].tire_inner_layer_temperature[2]",
+        "double",
+        "RL tyre inner temp 3 C",
+    ),
+    (
+        "wheels[3].suspension_deflection",
+        "double",
+        "RR suspension deflection m",
+    ),
+    ("wheels[3].ride_height", "double", "RR ride height m"),
+    ("wheels[3].susp_force", "double", "RR suspension force N"),
+    ("wheels[3].brake_temp", "double", "RR brake temperature C"),
+    (
+        "wheels[3].brake_pressure",
+        "double",
+        "RR brake pressure bar",
+    ),
+    ("wheels[3].rotation", "double", "RR rotation rad/s"),
+    (
+        "wheels[3].lateral_patch_vel",
+        "double",
+        "RR lateral patch velocity m/s",
+    ),
+    (
+        "wheels[3].longitudinal_patch_vel",
+        "double",
+        "RR longitudinal patch velocity m/s",
+    ),
+    (
+        "wheels[3].lateral_ground_vel",
+        "double",
+        "RR lateral ground velocity m/s",
+    ),
+    (
+        "wheels[3].longitudinal_ground_vel",
+        "double",
+        "RR longitudinal ground velocity m/s",
+    ),
+    ("wheels[3].camber", "double", "RR camber rad"),
+    ("wheels[3].lateral_force", "double", "RR lateral force N"),
+    (
+        "wheels[3].longitudinal_force",
+        "double",
+        "RR longitudinal force N",
+    ),
+    ("wheels[3].tire_load", "double", "RR tyre load N"),
+    ("wheels[3].grip_fract", "double", "RR grip fraction 0.0–1.0"),
+    ("wheels[3].pressure", "double", "RR tyre pressure bar"),
+    ("wheels[3].temperature[0]", "double", "RR tyre temp left C"),
+    (
+        "wheels[3].temperature[1]",
+        "double",
+        "RR tyre temp center C",
+    ),
+    ("wheels[3].temperature[2]", "double", "RR tyre temp right C"),
+    ("wheels[3].wear", "double", "RR tyre wear 0.0–1.0"),
+    ("wheels[3].terrain_name", "string", "RR terrain type"),
+    ("wheels[3].surface_type", "int", "RR surface type"),
+    ("wheels[3].flat", "int", "RR flat tyre flag"),
+    ("wheels[3].detached", "int", "RR detached flag"),
+    (
+        "wheels[3].static_unbalance",
+        "int",
+        "RR static unbalance flag",
+    ),
+    (
+        "wheels[3].vertical_tire_deflection",
+        "double",
+        "RR vertical tyre deflection m",
+    ),
+    (
+        "wheels[3].wheel_ylocation",
+        "double",
+        "RR wheel Y location m",
+    ),
+    ("wheels[3].toe", "double", "RR toe angle rad"),
+    (
+        "wheels[3].tire_carcass_temperature",
+        "double",
+        "RR tyre carcass temp C",
+    ),
+    (
+        "wheels[3].tire_inner_layer_temperature[0]",
+        "double",
+        "RR tyre inner temp 1 C",
+    ),
+    (
+        "wheels[3].tire_inner_layer_temperature[1]",
+        "double",
+        "RR tyre inner temp 2 C",
+    ),
+    (
+        "wheels[3].tire_inner_layer_temperature[2]",
+        "double",
+        "RR tyre inner temp 3 C",
+    ),
+];
+
 /// Returns metadata for every variable in the snapshot.
-///
-/// Since field names come from the struct directly, this just maps snapshot
-/// keys to generic metadata entries.
-pub fn var_list() -> Vec<VarMeta> {
-    // Build one snapshot from a zeroed frame to enumerate keys
-    let zeroed: crate::lmu::structs::rF2VehicleTelemetry = unsafe { std::mem::zeroed() };
-    zeroed
-        .to_snapshot()
-        .into_keys()
-        .map(|name| VarMeta {
-            type_name: "f64".into(),
-            unit: "".into(),
-            desc: "".into(),
+pub fn var_list_snapshot() -> Vec<VarMeta> {
+    LMU_VEHICLE_TELEMETRY_VARS
+        .iter()
+        .map(|(name, type_name, desc)| VarMeta {
+            name: name.to_string(),
+            type_name,
+            unit: String::new(),
+            desc: desc.to_string(),
             count: 1,
-            name,
         })
         .collect()
 }

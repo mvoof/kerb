@@ -22,7 +22,7 @@ fn main() -> Result<(), SimError> {
                 while conn.is_connected() {
                     conn.wait_for_data(100);
 
-                    let frame = conn.frame();
+                    let frame = conn.frame()?;
 
                     let gear = match frame.gear {
                         -1 => "R".to_string(),

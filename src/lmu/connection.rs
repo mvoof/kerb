@@ -1,83 +1,98 @@
 use crate::error::SimError;
-use crate::lmu::structs::{RF2_MAX_VEHICLES, rF2Extended, rF2Scoring, rF2Telemetry};
+use crate::lmu::structs::{rF2Extended, rF2Scoring, rF2Telemetry};
+use crate::lmu::types::{
+    LmuExtended, LmuFrame, LmuScoringInfo, LmuVehicleScoring, LmuVehicleTelemetry,
+};
 use crate::shm::SharedMemRegion;
 
 const SHM_TELEMETRY: &str = "$rFactor2SMMP_Telemetry$";
 const SHM_SCORING: &str = "$rFactor2SMMP_Scoring$";
 const SHM_EXTENDED: &str = "$rFactor2SMMP_Extended$";
 
-/// Point-in-time snapshot holding copies of all three rF2 shared-memory regions.
+/// Read a consistent snapshot of `T` from a shared-memory region guarded by
+/// `version_update_begin` / `version_update_end` seqlock counters.
 ///
-/// Fields are full copies (not references) because the underlying memory-mapped
-/// regions can be mutated by the sim at any time.
+/// Spins until both counters match and are even (no write in progress).
+/// Returns `Err` after 100 retries to avoid an infinite loop if the sim hangs.
 ///
-/// # Data scope
+/// # Safety
+/// Caller must ensure `begin_offset` and `end_offset` are valid byte offsets into
+/// the region, and that the region is at least `size_of::<T>()` bytes large.
+/// Read a consistent snapshot of `T` from a shared-memory region into a heap-allocated Box.
 ///
-/// - [`telemetry`](LmuFrame::telemetry) — raw array for **all vehicles**; use [`player_telemetry()`](LmuFrame::player_telemetry) for the player's car.
-/// - [`scoring`](LmuFrame::scoring) — raw array for **all vehicles** plus session-wide info; use [`player_scoring_idx()`](LmuFrame::player_scoring_idx) for the player's entry.
-/// - [`extended`](LmuFrame::extended) — plugin/session metadata; most users only need this via [`LmuConnection::is_connected()`].
-#[derive(Clone, Copy, Debug)]
-pub struct LmuFrame {
-    /// Raw telemetry array for **all vehicles** in the session (up to 128).
-    ///
-    /// Valid entries are `vehicles[0..header.num_vehicles]`. Use [`player_telemetry()`](LmuFrame::player_telemetry)
-    /// to get the player's car without manual index lookups. Iterate the full slice to build
-    /// leaderboard data.
-    pub telemetry: rF2Telemetry,
-    /// Scoring array for **all vehicles** in the session (up to 128) plus session-wide info.
-    ///
-    /// Valid entries are `vehicles[0..header.num_vehicles]`. Use [`player_scoring_idx()`](LmuFrame::player_scoring_idx)
-    /// to locate the player's entry. `scoring_info` contains track name, weather, flags, and session type.
-    pub scoring: rF2Scoring,
-    /// Plugin and session metadata.
-    ///
-    /// Most users only need this indirectly via [`LmuConnection::is_connected()`]. Contains
-    /// `is_plugin_enabled` and `session_started` flags used to confirm live data.
-    pub extended: rF2Extended,
-}
+/// Allocating on the heap avoids stack overflow for large structs (e.g. rF2Telemetry
+/// with 128 vehicles). Spins until the seqlock counters match and are even.
+/// Returns `Err` after 100 retries to avoid an infinite loop if the sim hangs.
+/// Read a consistent snapshot of `T` from a shared-memory region into a heap-allocated Box.
+///
+/// Uses the classic seqlock reader pattern:
+///   1. Read `begin` counter
+///   2. Copy region into heap buffer
+///   3. Read `end` counter
+///   4. If begin == end and both even → consistent, return
+///
+/// Allocating on the heap avoids stack overflow for large structs (e.g. rF2Telemetry).
+/// Retries up to 1000 times before giving up.
+unsafe fn read_region_consistent<T: Copy>(
+    region: &crate::shm::SharedMemRegion,
+    begin_offset: usize,
+    end_offset: usize,
+) -> Result<Box<T>, crate::error::SimError> {
+    let ptr = region.as_ptr();
 
-impl LmuFrame {
-    /// Returns the index into `scoring.vehicles` for the player's car, or `None` if not found.
-    ///
-    /// Use this index to access [`rF2VehicleScoring`](crate::lmu::structs::rF2VehicleScoring) fields
-    /// directly (position, lap times, pit state, flags, etc.).
-    ///
-    /// Returns `None` before a session starts or when the player car is not yet assigned.
-    pub fn player_scoring_idx(&self) -> Option<usize> {
-        let n = self.scoring.header.num_vehicles as usize;
-        self.scoring.vehicles[..n.min(RF2_MAX_VEHICLES)]
-            .iter()
-            .position(|v| v.is_player != 0)
+    // Pre-allocate the destination buffer once outside the retry loop.
+    let layout = std::alloc::Layout::new::<T>();
+    let raw = unsafe { std::alloc::alloc(layout) as *mut T };
+    if raw.is_null() {
+        std::alloc::handle_alloc_error(layout);
     }
 
-    /// Returns the player's [`rF2VehicleTelemetry`](crate::lmu::structs::rF2VehicleTelemetry) entry.
-    ///
-    /// Cross-references `scoring.vehicles` (by `is_player` flag) and `telemetry.vehicles`
-    /// (by matching `id`) to find the correct entry. Falls back to `vehicles[0]` if no match
-    /// is found (e.g. before session start).
-    ///
-    /// **Packed-field rule:** Always copy fields to local variables before using them in
-    /// expressions (arithmetic, `println!`, function calls) — taking a reference to a packed
-    /// field is a compile error in Rust.
-    pub fn player_telemetry(&self) -> &crate::lmu::structs::rF2VehicleTelemetry {
-        let n = self.telemetry.header.num_vehicles as usize;
-
-        if n == 0 {
-            return &self.telemetry.vehicles[0];
-        }
-
-        if let Some(idx) = self.player_scoring_idx() {
-            let player_id = self.scoring.vehicles[idx].id;
-
-            if let Some(telem_idx) = self.telemetry.vehicles[..n.min(RF2_MAX_VEHICLES)]
-                .iter()
-                .position(|v| v.id == player_id)
-            {
-                return &self.telemetry.vehicles[telem_idx];
+    let start = std::time::Instant::now();
+    let mut retries = 0u32;
+    loop {
+        // Step 1: read begin; skip the copy if a write is in progress (begin != end).
+        let begin = unsafe { std::ptr::read_volatile(ptr.add(begin_offset) as *const u32) };
+        let end_pre = unsafe { std::ptr::read_volatile(ptr.add(end_offset) as *const u32) };
+        if begin != end_pre {
+            // Write in progress — spin without copying.
+            retries += 1;
+            if retries.is_multiple_of(1000) {
+                if start.elapsed() > std::time::Duration::from_millis(100) {
+                    unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
+                    return Err(crate::error::SimError::InvalidHeader(
+                        "Torn read timeout in LMU region".into(),
+                    ));
+                }
+                std::thread::yield_now();
+            } else {
+                std::hint::spin_loop();
             }
+            continue;
         }
 
-        &self.telemetry.vehicles[0]
+        // Step 2: copy the whole region (only when consistent).
+        unsafe { std::ptr::copy_nonoverlapping(ptr, raw as *mut u8, std::mem::size_of::<T>()) };
+
+        // Step 3: read end after the copy — if it changed, a write snuck in.
+        let end = unsafe { std::ptr::read_volatile(ptr.add(end_offset) as *const u32) };
+
+        // Step 4: consistent if end still matches begin.
+        if begin == end {
+            return Ok(unsafe { Box::from_raw(raw) });
+        }
+
+        retries += 1;
+        if retries.is_multiple_of(1000) {
+            if start.elapsed() > std::time::Duration::from_millis(100) {
+                unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
+                return Err(crate::error::SimError::InvalidHeader(
+                    "Torn read timeout in LMU region".into(),
+                ));
+            }
+            std::thread::yield_now();
+        } else {
+            std::hint::spin_loop();
+        }
     }
 }
 
@@ -97,66 +112,107 @@ impl LmuConnection {
     /// Read a consistent point-in-time snapshot of all three shared-memory regions.
     ///
     /// Returns a `Box<LmuFrame>` because `LmuFrame` holds 128-vehicle arrays and
-    /// is too large to safely live on the stack (~500 KB). The copy is done with
-    /// `ptr::copy_nonoverlapping` for consistency.
-    pub fn frame(&self) -> Box<LmuFrame> {
+    /// is too large to safely live on the stack. Each region is read with
+    /// seqlock consistency — the read retries if a write was in progress.
+    pub fn frame(&self) -> Result<Box<LmuFrame>, crate::error::SimError> {
+        use crate::lmu::structs::{RF2_MAX_VEHICLES, rF2ScoringHeader, rF2TelemetryHeader};
         unsafe {
-            let mut frame = Box::<LmuFrame>::new_zeroed().assume_init();
-            std::ptr::copy_nonoverlapping(
-                self.telemetry.as_ptr() as *const rF2Telemetry,
-                &mut frame.telemetry as *mut rF2Telemetry,
-                1,
-            );
-            std::ptr::copy_nonoverlapping(
-                self.scoring.as_ptr() as *const rF2Scoring,
-                &mut frame.scoring as *mut rF2Scoring,
-                1,
-            );
-            std::ptr::copy_nonoverlapping(
-                self.extended.as_ptr() as *const rF2Extended,
-                &mut frame.extended as *mut rF2Extended,
-                1,
-            );
-            frame
+            let raw_telemetry = read_region_consistent::<rF2Telemetry>(
+                &self.telemetry,
+                std::mem::offset_of!(rF2Telemetry, header)
+                    + std::mem::offset_of!(rF2TelemetryHeader, version_update_begin),
+                std::mem::offset_of!(rF2Telemetry, header)
+                    + std::mem::offset_of!(rF2TelemetryHeader, version_update_end),
+            )?;
+            let raw_scoring = read_region_consistent::<rF2Scoring>(
+                &self.scoring,
+                std::mem::offset_of!(rF2Scoring, header)
+                    + std::mem::offset_of!(rF2ScoringHeader, version_update_begin),
+                std::mem::offset_of!(rF2Scoring, header)
+                    + std::mem::offset_of!(rF2ScoringHeader, version_update_end),
+            )?;
+            let raw_extended = read_region_consistent::<rF2Extended>(
+                &self.extended,
+                std::mem::offset_of!(rF2Extended, version_update_begin),
+                std::mem::offset_of!(rF2Extended, version_update_end),
+            )?;
+
+            let num = (raw_scoring.scoring_info.num_vehicles as usize).min(RF2_MAX_VEHICLES);
+
+            let mut frame = {
+                let layout = std::alloc::Layout::new::<LmuFrame>();
+                let ptr = std::alloc::alloc_zeroed(layout) as *mut LmuFrame;
+                if ptr.is_null() {
+                    std::alloc::handle_alloc_error(layout);
+                }
+                Box::from_raw(ptr)
+            };
+
+            for i in 0..num {
+                frame.vehicles_telemetry[i] = LmuVehicleTelemetry::from(raw_telemetry.vehicles[i]);
+                frame.vehicles_scoring[i] = LmuVehicleScoring::from(raw_scoring.vehicles[i]);
+            }
+            frame.num_vehicles = num;
+            frame.scoring_info = LmuScoringInfo::from(raw_scoring.scoring_info);
+            frame.extended = LmuExtended::from(*raw_extended);
+
+            Ok(frame)
         }
     }
 
     /// All player telemetry variables as a flat `HashMap<String, TelemetryValue>`.
     ///
     /// Scope: **player's car only** (calls `player_telemetry()` internally).
-    /// Keys are field names from [`rF2VehicleTelemetry`](crate::lmu::structs::rF2VehicleTelemetry).
     pub fn telemetry_snapshot(
         &self,
     ) -> std::collections::HashMap<String, crate::types::TelemetryValue> {
-        crate::lmu::snapshot::build_snapshot(&self.frame())
-    }
-
-    /// Metadata for every field in the player telemetry snapshot.
-    ///
-    /// Returns one [`VarMeta`](crate::types::VarMeta) per field. Only the `name` field is
-    /// populated — `unit`, `desc`, and `count` are empty/default because the rF2 plugin
-    /// format does not expose that metadata.
-    pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
-        crate::lmu::snapshot::var_list()
-    }
-
-    /// Returns `true` when the rF2/LMU plugin is active and a session has started.
-    ///
-    /// Reads `rF2Extended::is_plugin_enabled` and `rF2Extended::session_started` from
-    /// shared memory. Returns `false` during loading screens or when the plugin is missing.
-    pub fn is_connected(&self) -> bool {
-        unsafe {
-            let ext = std::ptr::read_unaligned(self.extended.as_ptr() as *const rF2Extended);
-            ext.is_plugin_enabled != 0 && ext.session_started != 0
+        match self.frame() {
+            Ok(frame) => crate::lmu::snapshot::build_snapshot(&frame),
+            Err(_) => std::collections::HashMap::new(),
         }
     }
 
-    /// Sleep for up to `timeout_ms` milliseconds (capped at 16 ms).
+    /// Metadata for every field in the player telemetry snapshot.
+    pub fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta> {
+        crate::lmu::snapshot::var_list_snapshot()
+    }
+
+    /// Returns `true` when the rF2/LMU shared-memory plugin is loaded and writing data.
     ///
-    /// LMU does not expose a data-ready event; this is a fixed-duration sleep.
-    /// Call in your polling loop to avoid busy-waiting at ~60 Hz.
+    /// Checks that `version_update_begin` is non-zero — the plugin increments this
+    /// seqlock counter on every update, so zero means no data has been written yet.
+    ///
+    /// This is `true` even when the game is in the main menu (no session running).
+    /// Use [`is_session_started`](Self::is_session_started) to check whether a
+    /// driveable session (practice / qualifying / race) is currently active.
+    pub(crate) fn is_plugin_active(&self) -> bool {
+        unsafe { std::ptr::read_volatile(self.extended.as_ptr() as *const u32) != 0 }
+    }
+
+    /// Returns `true` when a driveable session has started (practice, qualifying, or race).
+    ///
+    /// Will be `false` while the game is loading or sitting in the main menu even if
+    /// [`is_plugin_active`](Self::is_plugin_active) returns `true`.
+    pub(crate) fn is_session_started(&self) -> bool {
+        unsafe {
+            let offset = std::mem::offset_of!(rF2Extended, session_started);
+            let ptr = self.extended.as_ptr().add(offset);
+            std::ptr::read_volatile(ptr) != 0
+        }
+    }
+
+    /// Returns `true` when the plugin is active **and** a session has started.
+    ///
+    /// Equivalent to `is_plugin_active() && is_session_started()`.
+    pub fn is_connected(&self) -> bool {
+        self.is_plugin_active() && self.is_session_started()
+    }
+
+    /// Sleep for up to `timeout_ms` milliseconds.
+    ///
+    /// LMU does not expose a data-ready event; this is a simple sleep.
     pub fn wait_for_data(&self, timeout_ms: u32) {
-        std::thread::sleep(std::time::Duration::from_millis(timeout_ms.min(16) as u64));
+        std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
     }
 }
 
@@ -164,8 +220,7 @@ impl LmuConnection {
     /// Open the three rF2/LMU shared-memory regions (telemetry, scoring, extended).
     ///
     /// Returns [`SimError::NotConnected`] with a hint message if the plugin DLL is not installed.
-    /// Install `rFactor2SharedMemoryMapPlugin64.dll` to `<LMU>/Plugins/` first.
-    pub fn connect() -> Result<Self, SimError> {
+    pub(crate) fn connect() -> Result<Self, SimError> {
         let telemetry = SharedMemRegion::open(SHM_TELEMETRY).map_err(|e| {
             SimError::NotConnected(format!(
                 "{}. Is rFactor2SharedMemoryMapPlugin installed in LMU/Plugins/?",

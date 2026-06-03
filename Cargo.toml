@@ -9,14 +9,12 @@ keywords = ["iracing", "telemetry", "sim-racing", "assetto-corsa"]
 categories = ["game-development"]
 
 [features]
-default = ["iracing", "ac", "lmu"]
+default = ["iracing", "ac-evo", "lmu"]
 iracing = ["dep:windows-sys", "dep:serde_yaml"]
-ac = ["dep:windows-sys"]
 ac-evo = ["dep:windows-sys"]
 lmu = ["dep:windows-sys"]
 
 [dependencies]
-kerb-derive = { path = "kerb-derive" }
 encoding_rs = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = { version = "0.9", optional = true }
@@ -28,9 +26,8 @@ windows-sys = { version = "0.61.2", features = [
 
 [workspace]
 members = [
-    "tools/codegen",
+    "tools/iracing_type_gen",
     "examples",
-    "kerb-derive",
 ]
 resolver = "2"
 

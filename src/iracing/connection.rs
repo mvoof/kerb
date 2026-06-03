@@ -1,13 +1,10 @@
 use std::collections::HashMap;
 use std::thread::sleep;
 use std::time::Duration;
-use windows_sys::Win32::Foundation::{CloseHandle, FALSE, GetLastError, HANDLE, WAIT_OBJECT_0};
-use windows_sys::Win32::System::Memory::{
-    FILE_MAP_READ, MEMORY_MAPPED_VIEW_ADDRESS, MapViewOfFile, OpenFileMappingW, UnmapViewOfFile,
-};
+use windows_sys::Win32::Foundation::{CloseHandle, FALSE, HANDLE, WAIT_OBJECT_0};
 use windows_sys::Win32::System::Threading::{OpenEventW, WaitForSingleObject};
 
-use crate::iracing::types::{IRSDK_MAX_BUFS, VarType, irsdk_header, irsdk_varHeader};
+use crate::iracing::structs::{IRSDK_MAX_BUFS, VarType, irsdk_header, irsdk_varHeader};
 use crate::types::TelemetryValue;
 
 const SYNCHRONIZE: u32 = 0x00100000;
@@ -24,67 +21,44 @@ fn parse_c_str(bytes: &[u8]) -> String {
 
 /// Live connection to the iRacing telemetry service via Win32 shared memory.
 ///
-/// Holds the file-mapping handle, the mapped memory view, and an optional
-/// data-ready event used for efficient frame-synchronised waiting.
+/// Holds the shared-memory region, an optional data-ready event used for
+/// efficient frame-synchronised waiting, and the parsed variable header table.
 pub struct IRsdkConnection {
-    h_map: HANDLE,
-    view_address: MEMORY_MAPPED_VIEW_ADDRESS,
+    shm: crate::shm::SharedMemRegion,
     h_event: HANDLE,
-    pub vars: HashMap<String, irsdk_varHeader>,
+    pub(crate) vars: HashMap<String, irsdk_varHeader>,
     cached_session: std::cell::RefCell<Option<(i32, crate::iracing::session::IracingSession)>>,
+    pub(crate) offsets: crate::iracing::types::IracingOffsets,
 }
 
 impl IRsdkConnection {
     /// Create a mock connection for unit testing and benchmarking.
-    /// Exposes low-level fields internally.
     #[doc(hidden)]
-    pub fn new_mock(
+    pub unsafe fn new_mock(
         view_address: *mut std::ffi::c_void,
         vars: HashMap<String, irsdk_varHeader>,
     ) -> Self {
+        let offsets = crate::iracing::types::IracingOffsets::resolve(&vars);
         Self {
-            h_map: 0 as _,
-            view_address: MEMORY_MAPPED_VIEW_ADDRESS {
-                Value: view_address,
-            },
+            shm: unsafe { crate::shm::SharedMemRegion::new_mock(view_address) },
             h_event: 0 as _,
             vars,
             cached_session: std::cell::RefCell::new(None),
+            offsets,
         }
     }
 
     /// Open the iRacing shared-memory region and parse the variable header table.
     /// Returns `Err` if the sim is not running or the header is invalid.
+    #[doc(hidden)]
     pub fn connect() -> Result<Self, crate::error::SimError> {
+        let shm = crate::shm::SharedMemRegion::open(SHM_MEM_MAP_FILE)
+            .map_err(crate::error::SimError::NotConnected)?;
+
+        let shared_mem = shm.as_ptr();
+
         unsafe {
-            let map_name: Vec<u16> = SHM_MEM_MAP_FILE
-                .encode_utf16()
-                .chain(std::iter::once(0))
-                .collect();
-
-            let h_map = OpenFileMappingW(FILE_MAP_READ, FALSE, map_name.as_ptr());
-
-            if h_map.is_null() {
-                let err = GetLastError();
-
-                return Err(crate::error::SimError::NotConnected(format!(
-                    "Shared memory not found (Windows error: {})",
-                    err
-                )));
-            }
-
-            let view_address = MapViewOfFile(h_map, FILE_MAP_READ, 0, 0, 0);
-
-            if view_address.Value.is_null() {
-                let err = GetLastError();
-
-                CloseHandle(h_map);
-
-                return Err(crate::error::SimError::NotConnected(format!(
-                    "Failed to map view of file (error: {})",
-                    err
-                )));
-            }
+            let header = std::ptr::read_unaligned(shared_mem as *const irsdk_header);
 
             let event_name: Vec<u16> = SHM_DATA_VALID_EVENT
                 .encode_utf16()
@@ -93,17 +67,10 @@ impl IRsdkConnection {
 
             let h_event = OpenEventW(SYNCHRONIZE, FALSE, event_name.as_ptr());
 
-            let shared_mem = view_address.Value as *const u8;
-            let header = *(shared_mem as *const irsdk_header);
-
             if header.ver <= 0 || header.ver > 10 || header.num_vars <= 0 {
                 if !h_event.is_null() {
                     CloseHandle(h_event);
                 }
-
-                UnmapViewOfFile(view_address);
-
-                CloseHandle(h_map);
 
                 return Err(crate::error::SimError::InvalidHeader(format!(
                     "Invalid iRacing telemetry header (ver={}, num_vars={})",
@@ -111,26 +78,37 @@ impl IRsdkConnection {
                 )));
             }
 
+            let shm_size = 32 * 1024 * 1024usize; // 32 MB — upper bound for iRacing SHM
+            let var_offset = header.var_header_offset as usize;
+            let element_size = std::mem::size_of::<irsdk_varHeader>();
+            let num = header.num_vars as usize;
+            if var_offset.saturating_add(num.saturating_mul(element_size)) > shm_size {
+                if !h_event.is_null() {
+                    CloseHandle(h_event);
+                }
+                return Err(crate::error::SimError::InvalidHeader(
+                    "var_header_offset out of SHM bounds".into(),
+                ));
+            }
+
             let mut vars = HashMap::new();
 
-            for i in 0..header.num_vars as usize {
-                let offset =
-                    header.var_header_offset as usize + i * std::mem::size_of::<irsdk_varHeader>();
-
+            for i in 0..num {
+                let offset = var_offset + i * element_size;
                 let var_header_ptr = shared_mem.add(offset) as *const irsdk_varHeader;
-                let var_header = *var_header_ptr;
-
+                let var_header = std::ptr::read_unaligned(var_header_ptr);
                 let name_str = parse_c_str(&var_header.name);
-
                 vars.insert(name_str, var_header);
             }
 
+            let offsets = crate::iracing::types::IracingOffsets::resolve(&vars);
+
             Ok(Self {
-                h_map,
-                view_address,
+                shm,
                 h_event,
                 vars,
                 cached_session: std::cell::RefCell::new(None),
+                offsets,
             })
         }
     }
@@ -138,17 +116,10 @@ impl IRsdkConnection {
     /// Returns `true` when the iRacing sim is actively broadcasting telemetry (status bit 0).
     pub fn is_connected(&self) -> bool {
         unsafe {
-            let shared_mem = self.view_address.Value as *const u8;
-            let header = *(shared_mem as *const irsdk_header);
-
-            (header.status & 1) != 0
+            let offset = std::mem::offset_of!(irsdk_header, status);
+            let status = std::ptr::read_unaligned(self.shm.as_ptr().add(offset) as *const i32);
+            (status & 1) != 0
         }
-    }
-
-    /// Returns `true` if the data-valid event handle was opened successfully,
-    /// meaning we can do efficient event-based waiting instead of sleeping.
-    pub fn has_event_sync(&self) -> bool {
-        !self.h_event.is_null()
     }
 
     /// Block until the sim signals new data, or until `timeout_ms` elapses.
@@ -167,79 +138,25 @@ impl IRsdkConnection {
         }
     }
 
-    /// Read the session-info YAML string from shared memory.
-    /// Returns `None` if the header reports a zero-length info block.
-    pub fn get_session_info(&self) -> Option<String> {
-        unsafe {
-            let shared_mem = self.view_address.Value as *const u8;
-            let header = *(shared_mem as *const irsdk_header);
-
-            if header.session_info_len <= 0 {
-                return None;
-            }
-
-            let info_ptr = shared_mem.add(header.session_info_offset as usize);
-            let bytes = std::slice::from_raw_parts(info_ptr, header.session_info_len as usize);
-
-            let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
-
-            Some(crate::decode_cp1252(&bytes[..len]))
-        }
-    }
-
     /// Return the session info update version counter.
     /// This counter increments whenever the session info YAML block changes.
-    pub fn session_info_update(&self) -> i32 {
+    pub(crate) fn session_info_update(&self) -> i32 {
         unsafe {
-            if self.view_address.Value.is_null() {
+            let shared_mem = self.shm.as_ptr();
+            if shared_mem.is_null() {
                 return -1;
             }
-
-            let shared_mem = self.view_address.Value as *const u8;
-            let header = *(shared_mem as *const irsdk_header);
-
-            header.session_info_update
+            let offset = std::mem::offset_of!(irsdk_header, session_info_update);
+            std::ptr::read_unaligned(shared_mem.add(offset) as *const i32)
         }
-    }
-
-    /// Return a sorted list of `(name, type_string, description)` for every telemetry variable.
-    pub fn list_variables(&self) -> Vec<(String, String, String)> {
-        let mut list = Vec::new();
-        for (name, var) in &self.vars {
-            let type_str = match VarType::from_i32(var.type_) {
-                Some(VarType::Char) => "char",
-                Some(VarType::Bool) => "bool",
-                Some(VarType::Int) => "int",
-                Some(VarType::BitField) => "bitfield",
-                Some(VarType::Float) => "float",
-                Some(VarType::Double) => "double",
-                None => "unknown",
-            };
-
-            let count_str = if var.count > 1 {
-                format!("[{}]", var.count)
-            } else {
-                "".to_string()
-            };
-
-            list.push((
-                name.clone(),
-                format!("{}{}", type_str, count_str),
-                parse_c_str(&var.desc),
-            ));
-        }
-
-        list.sort_by(|a, b| a.0.cmp(&b.0));
-
-        list
     }
 
     // Find the double-buffer with the highest tick count and return a pointer to its data.
     fn get_latest_data_ptr(&self) -> Option<*const u8> {
         unsafe {
-            let shared_mem = self.view_address.Value as *const u8;
+            let shared_mem = self.shm.as_ptr();
 
-            let header = *(shared_mem as *const irsdk_header);
+            let header = std::ptr::read_unaligned(shared_mem as *const irsdk_header);
 
             if header.num_buf <= 0 || header.num_buf as usize > IRSDK_MAX_BUFS {
                 return None;
@@ -271,6 +188,7 @@ impl IRsdkConnection {
     /// Read a single telemetry variable by name from the latest data buffer.
     /// Uses `read_unaligned` because shared-memory offsets are not guaranteed
     /// to satisfy Rust's alignment requirements.
+    #[doc(hidden)]
     pub fn read_variable(&self, name: &str) -> Option<TelemetryValue> {
         let var = self.vars.get(name)?;
         let data_ptr = self.get_latest_data_ptr()?;
@@ -383,8 +301,8 @@ impl IRsdkConnection {
     }
 
     /// Snapshot every known variable from the latest data buffer into a map.
-    pub fn read_all_variables(&self) -> HashMap<String, TelemetryValue> {
-        let mut map = HashMap::new();
+    pub(crate) fn read_all_variables(&self) -> HashMap<String, TelemetryValue> {
+        let mut map = HashMap::with_capacity(self.vars.len());
 
         for name in self.vars.keys() {
             if let Some(val) = self.read_variable(name) {
@@ -394,86 +312,23 @@ impl IRsdkConnection {
         map
     }
 
-    /// Convenience: read a single `f32` variable by name.
-    pub fn read_float(&self, name: &str) -> Option<f32> {
-        if let Some(TelemetryValue::Float(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a single `f64` variable by name.
-    pub fn read_double(&self, name: &str) -> Option<f64> {
-        if let Some(TelemetryValue::Double(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a single `i32` variable by name.
-    pub fn read_int(&self, name: &str) -> Option<i32> {
-        if let Some(TelemetryValue::Int(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a single `bool` variable by name.
-    pub fn read_bool(&self, name: &str) -> Option<bool> {
-        if let Some(TelemetryValue::Bool(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<f32>` array variable by name.
-    pub fn read_float_array(&self, name: &str) -> Option<Vec<f32>> {
-        if let Some(TelemetryValue::FloatArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<f64>` array variable by name.
-    pub fn read_double_array(&self, name: &str) -> Option<Vec<f64>> {
-        if let Some(TelemetryValue::DoubleArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<i32>` array variable by name.
-    pub fn read_int_array(&self, name: &str) -> Option<Vec<i32>> {
-        if let Some(TelemetryValue::IntArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
-    /// Convenience: read a `Vec<bool>` array variable by name.
-    pub fn read_bool_array(&self, name: &str) -> Option<Vec<bool>> {
-        if let Some(TelemetryValue::BoolArray(v)) = self.read_variable(name) {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
     /// Raw YAML session string from iRacing shared memory.
     pub fn session_yaml(&self) -> Option<String> {
-        self.get_session_info()
-    }
+        unsafe {
+            let shared_mem = self.shm.as_ptr();
+            let header = std::ptr::read_unaligned(shared_mem as *const irsdk_header);
 
-    /// Parsed session info. Cached — only re-parses when iRacing reports a change.
-    pub fn session_info(&self) -> Option<crate::iracing::session::IracingSession> {
-        self.session()
+            if header.session_info_len <= 0 {
+                return None;
+            }
+
+            let info_ptr = shared_mem.add(header.session_info_offset as usize);
+            let bytes = std::slice::from_raw_parts(info_ptr, header.session_info_len as usize);
+
+            let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
+
+            Some(crate::decode_cp1252(&bytes[..len]))
+        }
     }
 
     /// All current telemetry variables as a map with sim-native names and units.
@@ -484,8 +339,8 @@ impl IRsdkConnection {
     }
 
     /// Metadata for every telemetry variable iRacing currently exposes.
-    pub fn var_list(&self) -> Vec<crate::types::VarMeta> {
-        use crate::iracing::types::VarType;
+    pub fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta> {
+        use crate::iracing::structs::VarType;
 
         self.vars
             .iter()
@@ -522,7 +377,7 @@ impl IRsdkConnection {
 
                 crate::types::VarMeta {
                     name: name.clone(),
-                    type_name: type_name.to_string(),
+                    type_name,
                     unit,
                     desc,
                     count: hdr.count as u32,
@@ -532,15 +387,21 @@ impl IRsdkConnection {
     }
 
     /// Capture a full telemetry frame. Reads all variables from shared memory in one pass.
-    pub fn frame(&self) -> crate::iracing::vars::IracingFrame {
-        crate::iracing::vars::IracingFrame::from_vars(&self.read_all_variables())
+    pub fn frame(&self) -> Result<crate::iracing::types::IracingFrame, crate::error::SimError> {
+        let data_ptr = self
+            .get_latest_data_ptr()
+            .ok_or_else(|| crate::error::SimError::InvalidHeader("No valid data buffer".into()))?;
+        Ok(crate::iracing::types::IracingFrame::from_raw(
+            data_ptr,
+            &self.offsets,
+        ))
     }
 
     /// Parse the current session-info YAML into an `IracingSession`.
     ///
     /// Automatically caches the parsed representation and only re-parses the large
     /// YAML block if iRacing reports that the session info has changed.
-    pub fn session(&self) -> Option<crate::iracing::session::IracingSession> {
+    pub fn session_info(&self) -> Option<crate::iracing::session::IracingSession> {
         let current_version = self.session_info_update();
 
         if let Some((_, session)) = self
@@ -552,7 +413,7 @@ impl IRsdkConnection {
             return Some(session.clone());
         }
 
-        let yaml = self.get_session_info()?;
+        let yaml = self.session_yaml()?;
 
         let session = crate::iracing::session::IracingSession::from_yaml(&yaml)?;
 
@@ -562,20 +423,13 @@ impl IRsdkConnection {
     }
 }
 
-/// Releases Win32 handles and unmaps the shared-memory view on drop.
+/// Closes the data-valid event handle on drop. The shared-memory region is
+/// managed by `SharedMemRegion` and cleaned up automatically.
 impl Drop for IRsdkConnection {
     fn drop(&mut self) {
         unsafe {
             if !self.h_event.is_null() {
                 CloseHandle(self.h_event);
-            }
-
-            if !self.view_address.Value.is_null() {
-                UnmapViewOfFile(self.view_address);
-            }
-
-            if !self.h_map.is_null() {
-                CloseHandle(self.h_map);
             }
         }
     }
