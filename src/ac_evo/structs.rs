@@ -1,6 +1,8 @@
-//! `#[repr(C, packed)]` structs that mirror Assetto Corsa Evo's shared
-//! memory layouts byte-for-byte. Field order and sizes must match the game
-//! definitions exactly — do not reorder or add padding.
+//! Structs mirroring Assetto Corsa Evo's shared memory layouts.
+//!
+//! All structs use `#[repr(C)]` — the game does not use `#pragma pack` anywhere.
+//! Natural C alignment applies throughout. Inner fixed-size sub-structs (`SMEvo*`)
+//! use a `_pad` field to reach the fixed byte size shown in the doc as `[N bytes]`.
 //!
 //! Source: https://www.assettocorsa.net/forum/index.php?threads/shared-memory-api-documentation.83659/.
 //! https://docs.google.com/document/d/1WzqMLkW2o_C0LGcvdMRelAV31ZIifux0CSHD9k6ddz0/edit?tab=t.0
@@ -13,7 +15,7 @@ pub const AC_STATUS_PAUSE: i32 = 3;
 // ── Assetto Corsa Evo ─────────────────────────────────────────────────────────
 
 /// Physics telemetry page — updated every simulation tick.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SPageFilePhysicsEvo {
     pub packet_id: i32,
@@ -104,7 +106,7 @@ pub(crate) struct SPageFilePhysicsEvo {
 }
 
 /// Per-tyre state. Fixed size: 256 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoTyreState {
     pub slip: f32,
@@ -124,11 +126,11 @@ pub(crate) struct SMEvoTyreState {
     pub tyre_normalized_temperature_right: f32,
     pub brake_normalized_temperature: f32,
     pub tyre_normalized_temperature_core: f32,
-    pub _pad: [u8; 133],
+    pub _pad: [u8; 128],
 }
 
 /// Structural damage per body zone. Fixed size: 128 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoDamageState {
     pub damage_front: f32,
@@ -145,7 +147,7 @@ pub(crate) struct SMEvoDamageState {
 
 /// Pit-stop service action states. Fixed size: 64 bytes.
 /// Values: -1 = will not perform, 0 = completed, 1 = in progress.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoPitInfo {
     pub damage: i8,
@@ -158,7 +160,7 @@ pub(crate) struct SMEvoPitInfo {
 }
 
 /// Driver-adjustable electronic aid settings. Fixed size: 128 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoElectronics {
     pub tc_level: i8,
@@ -183,11 +185,11 @@ pub(crate) struct SMEvoElectronics {
     pub is_ignition_on: bool,
     pub is_pitlimiter_on: bool,
     pub active_performance_mode: i8,
-    pub _pad: [u8; 97],
+    pub _pad: [u8; 88],
 }
 
 /// Cockpit lights, display, and wiper states. Fixed size: 128 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoInstrumentation {
     pub main_light_stage: i8,
@@ -206,7 +208,7 @@ pub(crate) struct SMEvoInstrumentation {
 }
 
 /// Session lifecycle and countdown. Fixed size: 256 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoSessionState {
     pub phase_name: [u8; 33],
@@ -226,11 +228,11 @@ pub(crate) struct SMEvoSessionState {
     pub ui_enable_setup: bool,
     pub is_ready_to_next_blinking: bool,
     pub show_waiting_for_players: bool,
-    pub _pad: [u8; 144],
+    pub _pad: [u8; 143],
 }
 
 /// HUD lap timing and delta display. Fixed size: 256 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoTimingState {
     pub current_laptime: [u8; 15],
@@ -243,11 +245,11 @@ pub(crate) struct SMEvoTimingState {
     pub ideal_laptime: [u8; 15],
     pub total_time: [u8; 15],
     pub is_invalid: bool,
-    pub _pad: [u8; 142],
+    pub _pad: [u8; 138],
 }
 
 /// Active driver-assist levels. Fixed size: 64 bytes.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SMEvoAssistsState {
     pub auto_gear: u8,
@@ -259,13 +261,16 @@ pub(crate) struct SMEvoAssistsState {
     pub standing_start_assist: u8,
     pub auto_steer: f32,
     pub arcade_stability_control: f32,
-    pub _pad: [u8; 49],
+    pub _pad: [u8; 48],
 }
 
 /// Graphics/HUD page for AC Evo. Updated each rendered frame.
 ///
 /// Layout: ACE_SharedFileOut_Documentation_v1.md (changelog 2026-04-01).
-#[repr(C, packed)]
+/// Uses natural C alignment (NOT packed) — the game struct has no #pragma pack.
+/// Inner sub-structs (SMEvoElectronics, SMEvoTyreState, etc.) remain packed
+/// because they are fixed-size blobs in the game's layout.
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SPageFileGraphicsEvo {
     pub packet_id: i32,
@@ -406,7 +411,7 @@ pub(crate) struct SPageFileGraphicsEvo {
 }
 
 /// Static session metadata for AC Evo — written once at session load.
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SPageFileStaticEvo {
     pub sm_version: [u8; 15],
@@ -454,3 +459,52 @@ zeroed_default!(
     SPageFileGraphicsEvo,
     SPageFileStaticEvo
 );
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn electronics_size() {
+        assert_eq!(std::mem::size_of::<SMEvoElectronics>(), 128);
+    }
+
+    #[test]
+    fn instrumentation_size() {
+        assert_eq!(std::mem::size_of::<SMEvoInstrumentation>(), 128);
+    }
+
+    #[test]
+    fn sub_struct_sizes() {
+        assert_eq!(std::mem::size_of::<SMEvoTyreState>(), 256);
+        assert_eq!(std::mem::size_of::<SMEvoDamageState>(), 128);
+        assert_eq!(std::mem::size_of::<SMEvoPitInfo>(), 64);
+        assert_eq!(std::mem::size_of::<SMEvoElectronics>(), 128);
+        assert_eq!(std::mem::size_of::<SMEvoInstrumentation>(), 128);
+        assert_eq!(std::mem::size_of::<SMEvoSessionState>(), 256);
+        assert_eq!(std::mem::size_of::<SMEvoTimingState>(), 256);
+        assert_eq!(std::mem::size_of::<SMEvoAssistsState>(), 64);
+    }
+
+    #[test]
+    fn electronics_offset() {
+        let offset = std::mem::offset_of!(SPageFileGraphicsEvo, electronics);
+        println!("SPageFileGraphicsEvo.electronics offset = {offset}");
+        println!(
+            "SPageFileGraphicsEvo total size = {}",
+            std::mem::size_of::<SPageFileGraphicsEvo>()
+        );
+        println!(
+            "SMEvoTyreState size = {}",
+            std::mem::size_of::<SMEvoTyreState>()
+        );
+        println!(
+            "SMEvoDamageState size = {}",
+            std::mem::size_of::<SMEvoDamageState>()
+        );
+        println!(
+            "SMEvoPitInfo size = {}",
+            std::mem::size_of::<SMEvoPitInfo>()
+        );
+    }
+}

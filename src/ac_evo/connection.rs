@@ -69,6 +69,14 @@ impl AcEvoConnection {
         }
     }
 
+    /// Size of the graphics shared-memory region in bytes (for diagnostics).
+    pub fn graphics_shm_len(&self) -> (usize, usize) {
+        (
+            self.graphics.len(),
+            std::mem::size_of::<SPageFileGraphicsEvo>(),
+        )
+    }
+
     /// Returns `true` when AC Evo is in a live driving session.
     pub fn is_connected(&self) -> bool {
         unsafe {
