@@ -5,7 +5,7 @@ use kerb::ac::types::{AcPhysicsData, AcStaticData};
 use kerb::lmu::types::LmuFrame;
 
 #[cfg(feature = "iracing")]
-use kerb::iracing::types::irsdk_header;
+use kerb::iracing::structs::irsdk_header;
 
 #[cfg(feature = "ac")]
 #[test]

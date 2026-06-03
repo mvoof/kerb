@@ -1,0 +1,25 @@
+[package]
+name = "iracing_type_gen"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "iracing_type_gen"
+path = "src/lib.rs"
+
+[[bin]]
+name = "iracing_type_gen"
+path = "src/main.rs"
+
+[dependencies]
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+encoding_rs = "0.8"
+windows-sys = { version = "0.61.2", features = [
+    "Win32_Foundation",
+    "Win32_System_Memory",
+] }
+
+[[test]]
+name = "iracing_type_gen_tests"
+path = "tests/codegen_tests.rs"

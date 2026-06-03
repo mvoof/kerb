@@ -1,4 +1,4 @@
-use kerb_codegen::{camel_to_snake, generate};
+use iracing_type_gen::{camel_to_snake, generate};
 
 #[test]
 fn camel_to_snake_simple() {

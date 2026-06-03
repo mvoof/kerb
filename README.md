@@ -303,20 +303,20 @@ If the plugin is missing, `SimConnection::connect()` skips LMU and tries the nex
 ## Codegen — iRacing Typed Frame (for crate developers only)
 
 > [!IMPORTANT]
-> **End users of the crate do not need this.** `src/iracing/vars.rs` is already committed to the repository with all current iRacing variables. Re-run codegen only if iRacing adds or changes variables after an SDK update.
+> **End users of the crate do not need this.** `src/iracing/types.rs` is already committed to the repository with all current iRacing variables. Re-run codegen only if iRacing adds or changes variables after an SDK update.
 
 `IracingFrame` is a struct with one pub field per iRacing variable. Field names are snake_case of the iRacing variable name (`SteeringWheelAngle` → `steering_wheel_angle`).
 
 ### How to regenerate
 
 1. Start iRacing and enter a session (practice, qualifying, or race)
-2. Run codegen — it connects to the live session, reads all variables, and writes `vars.rs`:
+2. Run codegen — it connects to the live session, reads all variables, and writes `types.rs`:
 
 ```bash
-cargo run --manifest-path tools/codegen/Cargo.toml -- src/iracing/vars.rs
+cargo run --manifest-path tools/iracing_type_gen/Cargo.toml -- src/iracing/types.rs
 ```
 
-3. Commit the updated `src/iracing/vars.rs`
+3. Commit the updated `src/iracing/types.rs`
 
 ## Benchmarks
 

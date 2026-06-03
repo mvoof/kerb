@@ -27,7 +27,7 @@ windows-sys = { version = "0.61.2", features = [
 
 [workspace]
 members = [
-    "tools/codegen",
+    "tools/iracing_type_gen",
     "examples",
 ]
 resolver = "2"

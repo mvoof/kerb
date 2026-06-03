@@ -4,7 +4,7 @@ use std::time::Duration;
 use windows_sys::Win32::Foundation::{CloseHandle, FALSE, HANDLE, WAIT_OBJECT_0};
 use windows_sys::Win32::System::Threading::{OpenEventW, WaitForSingleObject};
 
-use crate::iracing::types::{IRSDK_MAX_BUFS, VarType, irsdk_header, irsdk_varHeader};
+use crate::iracing::structs::{IRSDK_MAX_BUFS, VarType, irsdk_header, irsdk_varHeader};
 use crate::types::TelemetryValue;
 
 const SYNCHRONIZE: u32 = 0x00100000;
@@ -338,7 +338,7 @@ impl IRsdkConnection {
 
     /// Metadata for every telemetry variable iRacing currently exposes.
     pub fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta> {
-        use crate::iracing::types::VarType;
+        use crate::iracing::structs::VarType;
 
         self.vars
             .iter()
@@ -385,13 +385,13 @@ impl IRsdkConnection {
     }
 
     /// Capture a full telemetry frame. Reads all variables from shared memory in one pass.
-    pub fn frame(&self) -> Result<crate::iracing::vars::IracingFrame, crate::error::SimError> {
+    pub fn frame(&self) -> Result<crate::iracing::types::IracingFrame, crate::error::SimError> {
         if self.get_latest_data_ptr().is_none() {
             return Err(crate::error::SimError::InvalidHeader(
                 "No valid data buffer".into(),
             ));
         }
-        Ok(crate::iracing::vars::IracingFrame::from_connection(self))
+        Ok(crate::iracing::types::IracingFrame::from_connection(self))
     }
 
     /// Parse the current session-info YAML into an `IracingSession`.
