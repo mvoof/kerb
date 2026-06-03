@@ -61,36 +61,68 @@ fn rust_type(type_: &str, count: u32) -> String {
     }
 }
 
-fn extract_expr(type_: &str, count: u32, name: &str) -> String {
+fn raw_extract_expr(type_: &str, count: u32, field_name: &str) -> String {
     if count > 1 {
-        let variant = match type_ {
-            "f32" => "FloatArray",
-            "f64" => "DoubleArray",
-            "bool" => "BoolArray",
-            _ => "IntArray",
+        let (cast, _default) = match type_ {
+            "f32" => ("as *const f32", "0.0"),
+            "f64" => ("as *const f64", "0.0"),
+            "bool" => ("", "false"),
+            _ => ("as *const i32", "0"),
         };
 
-        format!(
-            r#"match vars.get("{}") {{ Some(crate::types::TelemetryValue::{}(v)) => v.clone(), _ => Vec::new() }}"#,
-            name, variant
-        )
+        if type_ == "bool" {
+            format!(
+                r#"match offsets.{} {{
+                Some(ref off) => unsafe {{
+                    let ptr = buf.add(off.offset);
+                    let mut vec = Vec::with_capacity(off.count);
+                    for idx in 0..off.count {{
+                        vec.push(std::ptr::read_unaligned(ptr.add(idx)) != 0);
+                    }}
+                    vec
+                }},
+                None => Vec::new(),
+            }}"#,
+                field_name
+            )
+        } else {
+            format!(
+                r#"match offsets.{} {{
+                Some(ref off) => unsafe {{
+                    let ptr = buf.add(off.offset) {};
+                    let mut vec = Vec::with_capacity(off.count);
+                    for idx in 0..off.count {{
+                        vec.push(std::ptr::read_unaligned(ptr.add(idx)));
+                    }}
+                    vec
+                }},
+                None => Vec::new(),
+            }}"#,
+                field_name, cast
+            )
+        }
     } else {
-        let (variant, default) = match type_ {
-            "f32" => ("Float", "0.0"),
-            "f64" => ("Double", "0.0"),
-            "i32" => ("Int", "0"),
-            "bool" => ("Bool", "false"),
-            _ => ("Int", "0"),
-        };
-
-        format!(
-            r#"match vars.get("{}") {{ Some(crate::types::TelemetryValue::{}(v)) => *v, _ => {} }}"#,
-            name, variant, default
-        )
+        match type_ {
+            "f32" => format!(
+                r#"match offsets.{} {{ Some(ref off) => unsafe {{ std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }}, None => 0.0 }}"#,
+                field_name
+            ),
+            "f64" => format!(
+                r#"match offsets.{} {{ Some(ref off) => unsafe {{ std::ptr::read_unaligned(buf.add(off.offset) as *const f64) }}, None => 0.0 }}"#,
+                field_name
+            ),
+            "bool" => format!(
+                r#"match offsets.{} {{ Some(ref off) => unsafe {{ std::ptr::read_unaligned(buf.add(off.offset)) != 0 }}, None => false }}"#,
+                field_name
+            ),
+            _ => format!(
+                r#"match offsets.{} {{ Some(ref off) => unsafe {{ std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }}, None => 0 }}"#,
+                field_name
+            ),
+        }
     }
 }
 
-/// Generate `src/iracing/vars.rs` from a slice of variable definitions.
 pub fn generate_from_defs(vars: &[VarDef]) -> String {
     let mut out = String::new();
 
@@ -101,6 +133,44 @@ pub fn generate_from_defs(vars: &[VarDef]) -> String {
     );
 
     out.push_str("use std::collections::HashMap;\n\n");
+
+    out.push_str(
+        "/// Information about a resolved telemetry variable offset and count in shared memory.\n",
+    );
+    out.push_str("#[derive(Debug, Clone, Copy)]\n");
+    out.push_str("pub struct IracingOffset {\n");
+    out.push_str("    pub offset: usize,\n");
+    out.push_str("    pub count: usize,\n");
+    out.push_str("}\n\n");
+
+    out.push_str("/// Cached shared memory offsets for all iRacing telemetry variables.\n");
+    out.push_str("#[derive(Debug, Clone)]\n");
+    out.push_str("pub struct IracingOffsets {\n");
+    for v in vars {
+        let field = camel_to_snake(&v.name);
+        let unit_str = if v.unit.is_empty() {
+            String::new()
+        } else {
+            format!(" [{}]", v.unit)
+        };
+        out.push_str(&format!("    /// {}{}\n", v.desc, unit_str));
+        out.push_str(&format!("    pub {}: Option<IracingOffset>,\n", field));
+    }
+    out.push_str("}\n\n");
+
+    out.push_str("impl IracingOffsets {\n");
+    out.push_str("    pub(crate) fn resolve(vars: &HashMap<String, crate::iracing::structs::irsdk_varHeader>) -> Self {\n");
+    out.push_str("        Self {\n");
+    for v in vars {
+        let field = camel_to_snake(&v.name);
+        out.push_str(&format!(
+            "            {}: vars.get(\"{}\").map(|v| IracingOffset {{ offset: v.offset as usize, count: v.count as usize }}),\n",
+            field, v.name
+        ));
+    }
+    out.push_str("        }\n");
+    out.push_str("    }\n");
+    out.push_str("}\n\n");
 
     out.push_str("/// Owned telemetry frame from iRacing. All fields populated in one SHM read.\n");
     out.push_str("#[derive(Debug, Clone)]\n");
@@ -126,7 +196,9 @@ pub fn generate_from_defs(vars: &[VarDef]) -> String {
     out.push_str("}\n\n");
 
     out.push_str("impl IracingFrame {\n");
-    out.push_str("    pub(crate) fn from_vars(vars: &HashMap<String, crate::types::TelemetryValue>) -> Self {\n");
+    out.push_str(
+        "    pub(crate) fn from_raw(buf: *const u8, offsets: &IracingOffsets) -> Self {\n",
+    );
     out.push_str("        Self {\n");
 
     for v in vars {
@@ -135,21 +207,17 @@ pub fn generate_from_defs(vars: &[VarDef]) -> String {
         out.push_str(&format!(
             "            {}: {},\n",
             field,
-            extract_expr(&v.type_, v.count, &v.name)
+            raw_extract_expr(&v.type_, v.count, &field)
         ));
     }
 
     out.push_str("        }\n");
-    out.push_str("    }\n\n");
-    out.push_str("    pub(crate) fn from_connection(conn: &crate::iracing::connection::IRsdkConnection) -> Self {\n");
-    out.push_str("        Self::from_vars(&conn.read_all_variables())\n");
     out.push_str("    }\n");
     out.push_str("}\n");
 
     out
 }
 
-/// Generate from a TOML string (used by tests).
 pub fn generate(toml_str: &str) -> String {
     let file: VarFile = toml::from_str(toml_str).expect("invalid toml");
 

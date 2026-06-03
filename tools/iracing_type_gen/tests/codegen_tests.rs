@@ -25,7 +25,8 @@ desc = "Engine revolutions per minute"
 "#;
     let output = generate(toml);
     assert!(output.contains("pub rpm: f32,"));
-    assert!(output.contains("FloatArray") || output.contains("Float"));
+    assert!(output.contains("read_unaligned"));
+    assert!(output.contains("as *const f32"));
     assert!(output.contains("rev/min"));
 }
 
@@ -41,7 +42,8 @@ desc = "Lap distance pct per car"
 "#;
     let output = generate(toml);
     assert!(output.contains("pub car_idx_lap_dist_pct: Vec<f32>,"));
-    assert!(output.contains("FloatArray"));
+    assert!(output.contains("read_unaligned"));
+    assert!(output.contains("as *const f32"));
 }
 
 #[test]
@@ -55,7 +57,8 @@ desc = "Gear number"
 "#;
     let output = generate(toml);
     assert!(output.contains("pub gear: i32,"));
-    assert!(output.contains("Int"));
+    assert!(output.contains("read_unaligned"));
+    assert!(output.contains("as *const i32"));
 }
 
 #[test]
@@ -69,5 +72,6 @@ desc = "Is on pit road"
 "#;
     let output = generate(toml);
     assert!(output.contains("pub on_pit_road: bool,"));
-    assert!(output.contains("Bool"));
+    assert!(output.contains("read_unaligned"));
+    assert!(output.contains("!= 0"));
 }

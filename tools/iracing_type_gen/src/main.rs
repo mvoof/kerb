@@ -119,14 +119,26 @@ fn write_dummy_placeholder(output_path: &str) -> std::io::Result<()> {
 // This is a placeholder file created to allow compilation when iRacing is not running.
 use std::collections::HashMap;
 
+#[derive(Debug, Clone, Copy)]
+pub struct IracingOffset {
+    pub offset: usize,
+    pub count: usize,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct IracingOffsets {}
+
+impl IracingOffsets {
+    pub(crate) fn resolve(_vars: &HashMap<String, crate::iracing::structs::irsdk_varHeader>) -> Self {
+        Self {}
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct IracingFrame {}
 
 impl IracingFrame {
-    pub(crate) fn from_vars(_vars: &HashMap<String, crate::types::TelemetryValue>) -> Self {
-        Self {}
-    }
-    pub(crate) fn from_connection(_conn: &crate::iracing::connection::IRsdkConnection) -> Self {
+    pub(crate) fn from_raw(_buf: *const u8, _offsets: &IracingOffsets) -> Self {
         Self {}
     }
 }

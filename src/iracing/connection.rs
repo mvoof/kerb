@@ -28,6 +28,7 @@ pub struct IRsdkConnection {
     h_event: HANDLE,
     pub(crate) vars: HashMap<String, irsdk_varHeader>,
     cached_session: std::cell::RefCell<Option<(i32, crate::iracing::session::IracingSession)>>,
+    pub(crate) offsets: crate::iracing::types::IracingOffsets,
 }
 
 impl IRsdkConnection {
@@ -37,11 +38,13 @@ impl IRsdkConnection {
         view_address: *mut std::ffi::c_void,
         vars: HashMap<String, irsdk_varHeader>,
     ) -> Self {
+        let offsets = crate::iracing::types::IracingOffsets::resolve(&vars);
         Self {
             shm: unsafe { crate::shm::SharedMemRegion::new_mock(view_address) },
             h_event: 0 as _,
             vars,
             cached_session: std::cell::RefCell::new(None),
+            offsets,
         }
     }
 
@@ -98,11 +101,14 @@ impl IRsdkConnection {
                 vars.insert(name_str, var_header);
             }
 
+            let offsets = crate::iracing::types::IracingOffsets::resolve(&vars);
+
             Ok(Self {
                 shm,
                 h_event,
                 vars,
                 cached_session: std::cell::RefCell::new(None),
+                offsets,
             })
         }
     }
@@ -386,12 +392,13 @@ impl IRsdkConnection {
 
     /// Capture a full telemetry frame. Reads all variables from shared memory in one pass.
     pub fn frame(&self) -> Result<crate::iracing::types::IracingFrame, crate::error::SimError> {
-        if self.get_latest_data_ptr().is_none() {
-            return Err(crate::error::SimError::InvalidHeader(
-                "No valid data buffer".into(),
-            ));
-        }
-        Ok(crate::iracing::types::IracingFrame::from_connection(self))
+        let data_ptr = self
+            .get_latest_data_ptr()
+            .ok_or_else(|| crate::error::SimError::InvalidHeader("No valid data buffer".into()))?;
+        Ok(crate::iracing::types::IracingFrame::from_raw(
+            data_ptr,
+            &self.offsets,
+        ))
     }
 
     /// Parse the current session-info YAML into an `IracingSession`.
