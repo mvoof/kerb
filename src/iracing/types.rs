@@ -2810,108 +2810,108 @@ impl IracingFrame {
             car_idx_best_lap_num: match offsets.car_idx_best_lap_num {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_best_lap_time: match offsets.car_idx_best_lap_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_class: match offsets.car_idx_class {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_class_position: match offsets.car_idx_class_position {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_est_time: match offsets.car_idx_est_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_f2time: match offsets.car_idx_f2time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_fast_repairs_used: match offsets.car_idx_fast_repairs_used {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_gear: match offsets.car_idx_gear {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_lap: match offsets.car_idx_lap {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_lap_completed: match offsets.car_idx_lap_completed {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_lap_dist_pct: match offsets.car_idx_lap_dist_pct {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_last_lap_time: match offsets.car_idx_last_lap_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -2929,9 +2929,9 @@ impl IracingFrame {
             car_idx_p2p_count: match offsets.car_idx_p2p_count {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -2949,45 +2949,45 @@ impl IracingFrame {
             car_idx_pace_flags: match offsets.car_idx_pace_flags {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_pace_line: match offsets.car_idx_pace_line {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_pace_row: match offsets.car_idx_pace_row {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_position: match offsets.car_idx_position {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_qual_tire_compound: match offsets.car_idx_qual_tire_compound {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3005,54 +3005,54 @@ impl IracingFrame {
             car_idx_rpm: match offsets.car_idx_rpm {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_session_flags: match offsets.car_idx_session_flags {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_steer: match offsets.car_idx_steer {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_tire_compound: match offsets.car_idx_tire_compound {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_track_surface: match offsets.car_idx_track_surface {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
             car_idx_track_surface_material: match offsets.car_idx_track_surface_material {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    let mut vec = vec![0i32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3301,9 +3301,9 @@ impl IracingFrame {
             l_fshock_defl_st: match offsets.l_fshock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3316,9 +3316,9 @@ impl IracingFrame {
             l_fshock_vel_st: match offsets.l_fshock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3397,9 +3397,9 @@ impl IracingFrame {
             l_rshock_defl_st: match offsets.l_rshock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3412,9 +3412,9 @@ impl IracingFrame {
             l_rshock_vel_st: match offsets.l_rshock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3615,9 +3615,9 @@ impl IracingFrame {
             lat_accel_st: match offsets.lat_accel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3646,9 +3646,9 @@ impl IracingFrame {
             long_accel_st: match offsets.long_accel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3789,9 +3789,9 @@ impl IracingFrame {
             pitch_rate_st: match offsets.pitch_rate_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -3986,9 +3986,9 @@ impl IracingFrame {
             r_fshock_defl_st: match offsets.r_fshock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4001,9 +4001,9 @@ impl IracingFrame {
             r_fshock_vel_st: match offsets.r_fshock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4088,9 +4088,9 @@ impl IracingFrame {
             r_rshock_defl_st: match offsets.r_rshock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4103,9 +4103,9 @@ impl IracingFrame {
             r_rshock_vel_st: match offsets.r_rshock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4248,9 +4248,9 @@ impl IracingFrame {
             roll_rate_st: match offsets.roll_rate_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4464,9 +4464,9 @@ impl IracingFrame {
             steering_wheel_torque_st: match offsets.steering_wheel_torque_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4549,9 +4549,9 @@ impl IracingFrame {
             velocity_x_st: match offsets.velocity_x_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4564,9 +4564,9 @@ impl IracingFrame {
             velocity_y_st: match offsets.velocity_y_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4579,9 +4579,9 @@ impl IracingFrame {
             velocity_z_st: match offsets.velocity_z_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4594,9 +4594,9 @@ impl IracingFrame {
             vert_accel_st: match offsets.vert_accel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },
@@ -4663,9 +4663,9 @@ impl IracingFrame {
             yaw_rate_st: match offsets.yaw_rate_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    let mut vec = vec![0.0f32; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
                 },
                 None => Vec::new(),
             },

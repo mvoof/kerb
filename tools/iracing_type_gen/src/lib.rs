@@ -79,7 +79,7 @@ fn raw_extract_expr(type_: &str, count: u32, field_name: &str) -> String {
                 field_name
             )
         } else {
-            let (cast, default) = match type_ {
+            let (cast, _default) = match type_ {
                 "f32" => ("as *const f32", "0.0f32"),
                 "f64" => ("as *const f64", "0.0f64"),
                 _ => ("as *const i32", "0i32"),
@@ -88,13 +88,11 @@ fn raw_extract_expr(type_: &str, count: u32, field_name: &str) -> String {
                 r#"match offsets.{} {{
                 Some(ref off) => unsafe {{
                     let src = buf.add(off.offset) {};
-                    let mut vec = vec![{}; off.count];
-                    std::ptr::copy_nonoverlapping(src, vec.as_mut_ptr(), off.count);
-                    vec
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 }},
                 None => Vec::new(),
             }}"#,
-                field_name, cast, default
+                field_name, cast
             )
         }
     } else {
