@@ -8,7 +8,7 @@ Add a single dependency, enable feature flags for the simulators you want, and c
 | Simulator         | Feature flag | Notes                         |
 | ----------------- | ------------ | ----------------------------- |
 | iRacing           | `iracing`    | Event-based sync, 0% CPU idle |
-| Assetto Corsa Evo | `ac`         | Windows Shared Memory         |
+| Assetto Corsa Evo | `ac-evo`     | Windows Shared Memory         |
 | Le Mans Ultimate  | `lmu`        | Requires rF2 plugin DLL       |
 
 ## Quick Start
@@ -41,7 +41,7 @@ fn main() -> Result<(), SimError> {
             let frame = c.frame();
             println!("rpm={:.0}  gear={}", frame.rpm, frame.gear);
         }
-        Connection::Ac(c) => {
+        Connection::AcEvo(c) => {
             let frame = c.frame()?;
             println!("rpm={}  gear={}", frame.physics.rpms, frame.physics.gear);
         }
@@ -124,7 +124,7 @@ All features are enabled by default. Use `default-features = false` to opt in se
 | Feature   | Module          | `Connection` variant  | Default |
 | --------- | --------------- | --------------------- | ------- |
 | `iracing` | `kerb::iracing` | `Connection::IRacing` | yes     |
-| `ac`      | `kerb::ac`      | `Connection::Ac`      | yes     |
+| `ac-evo`  | `kerb::ac_evo`  | `Connection::AcEvo`   | yes     |
 | `lmu`     | `kerb::lmu`     | `Connection::Lmu`     | yes     |
 
 ## Per-Simulator API
@@ -168,17 +168,17 @@ kerb::save_session(&conn, "session.yaml")?;
 
 ### Assetto Corsa Evo
 
-**Connection:** `AcConnection` (via `Connection::Ac`)
+**Connection:** `AcEvoConnection` (via `Connection::AcEvo`)
 
 | Method                 | Returns                           | Scope        | Notes                                                           |
 | ---------------------- | --------------------------------- | ------------ | --------------------------------------------------------------- |
-| `frame()`              | `Result<AcFrame>`                 | player's car | Plain struct with `physics`, `graphics`, `static_data`          |
+| `frame()`              | `Result<AcEvoFrame>`              | player's car | Plain struct with `physics`, `graphics`, `static_data`          |
 | `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car | Keys are field names from the physics/graphics/static structs   |
 | `var_list_snapshot()`  | `Vec<VarMeta>`                    | —            | All available field names                                       |
 | `is_connected()`       | `bool`                            | —            | `true` when status == `AC_STATUS_LIVE` (not paused, not replay) |
 | `wait_for_data(ms)`    | —                                 | —            | Sleep up to 16 ms; AC Evo has no data-ready event               |
 
-**`AcFrame` contents by page:**
+**`AcEvoFrame` contents by page:**
 
 | Field         | Struct           | Update rate          | What it contains                                                               |
 | ------------- | ---------------- | -------------------- | ------------------------------------------------------------------------------ |
@@ -187,7 +187,7 @@ kerb::save_session(&conn, "session.yaml")?;
 | `static_data` | `AcStaticData`   | Once at session load | Car model, track name, player name, session type                               |
 
 ```rust
-Connection::Ac(conn) => {
+Connection::AcEvo(conn) => {
     let frame = conn.frame()?;
 
     let rpms = frame.physics.rpms;
@@ -330,7 +330,7 @@ Covers CP-1252 decoding, frame copies, snapshot HashMap allocation, and iRacing 
 
 ```bash
 cargo run -p kerb-examples --example facade_iracing
-cargo run -p kerb-examples --example facade_ac
+cargo run -p kerb-examples --example facade_ac_evo
 cargo run -p kerb-examples --example facade_lmu
 ```
 
