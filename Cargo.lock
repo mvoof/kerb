@@ -308,6 +308,7 @@ name = "kerb-examples"
 version = "0.1.0"
 dependencies = [
  "kerb",
+ "serde_yaml",
 ]
 
 [[package]]
