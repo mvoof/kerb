@@ -139,8 +139,9 @@ impl IRsdkConnection {
     }
 
     /// Return the session info update version counter.
-    /// This counter increments whenever the session info YAML block changes.
-    pub(crate) fn session_info_update(&self) -> i32 {
+    /// This counter increments whenever the session info YAML block changes,
+    /// so callers can cheaply detect session changes without re-reading the YAML.
+    pub fn session_info_update(&self) -> i32 {
         unsafe {
             let shared_mem = self.shm.as_ptr();
             if shared_mem.is_null() {
