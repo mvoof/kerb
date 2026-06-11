@@ -23,7 +23,7 @@ pub struct IracingOffsets {
     /// 0=brake released to 1=max pedal force [%]
     pub brake: Option<IracingOffset>,
     /// true if abs is currently reducing brake force pressure
-    pub brake_ab_sactive: Option<IracingOffset>,
+    pub brake_abs_active: Option<IracingOffset>,
     /// Raw brake input 0=brake released to 1=max pedal force [%]
     pub brake_raw: Option<IracingOffset>,
     /// Active camera number
@@ -49,7 +49,7 @@ pub struct IracingOffsets {
     /// Estimated time to reach current location on track [s]
     pub car_idx_est_time: Option<IracingOffset>,
     /// Race time behind leader or fastest lap time otherwise [s]
-    pub car_idx_f2time: Option<IracingOffset>,
+    pub car_idx_f2_time: Option<IracingOffset>,
     /// How many fast repairs each car has used
     pub car_idx_fast_repairs_used: Option<IracingOffset>,
     /// -1=reverse  0=neutral  1..n=current gear by car index
@@ -171,61 +171,61 @@ pub struct IracingOffsets {
     /// How many left front tires used so far
     pub lf_tires_used: Option<IracingOffset>,
     /// LF brake line pressure [bar]
-    pub l_fbrake_line_press: Option<IracingOffset>,
+    pub lf_brake_line_press: Option<IracingOffset>,
     /// LF tire cold pressure  as set in the garage [kPa]
-    pub l_fcold_pressure: Option<IracingOffset>,
+    pub lf_cold_pressure: Option<IracingOffset>,
     /// LF distance tire traveled since being placed on car [m]
-    pub l_fodometer: Option<IracingOffset>,
+    pub lf_odometer: Option<IracingOffset>,
     /// LF shock deflection [m]
-    pub l_fshock_defl: Option<IracingOffset>,
+    pub lf_shock_defl: Option<IracingOffset>,
     /// LF shock deflection at 360 Hz [m]
-    pub l_fshock_defl_st: Option<IracingOffset>,
+    pub lf_shock_defl_st: Option<IracingOffset>,
     /// LF shock velocity [m/s]
-    pub l_fshock_vel: Option<IracingOffset>,
+    pub lf_shock_vel: Option<IracingOffset>,
     /// LF shock velocity at 360 Hz [m/s]
-    pub l_fshock_vel_st: Option<IracingOffset>,
+    pub lf_shock_vel_st: Option<IracingOffset>,
     /// LF tire left carcass temperature [C]
-    pub l_ftemp_cl: Option<IracingOffset>,
+    pub lf_temp_cl: Option<IracingOffset>,
     /// LF tire middle carcass temperature [C]
-    pub l_ftemp_cm: Option<IracingOffset>,
+    pub lf_temp_cm: Option<IracingOffset>,
     /// LF tire right carcass temperature [C]
-    pub l_ftemp_cr: Option<IracingOffset>,
+    pub lf_temp_cr: Option<IracingOffset>,
     /// LF tire left percent tread remaining [%]
-    pub l_fwear_l: Option<IracingOffset>,
+    pub lf_wear_l: Option<IracingOffset>,
     /// LF tire middle percent tread remaining [%]
-    pub l_fwear_m: Option<IracingOffset>,
+    pub lf_wear_m: Option<IracingOffset>,
     /// LF tire right percent tread remaining [%]
-    pub l_fwear_r: Option<IracingOffset>,
+    pub lf_wear_r: Option<IracingOffset>,
     /// How many left rear tires are remaining  255 is unlimited
     pub lr_tires_available: Option<IracingOffset>,
     /// How many left rear tires used so far
     pub lr_tires_used: Option<IracingOffset>,
     /// LR brake line pressure [bar]
-    pub l_rbrake_line_press: Option<IracingOffset>,
+    pub lr_brake_line_press: Option<IracingOffset>,
     /// LR tire cold pressure  as set in the garage [kPa]
-    pub l_rcold_pressure: Option<IracingOffset>,
+    pub lr_cold_pressure: Option<IracingOffset>,
     /// LR distance tire traveled since being placed on car [m]
-    pub l_rodometer: Option<IracingOffset>,
+    pub lr_odometer: Option<IracingOffset>,
     /// LR shock deflection [m]
-    pub l_rshock_defl: Option<IracingOffset>,
+    pub lr_shock_defl: Option<IracingOffset>,
     /// LR shock deflection at 360 Hz [m]
-    pub l_rshock_defl_st: Option<IracingOffset>,
+    pub lr_shock_defl_st: Option<IracingOffset>,
     /// LR shock velocity [m/s]
-    pub l_rshock_vel: Option<IracingOffset>,
+    pub lr_shock_vel: Option<IracingOffset>,
     /// LR shock velocity at 360 Hz [m/s]
-    pub l_rshock_vel_st: Option<IracingOffset>,
+    pub lr_shock_vel_st: Option<IracingOffset>,
     /// LR tire left carcass temperature [C]
-    pub l_rtemp_cl: Option<IracingOffset>,
+    pub lr_temp_cl: Option<IracingOffset>,
     /// LR tire middle carcass temperature [C]
-    pub l_rtemp_cm: Option<IracingOffset>,
+    pub lr_temp_cm: Option<IracingOffset>,
     /// LR tire right carcass temperature [C]
-    pub l_rtemp_cr: Option<IracingOffset>,
+    pub lr_temp_cr: Option<IracingOffset>,
     /// LR tire left percent tread remaining [%]
-    pub l_rwear_l: Option<IracingOffset>,
+    pub lr_wear_l: Option<IracingOffset>,
     /// LR tire middle percent tread remaining [%]
-    pub l_rwear_m: Option<IracingOffset>,
+    pub lr_wear_m: Option<IracingOffset>,
     /// LR tire right percent tread remaining [%]
-    pub l_rwear_r: Option<IracingOffset>,
+    pub lr_wear_r: Option<IracingOffset>,
     /// Laps started count
     pub lap: Option<IracingOffset>,
     /// Players best lap number
@@ -403,31 +403,31 @@ pub struct IracingOffsets {
     /// How many right front tires used so far
     pub rf_tires_used: Option<IracingOffset>,
     /// RF brake line pressure [bar]
-    pub r_fbrake_line_press: Option<IracingOffset>,
+    pub rf_brake_line_press: Option<IracingOffset>,
     /// RF tire cold pressure  as set in the garage [kPa]
-    pub r_fcold_pressure: Option<IracingOffset>,
+    pub rf_cold_pressure: Option<IracingOffset>,
     /// RF distance tire traveled since being placed on car [m]
-    pub r_fodometer: Option<IracingOffset>,
+    pub rf_odometer: Option<IracingOffset>,
     /// RF shock deflection [m]
-    pub r_fshock_defl: Option<IracingOffset>,
+    pub rf_shock_defl: Option<IracingOffset>,
     /// RF shock deflection at 360 Hz [m]
-    pub r_fshock_defl_st: Option<IracingOffset>,
+    pub rf_shock_defl_st: Option<IracingOffset>,
     /// RF shock velocity [m/s]
-    pub r_fshock_vel: Option<IracingOffset>,
+    pub rf_shock_vel: Option<IracingOffset>,
     /// RF shock velocity at 360 Hz [m/s]
-    pub r_fshock_vel_st: Option<IracingOffset>,
+    pub rf_shock_vel_st: Option<IracingOffset>,
     /// RF tire left carcass temperature [C]
-    pub r_ftemp_cl: Option<IracingOffset>,
+    pub rf_temp_cl: Option<IracingOffset>,
     /// RF tire middle carcass temperature [C]
-    pub r_ftemp_cm: Option<IracingOffset>,
+    pub rf_temp_cm: Option<IracingOffset>,
     /// RF tire right carcass temperature [C]
-    pub r_ftemp_cr: Option<IracingOffset>,
+    pub rf_temp_cr: Option<IracingOffset>,
     /// RF tire left percent tread remaining [%]
-    pub r_fwear_l: Option<IracingOffset>,
+    pub rf_wear_l: Option<IracingOffset>,
     /// RF tire middle percent tread remaining [%]
-    pub r_fwear_m: Option<IracingOffset>,
+    pub rf_wear_m: Option<IracingOffset>,
     /// RF tire right percent tread remaining [%]
-    pub r_fwear_r: Option<IracingOffset>,
+    pub rf_wear_r: Option<IracingOffset>,
     /// Engine rpm [revs/min]
     pub rpm: Option<IracingOffset>,
     /// How many right rear tires are remaining  255 is unlimited
@@ -435,31 +435,31 @@ pub struct IracingOffsets {
     /// How many right rear tires used so far
     pub rr_tires_used: Option<IracingOffset>,
     /// RR brake line pressure [bar]
-    pub r_rbrake_line_press: Option<IracingOffset>,
+    pub rr_brake_line_press: Option<IracingOffset>,
     /// RR tire cold pressure  as set in the garage [kPa]
-    pub r_rcold_pressure: Option<IracingOffset>,
+    pub rr_cold_pressure: Option<IracingOffset>,
     /// RR distance tire traveled since being placed on car [m]
-    pub r_rodometer: Option<IracingOffset>,
+    pub rr_odometer: Option<IracingOffset>,
     /// RR shock deflection [m]
-    pub r_rshock_defl: Option<IracingOffset>,
+    pub rr_shock_defl: Option<IracingOffset>,
     /// RR shock deflection at 360 Hz [m]
-    pub r_rshock_defl_st: Option<IracingOffset>,
+    pub rr_shock_defl_st: Option<IracingOffset>,
     /// RR shock velocity [m/s]
-    pub r_rshock_vel: Option<IracingOffset>,
+    pub rr_shock_vel: Option<IracingOffset>,
     /// RR shock velocity at 360 Hz [m/s]
-    pub r_rshock_vel_st: Option<IracingOffset>,
+    pub rr_shock_vel_st: Option<IracingOffset>,
     /// RR tire left carcass temperature [C]
-    pub r_rtemp_cl: Option<IracingOffset>,
+    pub rr_temp_cl: Option<IracingOffset>,
     /// RR tire middle carcass temperature [C]
-    pub r_rtemp_cm: Option<IracingOffset>,
+    pub rr_temp_cm: Option<IracingOffset>,
     /// RR tire right carcass temperature [C]
-    pub r_rtemp_cr: Option<IracingOffset>,
+    pub rr_temp_cr: Option<IracingOffset>,
     /// RR tire left percent tread remaining [%]
-    pub r_rwear_l: Option<IracingOffset>,
+    pub rr_wear_l: Option<IracingOffset>,
     /// RR tire middle percent tread remaining [%]
-    pub r_rwear_m: Option<IracingOffset>,
+    pub rr_wear_m: Option<IracingOffset>,
     /// RR tire right percent tread remaining [%]
-    pub r_rwear_r: Option<IracingOffset>,
+    pub rr_wear_r: Option<IracingOffset>,
     /// Laps completed in race
     pub race_laps: Option<IracingOffset>,
     /// The car index of the current person speaking on the radio
@@ -642,6 +642,8 @@ pub struct IracingOffsets {
     pub dc_pit_speed_limiter_toggle: Option<IracingOffset>,
     /// In car trigger car starter
     pub dc_starter: Option<IracingOffset>,
+    /// In car throttle shape adjustment
+    pub dc_throttle_shape: Option<IracingOffset>,
     /// In car turn wipers on or off
     pub dc_toggle_windshield_wipers: Option<IracingOffset>,
     /// In car traction control adjustment
@@ -679,1390 +681,340 @@ pub struct IracingOffsets {
 }
 
 impl IracingOffsets {
-    pub(crate) fn resolve(
-        vars: &HashMap<String, crate::iracing::structs::irsdk_varHeader>,
-    ) -> Self {
+    pub(crate) fn resolve(vars: &HashMap<String, crate::iracing::structs::irsdk_varHeader>) -> Self {
         Self {
-            air_density: vars.get("AirDensity").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            air_pressure: vars.get("AirPressure").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            air_temp: vars.get("AirTemp").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            brake: vars.get("Brake").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            brake_ab_sactive: vars.get("BrakeABSactive").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            brake_raw: vars.get("BrakeRaw").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            cam_camera_number: vars.get("CamCameraNumber").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            cam_camera_state: vars.get("CamCameraState").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            cam_car_idx: vars.get("CamCarIdx").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            cam_group_number: vars.get("CamGroupNumber").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_dist_ahead: vars.get("CarDistAhead").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_dist_behind: vars.get("CarDistBehind").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_best_lap_num: vars.get("CarIdxBestLapNum").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_best_lap_time: vars.get("CarIdxBestLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_class: vars.get("CarIdxClass").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_class_position: vars.get("CarIdxClassPosition").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_est_time: vars.get("CarIdxEstTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_f2time: vars.get("CarIdxF2Time").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_fast_repairs_used: vars.get("CarIdxFastRepairsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_gear: vars.get("CarIdxGear").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_lap: vars.get("CarIdxLap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_lap_completed: vars.get("CarIdxLapCompleted").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_lap_dist_pct: vars.get("CarIdxLapDistPct").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_last_lap_time: vars.get("CarIdxLastLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_on_pit_road: vars.get("CarIdxOnPitRoad").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_p2p_count: vars.get("CarIdxP2P_Count").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_p2p_status: vars.get("CarIdxP2P_Status").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_pace_flags: vars.get("CarIdxPaceFlags").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_pace_line: vars.get("CarIdxPaceLine").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_pace_row: vars.get("CarIdxPaceRow").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_position: vars.get("CarIdxPosition").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_qual_tire_compound: vars.get("CarIdxQualTireCompound").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_qual_tire_compound_locked: vars.get("CarIdxQualTireCompoundLocked").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            car_idx_rpm: vars.get("CarIdxRPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_session_flags: vars.get("CarIdxSessionFlags").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_steer: vars.get("CarIdxSteer").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_tire_compound: vars.get("CarIdxTireCompound").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_track_surface: vars.get("CarIdxTrackSurface").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            car_idx_track_surface_material: vars.get("CarIdxTrackSurfaceMaterial").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            car_left_right: vars.get("CarLeftRight").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            chan_avg_latency: vars.get("ChanAvgLatency").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            chan_clock_skew: vars.get("ChanClockSkew").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            chan_latency: vars.get("ChanLatency").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            chan_partner_quality: vars.get("ChanPartnerQuality").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            chan_quality: vars.get("ChanQuality").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            clutch: vars.get("Clutch").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            clutch_raw: vars.get("ClutchRaw").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            cpu_usage_bg: vars.get("CpuUsageBG").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            cpu_usage_fg: vars.get("CpuUsageFG").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_drivers_so_far: vars.get("DCDriversSoFar").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_lap_status: vars.get("DCLapStatus").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            display_units: vars.get("DisplayUnits").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            driver_marker: vars.get("DriverMarker").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            engine0_rpm: vars.get("Engine0_RPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            engine_warnings: vars.get("EngineWarnings").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            enter_exit_reset: vars.get("EnterExitReset").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fast_repair_available: vars.get("FastRepairAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fast_repair_used: vars.get("FastRepairUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fog_level: vars.get("FogLevel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            frame_rate: vars.get("FrameRate").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            front_tire_sets_available: vars.get("FrontTireSetsAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            front_tire_sets_used: vars.get("FrontTireSetsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fuel_level: vars.get("FuelLevel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fuel_level_pct: vars.get("FuelLevelPct").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fuel_press: vars.get("FuelPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            fuel_use_per_hour: vars.get("FuelUsePerHour").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            gear: vars.get("Gear").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            gpu_usage: vars.get("GpuUsage").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            handbrake_raw: vars.get("HandbrakeRaw").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_disk_logging_active: vars.get("IsDiskLoggingActive").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_disk_logging_enabled: vars.get("IsDiskLoggingEnabled").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_garage_visible: vars.get("IsGarageVisible").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_in_garage: vars.get("IsInGarage").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_on_track: vars.get("IsOnTrack").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_on_track_car: vars.get("IsOnTrackCar").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            is_replay_playing: vars.get("IsReplayPlaying").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lf_tires_available: vars.get("LFTiresAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lf_tires_used: vars.get("LFTiresUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fbrake_line_press: vars.get("LFbrakeLinePress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fcold_pressure: vars.get("LFcoldPressure").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fodometer: vars.get("LFodometer").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fshock_defl: vars.get("LFshockDefl").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fshock_defl_st: vars.get("LFshockDefl_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fshock_vel: vars.get("LFshockVel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fshock_vel_st: vars.get("LFshockVel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_ftemp_cl: vars.get("LFtempCL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_ftemp_cm: vars.get("LFtempCM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_ftemp_cr: vars.get("LFtempCR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fwear_l: vars.get("LFwearL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fwear_m: vars.get("LFwearM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_fwear_r: vars.get("LFwearR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lr_tires_available: vars.get("LRTiresAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lr_tires_used: vars.get("LRTiresUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rbrake_line_press: vars.get("LRbrakeLinePress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rcold_pressure: vars.get("LRcoldPressure").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rodometer: vars.get("LRodometer").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rshock_defl: vars.get("LRshockDefl").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rshock_defl_st: vars.get("LRshockDefl_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rshock_vel: vars.get("LRshockVel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rshock_vel_st: vars.get("LRshockVel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rtemp_cl: vars.get("LRtempCL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rtemp_cm: vars.get("LRtempCM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rtemp_cr: vars.get("LRtempCR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rwear_l: vars.get("LRwearL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rwear_m: vars.get("LRwearM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            l_rwear_r: vars.get("LRwearR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap: vars.get("Lap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_best_lap: vars.get("LapBestLap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_best_lap_time: vars.get("LapBestLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_best_n_lap_lap: vars.get("LapBestNLapLap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_best_n_lap_time: vars.get("LapBestNLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_completed: vars.get("LapCompleted").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_current_lap_time: vars.get("LapCurrentLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_delta_to_best_lap: vars.get("LapDeltaToBestLap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_delta_to_best_lap_dd: vars.get("LapDeltaToBestLap_DD").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_delta_to_best_lap_ok: vars.get("LapDeltaToBestLap_OK").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_delta_to_optimal_lap: vars.get("LapDeltaToOptimalLap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_delta_to_optimal_lap_dd: vars.get("LapDeltaToOptimalLap_DD").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_optimal_lap_ok: vars.get("LapDeltaToOptimalLap_OK").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_best_lap: vars.get("LapDeltaToSessionBestLap").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_best_lap_dd: vars.get("LapDeltaToSessionBestLap_DD").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_best_lap_ok: vars.get("LapDeltaToSessionBestLap_OK").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_lastl_lap: vars.get("LapDeltaToSessionLastlLap").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_lastl_lap_dd: vars.get("LapDeltaToSessionLastlLap_DD").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_lastl_lap_ok: vars.get("LapDeltaToSessionLastlLap_OK").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_optimal_lap: vars.get("LapDeltaToSessionOptimalLap").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            lap_delta_to_session_optimal_lap_dd: vars.get("LapDeltaToSessionOptimalLap_DD").map(
-                |v| IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                },
-            ),
-            lap_delta_to_session_optimal_lap_ok: vars.get("LapDeltaToSessionOptimalLap_OK").map(
-                |v| IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                },
-            ),
-            lap_dist: vars.get("LapDist").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_dist_pct: vars.get("LapDistPct").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_las_n_lap_seq: vars.get("LapLasNLapSeq").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_last_lap_time: vars.get("LapLastLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lap_last_n_lap_time: vars.get("LapLastNLapTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lat_accel: vars.get("LatAccel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            lat_accel_st: vars.get("LatAccel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            left_tire_sets_available: vars.get("LeftTireSetsAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            left_tire_sets_used: vars.get("LeftTireSetsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            load_num_textures: vars.get("LoadNumTextures").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            long_accel: vars.get("LongAccel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            long_accel_st: vars.get("LongAccel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            manifold_press: vars.get("ManifoldPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            manual_boost: vars.get("ManualBoost").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            manual_no_boost: vars.get("ManualNoBoost").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            mem_page_fault_sec: vars.get("MemPageFaultSec").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            mem_soft_page_fault_sec: vars.get("MemSoftPageFaultSec").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            oil_level: vars.get("OilLevel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            oil_press: vars.get("OilPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            oil_temp: vars.get("OilTemp").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            ok_to_reload_textures: vars.get("OkToReloadTextures").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            on_pit_road: vars.get("OnPitRoad").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            p2p_count: vars.get("P2P_Count").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            p2p_status: vars.get("P2P_Status").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pace_mode: vars.get("PaceMode").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_opt_repair_left: vars.get("PitOptRepairLeft").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_repair_left: vars.get("PitRepairLeft").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_flags: vars.get("PitSvFlags").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_fuel: vars.get("PitSvFuel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_lfp: vars.get("PitSvLFP").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_lrp: vars.get("PitSvLRP").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_rfp: vars.get("PitSvRFP").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_rrp: vars.get("PitSvRRP").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pit_sv_tire_compound: vars.get("PitSvTireCompound").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pitch: vars.get("Pitch").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pitch_rate: vars.get("PitchRate").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pitch_rate_st: vars.get("PitchRate_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pits_open: vars.get("PitsOpen").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            pitstop_active: vars.get("PitstopActive").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_class: vars.get("PlayerCarClass").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_class_position: vars.get("PlayerCarClassPosition").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_driver_incident_count: vars.get("PlayerCarDriverIncidentCount").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            player_car_dry_tire_set_limit: vars.get("PlayerCarDryTireSetLimit").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            player_car_idx: vars.get("PlayerCarIdx").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_in_pit_stall: vars.get("PlayerCarInPitStall").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_my_incident_count: vars.get("PlayerCarMyIncidentCount").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            player_car_pit_sv_status: vars.get("PlayerCarPitSvStatus").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_position: vars.get("PlayerCarPosition").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_power_adjust: vars.get("PlayerCarPowerAdjust").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_sl_blink_rpm: vars.get("PlayerCarSLBlinkRPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_sl_first_rpm: vars.get("PlayerCarSLFirstRPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_sl_last_rpm: vars.get("PlayerCarSLLastRPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_sl_shift_rpm: vars.get("PlayerCarSLShiftRPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_team_incident_count: vars.get("PlayerCarTeamIncidentCount").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            player_car_tow_time: vars.get("PlayerCarTowTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_car_weight_penalty: vars.get("PlayerCarWeightPenalty").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_fast_repairs_used: vars.get("PlayerFastRepairsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_incidents: vars.get("PlayerIncidents").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_tire_compound: vars.get("PlayerTireCompound").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_track_surface: vars.get("PlayerTrackSurface").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            player_track_surface_material: vars.get("PlayerTrackSurfaceMaterial").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            precipitation: vars.get("Precipitation").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            push_to_pass: vars.get("PushToPass").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            push_to_talk: vars.get("PushToTalk").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rf_tires_available: vars.get("RFTiresAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rf_tires_used: vars.get("RFTiresUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fbrake_line_press: vars.get("RFbrakeLinePress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fcold_pressure: vars.get("RFcoldPressure").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fodometer: vars.get("RFodometer").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fshock_defl: vars.get("RFshockDefl").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fshock_defl_st: vars.get("RFshockDefl_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fshock_vel: vars.get("RFshockVel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fshock_vel_st: vars.get("RFshockVel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_ftemp_cl: vars.get("RFtempCL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_ftemp_cm: vars.get("RFtempCM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_ftemp_cr: vars.get("RFtempCR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fwear_l: vars.get("RFwearL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fwear_m: vars.get("RFwearM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_fwear_r: vars.get("RFwearR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rpm: vars.get("RPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rr_tires_available: vars.get("RRTiresAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rr_tires_used: vars.get("RRTiresUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rbrake_line_press: vars.get("RRbrakeLinePress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rcold_pressure: vars.get("RRcoldPressure").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rodometer: vars.get("RRodometer").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rshock_defl: vars.get("RRshockDefl").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rshock_defl_st: vars.get("RRshockDefl_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rshock_vel: vars.get("RRshockVel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rshock_vel_st: vars.get("RRshockVel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rtemp_cl: vars.get("RRtempCL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rtemp_cm: vars.get("RRtempCM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rtemp_cr: vars.get("RRtempCR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rwear_l: vars.get("RRwearL").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rwear_m: vars.get("RRwearM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            r_rwear_r: vars.get("RRwearR").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            race_laps: vars.get("RaceLaps").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            radio_transmit_car_idx: vars.get("RadioTransmitCarIdx").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            radio_transmit_frequency_idx: vars.get("RadioTransmitFrequencyIdx").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            radio_transmit_radio_idx: vars.get("RadioTransmitRadioIdx").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rear_tire_sets_available: vars.get("RearTireSetsAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            rear_tire_sets_used: vars.get("RearTireSetsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            relative_humidity: vars.get("RelativeHumidity").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            replay_frame_num: vars.get("ReplayFrameNum").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            replay_frame_num_end: vars.get("ReplayFrameNumEnd").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            replay_play_slow_motion: vars.get("ReplayPlaySlowMotion").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            replay_play_speed: vars.get("ReplayPlaySpeed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            replay_session_num: vars.get("ReplaySessionNum").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            replay_session_time: vars.get("ReplaySessionTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            right_tire_sets_available: vars.get("RightTireSetsAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            right_tire_sets_used: vars.get("RightTireSetsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            roll: vars.get("Roll").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            roll_rate: vars.get("RollRate").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            roll_rate_st: vars.get("RollRate_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_flags: vars.get("SessionFlags").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_joker_laps_remain: vars.get("SessionJokerLapsRemain").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_laps_remain: vars.get("SessionLapsRemain").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_laps_remain_ex: vars.get("SessionLapsRemainEx").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_laps_total: vars.get("SessionLapsTotal").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_num: vars.get("SessionNum").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_on_joker_lap: vars.get("SessionOnJokerLap").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_state: vars.get("SessionState").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_tick: vars.get("SessionTick").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_time: vars.get("SessionTime").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_time_of_day: vars.get("SessionTimeOfDay").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_time_remain: vars.get("SessionTimeRemain").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_time_total: vars.get("SessionTimeTotal").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            session_unique_id: vars.get("SessionUniqueID").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            shift_grind_rpm: vars.get("ShiftGrindRPM").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            shift_indicator_pct: vars.get("ShiftIndicatorPct").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            shift_power_pct: vars.get("ShiftPowerPct").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            shifter: vars.get("Shifter").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            skies: vars.get("Skies").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            solar_altitude: vars.get("SolarAltitude").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            solar_azimuth: vars.get("SolarAzimuth").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            speed: vars.get("Speed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_ffb_enabled: vars.get("SteeringFFBEnabled").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_angle: vars.get("SteeringWheelAngle").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_angle_max: vars.get("SteeringWheelAngleMax").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_limiter: vars.get("SteeringWheelLimiter").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_max_force_nm: vars.get("SteeringWheelMaxForceNm").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            steering_wheel_pct_damper: vars.get("SteeringWheelPctDamper").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_pct_intensity: vars.get("SteeringWheelPctIntensity").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            steering_wheel_pct_smoothing: vars.get("SteeringWheelPctSmoothing").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            steering_wheel_pct_torque: vars.get("SteeringWheelPctTorque").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_pct_torque_sign: vars.get("SteeringWheelPctTorqueSign").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            steering_wheel_pct_torque_sign_stops: vars.get("SteeringWheelPctTorqueSignStops").map(
-                |v| IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                },
-            ),
-            steering_wheel_peak_force_nm: vars.get("SteeringWheelPeakForceNm").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            steering_wheel_torque: vars.get("SteeringWheelTorque").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_torque_st: vars.get("SteeringWheelTorque_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            steering_wheel_use_linear: vars.get("SteeringWheelUseLinear").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            throttle: vars.get("Throttle").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            throttle_raw: vars.get("ThrottleRaw").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            tire_lf_rumble_pitch: vars.get("TireLF_RumblePitch").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            tire_lr_rumble_pitch: vars.get("TireLR_RumblePitch").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            tire_rf_rumble_pitch: vars.get("TireRF_RumblePitch").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            tire_rr_rumble_pitch: vars.get("TireRR_RumblePitch").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            tire_sets_available: vars.get("TireSetsAvailable").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            tire_sets_used: vars.get("TireSetsUsed").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            track_temp: vars.get("TrackTemp").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            track_temp_crew: vars.get("TrackTempCrew").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            track_wetness: vars.get("TrackWetness").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            velocity_x: vars.get("VelocityX").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            velocity_x_st: vars.get("VelocityX_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            velocity_y: vars.get("VelocityY").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            velocity_y_st: vars.get("VelocityY_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            velocity_z: vars.get("VelocityZ").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            velocity_z_st: vars.get("VelocityZ_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            vert_accel: vars.get("VertAccel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            vert_accel_st: vars.get("VertAccel_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            vid_cap_active: vars.get("VidCapActive").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            vid_cap_enabled: vars.get("VidCapEnabled").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            voltage: vars.get("Voltage").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            water_level: vars.get("WaterLevel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            water_temp: vars.get("WaterTemp").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            weather_declared_wet: vars.get("WeatherDeclaredWet").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            wind_dir: vars.get("WindDir").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            wind_vel: vars.get("WindVel").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            yaw: vars.get("Yaw").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            yaw_north: vars.get("YawNorth").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            yaw_rate: vars.get("YawRate").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            yaw_rate_st: vars.get("YawRate_ST").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_abs: vars.get("dcABS").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_brake_bias: vars.get("dcBrakeBias").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_headlight_flash: vars.get("dcHeadlightFlash").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_pit_speed_limiter_toggle: vars.get("dcPitSpeedLimiterToggle").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            dc_starter: vars.get("dcStarter").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_toggle_windshield_wipers: vars.get("dcToggleWindshieldWipers").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            dc_traction_control: vars.get("dcTractionControl").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dc_trigger_windshield_wipers: vars.get("dcTriggerWindshieldWipers").map(|v| {
-                IracingOffset {
-                    offset: v.offset as usize,
-                    count: v.count as usize,
-                }
-            }),
-            dp_fast_repair: vars.get("dpFastRepair").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_fuel_add_kg: vars.get("dpFuelAddKg").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_fuel_auto_fill_active: vars.get("dpFuelAutoFillActive").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_fuel_auto_fill_enabled: vars.get("dpFuelAutoFillEnabled").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_fuel_fill: vars.get("dpFuelFill").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_lf_tire_change: vars.get("dpLFTireChange").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_lf_tire_cold_press: vars.get("dpLFTireColdPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_lr_tire_change: vars.get("dpLRTireChange").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_lr_tire_cold_press: vars.get("dpLRTireColdPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_rf_tire_change: vars.get("dpRFTireChange").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_rf_tire_cold_press: vars.get("dpRFTireColdPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_rr_tire_change: vars.get("dpRRTireChange").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_rr_tire_cold_press: vars.get("dpRRTireColdPress").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
-            dp_windshield_tearoff: vars.get("dpWindshieldTearoff").map(|v| IracingOffset {
-                offset: v.offset as usize,
-                count: v.count as usize,
-            }),
+            air_density: vars.get("AirDensity").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            air_pressure: vars.get("AirPressure").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            air_temp: vars.get("AirTemp").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            brake: vars.get("Brake").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            brake_abs_active: vars.get("BrakeABSactive").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            brake_raw: vars.get("BrakeRaw").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            cam_camera_number: vars.get("CamCameraNumber").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            cam_camera_state: vars.get("CamCameraState").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            cam_car_idx: vars.get("CamCarIdx").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            cam_group_number: vars.get("CamGroupNumber").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_dist_ahead: vars.get("CarDistAhead").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_dist_behind: vars.get("CarDistBehind").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_best_lap_num: vars.get("CarIdxBestLapNum").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_best_lap_time: vars.get("CarIdxBestLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_class: vars.get("CarIdxClass").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_class_position: vars.get("CarIdxClassPosition").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_est_time: vars.get("CarIdxEstTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_f2_time: vars.get("CarIdxF2Time").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_fast_repairs_used: vars.get("CarIdxFastRepairsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_gear: vars.get("CarIdxGear").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_lap: vars.get("CarIdxLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_lap_completed: vars.get("CarIdxLapCompleted").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_lap_dist_pct: vars.get("CarIdxLapDistPct").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_last_lap_time: vars.get("CarIdxLastLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_on_pit_road: vars.get("CarIdxOnPitRoad").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_p2p_count: vars.get("CarIdxP2P_Count").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_p2p_status: vars.get("CarIdxP2P_Status").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_pace_flags: vars.get("CarIdxPaceFlags").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_pace_line: vars.get("CarIdxPaceLine").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_pace_row: vars.get("CarIdxPaceRow").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_position: vars.get("CarIdxPosition").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_qual_tire_compound: vars.get("CarIdxQualTireCompound").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_qual_tire_compound_locked: vars.get("CarIdxQualTireCompoundLocked").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_rpm: vars.get("CarIdxRPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_session_flags: vars.get("CarIdxSessionFlags").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_steer: vars.get("CarIdxSteer").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_tire_compound: vars.get("CarIdxTireCompound").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_track_surface: vars.get("CarIdxTrackSurface").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_idx_track_surface_material: vars.get("CarIdxTrackSurfaceMaterial").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            car_left_right: vars.get("CarLeftRight").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            chan_avg_latency: vars.get("ChanAvgLatency").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            chan_clock_skew: vars.get("ChanClockSkew").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            chan_latency: vars.get("ChanLatency").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            chan_partner_quality: vars.get("ChanPartnerQuality").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            chan_quality: vars.get("ChanQuality").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            clutch: vars.get("Clutch").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            clutch_raw: vars.get("ClutchRaw").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            cpu_usage_bg: vars.get("CpuUsageBG").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            cpu_usage_fg: vars.get("CpuUsageFG").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_drivers_so_far: vars.get("DCDriversSoFar").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_lap_status: vars.get("DCLapStatus").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            display_units: vars.get("DisplayUnits").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            driver_marker: vars.get("DriverMarker").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            engine0_rpm: vars.get("Engine0_RPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            engine_warnings: vars.get("EngineWarnings").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            enter_exit_reset: vars.get("EnterExitReset").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fast_repair_available: vars.get("FastRepairAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fast_repair_used: vars.get("FastRepairUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fog_level: vars.get("FogLevel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            frame_rate: vars.get("FrameRate").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            front_tire_sets_available: vars.get("FrontTireSetsAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            front_tire_sets_used: vars.get("FrontTireSetsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fuel_level: vars.get("FuelLevel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fuel_level_pct: vars.get("FuelLevelPct").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fuel_press: vars.get("FuelPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            fuel_use_per_hour: vars.get("FuelUsePerHour").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            gear: vars.get("Gear").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            gpu_usage: vars.get("GpuUsage").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            handbrake_raw: vars.get("HandbrakeRaw").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_disk_logging_active: vars.get("IsDiskLoggingActive").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_disk_logging_enabled: vars.get("IsDiskLoggingEnabled").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_garage_visible: vars.get("IsGarageVisible").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_in_garage: vars.get("IsInGarage").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_on_track: vars.get("IsOnTrack").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_on_track_car: vars.get("IsOnTrackCar").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            is_replay_playing: vars.get("IsReplayPlaying").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_tires_available: vars.get("LFTiresAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_tires_used: vars.get("LFTiresUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_brake_line_press: vars.get("LFbrakeLinePress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_cold_pressure: vars.get("LFcoldPressure").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_odometer: vars.get("LFodometer").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_shock_defl: vars.get("LFshockDefl").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_shock_defl_st: vars.get("LFshockDefl_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_shock_vel: vars.get("LFshockVel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_shock_vel_st: vars.get("LFshockVel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_temp_cl: vars.get("LFtempCL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_temp_cm: vars.get("LFtempCM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_temp_cr: vars.get("LFtempCR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_wear_l: vars.get("LFwearL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_wear_m: vars.get("LFwearM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lf_wear_r: vars.get("LFwearR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_tires_available: vars.get("LRTiresAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_tires_used: vars.get("LRTiresUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_brake_line_press: vars.get("LRbrakeLinePress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_cold_pressure: vars.get("LRcoldPressure").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_odometer: vars.get("LRodometer").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_shock_defl: vars.get("LRshockDefl").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_shock_defl_st: vars.get("LRshockDefl_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_shock_vel: vars.get("LRshockVel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_shock_vel_st: vars.get("LRshockVel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_temp_cl: vars.get("LRtempCL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_temp_cm: vars.get("LRtempCM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_temp_cr: vars.get("LRtempCR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_wear_l: vars.get("LRwearL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_wear_m: vars.get("LRwearM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lr_wear_r: vars.get("LRwearR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap: vars.get("Lap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_best_lap: vars.get("LapBestLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_best_lap_time: vars.get("LapBestLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_best_n_lap_lap: vars.get("LapBestNLapLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_best_n_lap_time: vars.get("LapBestNLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_completed: vars.get("LapCompleted").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_current_lap_time: vars.get("LapCurrentLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_best_lap: vars.get("LapDeltaToBestLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_best_lap_dd: vars.get("LapDeltaToBestLap_DD").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_best_lap_ok: vars.get("LapDeltaToBestLap_OK").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_optimal_lap: vars.get("LapDeltaToOptimalLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_optimal_lap_dd: vars.get("LapDeltaToOptimalLap_DD").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_optimal_lap_ok: vars.get("LapDeltaToOptimalLap_OK").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_best_lap: vars.get("LapDeltaToSessionBestLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_best_lap_dd: vars.get("LapDeltaToSessionBestLap_DD").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_best_lap_ok: vars.get("LapDeltaToSessionBestLap_OK").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_lastl_lap: vars.get("LapDeltaToSessionLastlLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_lastl_lap_dd: vars.get("LapDeltaToSessionLastlLap_DD").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_lastl_lap_ok: vars.get("LapDeltaToSessionLastlLap_OK").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_optimal_lap: vars.get("LapDeltaToSessionOptimalLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_optimal_lap_dd: vars.get("LapDeltaToSessionOptimalLap_DD").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_delta_to_session_optimal_lap_ok: vars.get("LapDeltaToSessionOptimalLap_OK").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_dist: vars.get("LapDist").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_dist_pct: vars.get("LapDistPct").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_las_n_lap_seq: vars.get("LapLasNLapSeq").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_last_lap_time: vars.get("LapLastLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lap_last_n_lap_time: vars.get("LapLastNLapTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lat_accel: vars.get("LatAccel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            lat_accel_st: vars.get("LatAccel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            left_tire_sets_available: vars.get("LeftTireSetsAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            left_tire_sets_used: vars.get("LeftTireSetsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            load_num_textures: vars.get("LoadNumTextures").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            long_accel: vars.get("LongAccel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            long_accel_st: vars.get("LongAccel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            manifold_press: vars.get("ManifoldPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            manual_boost: vars.get("ManualBoost").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            manual_no_boost: vars.get("ManualNoBoost").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            mem_page_fault_sec: vars.get("MemPageFaultSec").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            mem_soft_page_fault_sec: vars.get("MemSoftPageFaultSec").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            oil_level: vars.get("OilLevel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            oil_press: vars.get("OilPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            oil_temp: vars.get("OilTemp").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            ok_to_reload_textures: vars.get("OkToReloadTextures").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            on_pit_road: vars.get("OnPitRoad").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            p2p_count: vars.get("P2P_Count").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            p2p_status: vars.get("P2P_Status").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pace_mode: vars.get("PaceMode").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_opt_repair_left: vars.get("PitOptRepairLeft").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_repair_left: vars.get("PitRepairLeft").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_flags: vars.get("PitSvFlags").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_fuel: vars.get("PitSvFuel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_lfp: vars.get("PitSvLFP").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_lrp: vars.get("PitSvLRP").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_rfp: vars.get("PitSvRFP").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_rrp: vars.get("PitSvRRP").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pit_sv_tire_compound: vars.get("PitSvTireCompound").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pitch: vars.get("Pitch").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pitch_rate: vars.get("PitchRate").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pitch_rate_st: vars.get("PitchRate_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pits_open: vars.get("PitsOpen").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            pitstop_active: vars.get("PitstopActive").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_class: vars.get("PlayerCarClass").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_class_position: vars.get("PlayerCarClassPosition").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_driver_incident_count: vars.get("PlayerCarDriverIncidentCount").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_dry_tire_set_limit: vars.get("PlayerCarDryTireSetLimit").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_idx: vars.get("PlayerCarIdx").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_in_pit_stall: vars.get("PlayerCarInPitStall").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_my_incident_count: vars.get("PlayerCarMyIncidentCount").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_pit_sv_status: vars.get("PlayerCarPitSvStatus").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_position: vars.get("PlayerCarPosition").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_power_adjust: vars.get("PlayerCarPowerAdjust").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_sl_blink_rpm: vars.get("PlayerCarSLBlinkRPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_sl_first_rpm: vars.get("PlayerCarSLFirstRPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_sl_last_rpm: vars.get("PlayerCarSLLastRPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_sl_shift_rpm: vars.get("PlayerCarSLShiftRPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_team_incident_count: vars.get("PlayerCarTeamIncidentCount").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_tow_time: vars.get("PlayerCarTowTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_car_weight_penalty: vars.get("PlayerCarWeightPenalty").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_fast_repairs_used: vars.get("PlayerFastRepairsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_incidents: vars.get("PlayerIncidents").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_tire_compound: vars.get("PlayerTireCompound").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_track_surface: vars.get("PlayerTrackSurface").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            player_track_surface_material: vars.get("PlayerTrackSurfaceMaterial").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            precipitation: vars.get("Precipitation").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            push_to_pass: vars.get("PushToPass").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            push_to_talk: vars.get("PushToTalk").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_tires_available: vars.get("RFTiresAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_tires_used: vars.get("RFTiresUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_brake_line_press: vars.get("RFbrakeLinePress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_cold_pressure: vars.get("RFcoldPressure").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_odometer: vars.get("RFodometer").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_shock_defl: vars.get("RFshockDefl").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_shock_defl_st: vars.get("RFshockDefl_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_shock_vel: vars.get("RFshockVel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_shock_vel_st: vars.get("RFshockVel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_temp_cl: vars.get("RFtempCL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_temp_cm: vars.get("RFtempCM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_temp_cr: vars.get("RFtempCR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_wear_l: vars.get("RFwearL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_wear_m: vars.get("RFwearM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rf_wear_r: vars.get("RFwearR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rpm: vars.get("RPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_tires_available: vars.get("RRTiresAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_tires_used: vars.get("RRTiresUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_brake_line_press: vars.get("RRbrakeLinePress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_cold_pressure: vars.get("RRcoldPressure").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_odometer: vars.get("RRodometer").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_shock_defl: vars.get("RRshockDefl").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_shock_defl_st: vars.get("RRshockDefl_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_shock_vel: vars.get("RRshockVel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_shock_vel_st: vars.get("RRshockVel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_temp_cl: vars.get("RRtempCL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_temp_cm: vars.get("RRtempCM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_temp_cr: vars.get("RRtempCR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_wear_l: vars.get("RRwearL").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_wear_m: vars.get("RRwearM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rr_wear_r: vars.get("RRwearR").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            race_laps: vars.get("RaceLaps").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            radio_transmit_car_idx: vars.get("RadioTransmitCarIdx").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            radio_transmit_frequency_idx: vars.get("RadioTransmitFrequencyIdx").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            radio_transmit_radio_idx: vars.get("RadioTransmitRadioIdx").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rear_tire_sets_available: vars.get("RearTireSetsAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            rear_tire_sets_used: vars.get("RearTireSetsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            relative_humidity: vars.get("RelativeHumidity").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            replay_frame_num: vars.get("ReplayFrameNum").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            replay_frame_num_end: vars.get("ReplayFrameNumEnd").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            replay_play_slow_motion: vars.get("ReplayPlaySlowMotion").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            replay_play_speed: vars.get("ReplayPlaySpeed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            replay_session_num: vars.get("ReplaySessionNum").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            replay_session_time: vars.get("ReplaySessionTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            right_tire_sets_available: vars.get("RightTireSetsAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            right_tire_sets_used: vars.get("RightTireSetsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            roll: vars.get("Roll").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            roll_rate: vars.get("RollRate").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            roll_rate_st: vars.get("RollRate_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_flags: vars.get("SessionFlags").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_joker_laps_remain: vars.get("SessionJokerLapsRemain").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_laps_remain: vars.get("SessionLapsRemain").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_laps_remain_ex: vars.get("SessionLapsRemainEx").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_laps_total: vars.get("SessionLapsTotal").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_num: vars.get("SessionNum").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_on_joker_lap: vars.get("SessionOnJokerLap").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_state: vars.get("SessionState").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_tick: vars.get("SessionTick").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_time: vars.get("SessionTime").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_time_of_day: vars.get("SessionTimeOfDay").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_time_remain: vars.get("SessionTimeRemain").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_time_total: vars.get("SessionTimeTotal").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            session_unique_id: vars.get("SessionUniqueID").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            shift_grind_rpm: vars.get("ShiftGrindRPM").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            shift_indicator_pct: vars.get("ShiftIndicatorPct").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            shift_power_pct: vars.get("ShiftPowerPct").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            shifter: vars.get("Shifter").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            skies: vars.get("Skies").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            solar_altitude: vars.get("SolarAltitude").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            solar_azimuth: vars.get("SolarAzimuth").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            speed: vars.get("Speed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_ffb_enabled: vars.get("SteeringFFBEnabled").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_angle: vars.get("SteeringWheelAngle").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_angle_max: vars.get("SteeringWheelAngleMax").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_limiter: vars.get("SteeringWheelLimiter").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_max_force_nm: vars.get("SteeringWheelMaxForceNm").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_pct_damper: vars.get("SteeringWheelPctDamper").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_pct_intensity: vars.get("SteeringWheelPctIntensity").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_pct_smoothing: vars.get("SteeringWheelPctSmoothing").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_pct_torque: vars.get("SteeringWheelPctTorque").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_pct_torque_sign: vars.get("SteeringWheelPctTorqueSign").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_pct_torque_sign_stops: vars.get("SteeringWheelPctTorqueSignStops").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_peak_force_nm: vars.get("SteeringWheelPeakForceNm").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_torque: vars.get("SteeringWheelTorque").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_torque_st: vars.get("SteeringWheelTorque_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            steering_wheel_use_linear: vars.get("SteeringWheelUseLinear").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            throttle: vars.get("Throttle").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            throttle_raw: vars.get("ThrottleRaw").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            tire_lf_rumble_pitch: vars.get("TireLF_RumblePitch").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            tire_lr_rumble_pitch: vars.get("TireLR_RumblePitch").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            tire_rf_rumble_pitch: vars.get("TireRF_RumblePitch").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            tire_rr_rumble_pitch: vars.get("TireRR_RumblePitch").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            tire_sets_available: vars.get("TireSetsAvailable").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            tire_sets_used: vars.get("TireSetsUsed").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            track_temp: vars.get("TrackTemp").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            track_temp_crew: vars.get("TrackTempCrew").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            track_wetness: vars.get("TrackWetness").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            velocity_x: vars.get("VelocityX").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            velocity_x_st: vars.get("VelocityX_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            velocity_y: vars.get("VelocityY").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            velocity_y_st: vars.get("VelocityY_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            velocity_z: vars.get("VelocityZ").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            velocity_z_st: vars.get("VelocityZ_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            vert_accel: vars.get("VertAccel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            vert_accel_st: vars.get("VertAccel_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            vid_cap_active: vars.get("VidCapActive").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            vid_cap_enabled: vars.get("VidCapEnabled").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            voltage: vars.get("Voltage").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            water_level: vars.get("WaterLevel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            water_temp: vars.get("WaterTemp").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            weather_declared_wet: vars.get("WeatherDeclaredWet").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            wind_dir: vars.get("WindDir").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            wind_vel: vars.get("WindVel").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            yaw: vars.get("Yaw").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            yaw_north: vars.get("YawNorth").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            yaw_rate: vars.get("YawRate").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            yaw_rate_st: vars.get("YawRate_ST").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_abs: vars.get("dcABS").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_brake_bias: vars.get("dcBrakeBias").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_headlight_flash: vars.get("dcHeadlightFlash").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_pit_speed_limiter_toggle: vars.get("dcPitSpeedLimiterToggle").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_starter: vars.get("dcStarter").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_throttle_shape: vars.get("dcThrottleShape").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_toggle_windshield_wipers: vars.get("dcToggleWindshieldWipers").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_traction_control: vars.get("dcTractionControl").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dc_trigger_windshield_wipers: vars.get("dcTriggerWindshieldWipers").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_fast_repair: vars.get("dpFastRepair").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_fuel_add_kg: vars.get("dpFuelAddKg").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_fuel_auto_fill_active: vars.get("dpFuelAutoFillActive").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_fuel_auto_fill_enabled: vars.get("dpFuelAutoFillEnabled").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_fuel_fill: vars.get("dpFuelFill").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_lf_tire_change: vars.get("dpLFTireChange").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_lf_tire_cold_press: vars.get("dpLFTireColdPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_lr_tire_change: vars.get("dpLRTireChange").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_lr_tire_cold_press: vars.get("dpLRTireColdPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_rf_tire_change: vars.get("dpRFTireChange").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_rf_tire_cold_press: vars.get("dpRFTireColdPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_rr_tire_change: vars.get("dpRRTireChange").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_rr_tire_cold_press: vars.get("dpRRTireColdPress").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
+            dp_windshield_tearoff: vars.get("dpWindshieldTearoff").map(|v| IracingOffset { offset: v.offset as usize, count: v.count as usize }),
         }
     }
 }
@@ -2079,7 +1031,7 @@ pub struct IracingFrame {
     /// 0=brake released to 1=max pedal force [%]
     pub brake: f32,
     /// true if abs is currently reducing brake force pressure
-    pub brake_ab_sactive: bool,
+    pub brake_abs_active: bool,
     /// Raw brake input 0=brake released to 1=max pedal force [%]
     pub brake_raw: f32,
     /// Active camera number
@@ -2105,7 +1057,7 @@ pub struct IracingFrame {
     /// Estimated time to reach current location on track [s]
     pub car_idx_est_time: Vec<f32>,
     /// Race time behind leader or fastest lap time otherwise [s]
-    pub car_idx_f2time: Vec<f32>,
+    pub car_idx_f2_time: Vec<f32>,
     /// How many fast repairs each car has used
     pub car_idx_fast_repairs_used: Vec<i32>,
     /// -1=reverse  0=neutral  1..n=current gear by car index
@@ -2227,61 +1179,61 @@ pub struct IracingFrame {
     /// How many left front tires used so far
     pub lf_tires_used: i32,
     /// LF brake line pressure [bar]
-    pub l_fbrake_line_press: f32,
+    pub lf_brake_line_press: f32,
     /// LF tire cold pressure  as set in the garage [kPa]
-    pub l_fcold_pressure: f32,
+    pub lf_cold_pressure: f32,
     /// LF distance tire traveled since being placed on car [m]
-    pub l_fodometer: f32,
+    pub lf_odometer: f32,
     /// LF shock deflection [m]
-    pub l_fshock_defl: f32,
+    pub lf_shock_defl: f32,
     /// LF shock deflection at 360 Hz [m]
-    pub l_fshock_defl_st: Vec<f32>,
+    pub lf_shock_defl_st: Vec<f32>,
     /// LF shock velocity [m/s]
-    pub l_fshock_vel: f32,
+    pub lf_shock_vel: f32,
     /// LF shock velocity at 360 Hz [m/s]
-    pub l_fshock_vel_st: Vec<f32>,
+    pub lf_shock_vel_st: Vec<f32>,
     /// LF tire left carcass temperature [C]
-    pub l_ftemp_cl: f32,
+    pub lf_temp_cl: f32,
     /// LF tire middle carcass temperature [C]
-    pub l_ftemp_cm: f32,
+    pub lf_temp_cm: f32,
     /// LF tire right carcass temperature [C]
-    pub l_ftemp_cr: f32,
+    pub lf_temp_cr: f32,
     /// LF tire left percent tread remaining [%]
-    pub l_fwear_l: f32,
+    pub lf_wear_l: f32,
     /// LF tire middle percent tread remaining [%]
-    pub l_fwear_m: f32,
+    pub lf_wear_m: f32,
     /// LF tire right percent tread remaining [%]
-    pub l_fwear_r: f32,
+    pub lf_wear_r: f32,
     /// How many left rear tires are remaining  255 is unlimited
     pub lr_tires_available: i32,
     /// How many left rear tires used so far
     pub lr_tires_used: i32,
     /// LR brake line pressure [bar]
-    pub l_rbrake_line_press: f32,
+    pub lr_brake_line_press: f32,
     /// LR tire cold pressure  as set in the garage [kPa]
-    pub l_rcold_pressure: f32,
+    pub lr_cold_pressure: f32,
     /// LR distance tire traveled since being placed on car [m]
-    pub l_rodometer: f32,
+    pub lr_odometer: f32,
     /// LR shock deflection [m]
-    pub l_rshock_defl: f32,
+    pub lr_shock_defl: f32,
     /// LR shock deflection at 360 Hz [m]
-    pub l_rshock_defl_st: Vec<f32>,
+    pub lr_shock_defl_st: Vec<f32>,
     /// LR shock velocity [m/s]
-    pub l_rshock_vel: f32,
+    pub lr_shock_vel: f32,
     /// LR shock velocity at 360 Hz [m/s]
-    pub l_rshock_vel_st: Vec<f32>,
+    pub lr_shock_vel_st: Vec<f32>,
     /// LR tire left carcass temperature [C]
-    pub l_rtemp_cl: f32,
+    pub lr_temp_cl: f32,
     /// LR tire middle carcass temperature [C]
-    pub l_rtemp_cm: f32,
+    pub lr_temp_cm: f32,
     /// LR tire right carcass temperature [C]
-    pub l_rtemp_cr: f32,
+    pub lr_temp_cr: f32,
     /// LR tire left percent tread remaining [%]
-    pub l_rwear_l: f32,
+    pub lr_wear_l: f32,
     /// LR tire middle percent tread remaining [%]
-    pub l_rwear_m: f32,
+    pub lr_wear_m: f32,
     /// LR tire right percent tread remaining [%]
-    pub l_rwear_r: f32,
+    pub lr_wear_r: f32,
     /// Laps started count
     pub lap: i32,
     /// Players best lap number
@@ -2459,31 +1411,31 @@ pub struct IracingFrame {
     /// How many right front tires used so far
     pub rf_tires_used: i32,
     /// RF brake line pressure [bar]
-    pub r_fbrake_line_press: f32,
+    pub rf_brake_line_press: f32,
     /// RF tire cold pressure  as set in the garage [kPa]
-    pub r_fcold_pressure: f32,
+    pub rf_cold_pressure: f32,
     /// RF distance tire traveled since being placed on car [m]
-    pub r_fodometer: f32,
+    pub rf_odometer: f32,
     /// RF shock deflection [m]
-    pub r_fshock_defl: f32,
+    pub rf_shock_defl: f32,
     /// RF shock deflection at 360 Hz [m]
-    pub r_fshock_defl_st: Vec<f32>,
+    pub rf_shock_defl_st: Vec<f32>,
     /// RF shock velocity [m/s]
-    pub r_fshock_vel: f32,
+    pub rf_shock_vel: f32,
     /// RF shock velocity at 360 Hz [m/s]
-    pub r_fshock_vel_st: Vec<f32>,
+    pub rf_shock_vel_st: Vec<f32>,
     /// RF tire left carcass temperature [C]
-    pub r_ftemp_cl: f32,
+    pub rf_temp_cl: f32,
     /// RF tire middle carcass temperature [C]
-    pub r_ftemp_cm: f32,
+    pub rf_temp_cm: f32,
     /// RF tire right carcass temperature [C]
-    pub r_ftemp_cr: f32,
+    pub rf_temp_cr: f32,
     /// RF tire left percent tread remaining [%]
-    pub r_fwear_l: f32,
+    pub rf_wear_l: f32,
     /// RF tire middle percent tread remaining [%]
-    pub r_fwear_m: f32,
+    pub rf_wear_m: f32,
     /// RF tire right percent tread remaining [%]
-    pub r_fwear_r: f32,
+    pub rf_wear_r: f32,
     /// Engine rpm [revs/min]
     pub rpm: f32,
     /// How many right rear tires are remaining  255 is unlimited
@@ -2491,31 +1443,31 @@ pub struct IracingFrame {
     /// How many right rear tires used so far
     pub rr_tires_used: i32,
     /// RR brake line pressure [bar]
-    pub r_rbrake_line_press: f32,
+    pub rr_brake_line_press: f32,
     /// RR tire cold pressure  as set in the garage [kPa]
-    pub r_rcold_pressure: f32,
+    pub rr_cold_pressure: f32,
     /// RR distance tire traveled since being placed on car [m]
-    pub r_rodometer: f32,
+    pub rr_odometer: f32,
     /// RR shock deflection [m]
-    pub r_rshock_defl: f32,
+    pub rr_shock_defl: f32,
     /// RR shock deflection at 360 Hz [m]
-    pub r_rshock_defl_st: Vec<f32>,
+    pub rr_shock_defl_st: Vec<f32>,
     /// RR shock velocity [m/s]
-    pub r_rshock_vel: f32,
+    pub rr_shock_vel: f32,
     /// RR shock velocity at 360 Hz [m/s]
-    pub r_rshock_vel_st: Vec<f32>,
+    pub rr_shock_vel_st: Vec<f32>,
     /// RR tire left carcass temperature [C]
-    pub r_rtemp_cl: f32,
+    pub rr_temp_cl: f32,
     /// RR tire middle carcass temperature [C]
-    pub r_rtemp_cm: f32,
+    pub rr_temp_cm: f32,
     /// RR tire right carcass temperature [C]
-    pub r_rtemp_cr: f32,
+    pub rr_temp_cr: f32,
     /// RR tire left percent tread remaining [%]
-    pub r_rwear_l: f32,
+    pub rr_wear_l: f32,
     /// RR tire middle percent tread remaining [%]
-    pub r_rwear_m: f32,
+    pub rr_wear_m: f32,
     /// RR tire right percent tread remaining [%]
-    pub r_rwear_r: f32,
+    pub rr_wear_r: f32,
     /// Laps completed in race
     pub race_laps: i32,
     /// The car index of the current person speaking on the radio
@@ -2698,6 +1650,8 @@ pub struct IracingFrame {
     pub dc_pit_speed_limiter_toggle: bool,
     /// In car trigger car starter
     pub dc_starter: bool,
+    /// In car throttle shape adjustment
+    pub dc_throttle_shape: f32,
     /// In car turn wipers on or off
     pub dc_toggle_windshield_wipers: bool,
     /// In car traction control adjustment
@@ -2737,181 +1691,99 @@ pub struct IracingFrame {
 impl IracingFrame {
     pub(crate) fn from_raw(buf: *const u8, offsets: &IracingOffsets) -> Self {
         Self {
-            air_density: match offsets.air_density {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            air_pressure: match offsets.air_pressure {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            air_temp: match offsets.air_temp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            brake: match offsets.brake {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            brake_ab_sactive: match offsets.brake_ab_sactive {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            brake_raw: match offsets.brake_raw {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            cam_camera_number: match offsets.cam_camera_number {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            cam_camera_state: match offsets.cam_camera_state {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            cam_car_idx: match offsets.cam_car_idx {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            cam_group_number: match offsets.cam_group_number {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            car_dist_ahead: match offsets.car_dist_ahead {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            car_dist_behind: match offsets.car_dist_behind {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            air_density: match offsets.air_density { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            air_pressure: match offsets.air_pressure { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            air_temp: match offsets.air_temp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            brake: match offsets.brake { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            brake_abs_active: match offsets.brake_abs_active { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            brake_raw: match offsets.brake_raw { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            cam_camera_number: match offsets.cam_camera_number { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            cam_camera_state: match offsets.cam_camera_state { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            cam_car_idx: match offsets.cam_car_idx { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            cam_group_number: match offsets.cam_group_number { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            car_dist_ahead: match offsets.car_dist_ahead { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            car_dist_behind: match offsets.car_dist_behind { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             car_idx_best_lap_num: match offsets.car_idx_best_lap_num {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_best_lap_time: match offsets.car_idx_best_lap_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_class: match offsets.car_idx_class {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_class_position: match offsets.car_idx_class_position {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_est_time: match offsets.car_idx_est_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            car_idx_f2time: match offsets.car_idx_f2time {
+            car_idx_f2_time: match offsets.car_idx_f2_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_fast_repairs_used: match offsets.car_idx_fast_repairs_used {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_gear: match offsets.car_idx_gear {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_lap: match offsets.car_idx_lap {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_lap_completed: match offsets.car_idx_lap_completed {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_lap_dist_pct: match offsets.car_idx_lap_dist_pct {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_last_lap_time: match offsets.car_idx_last_lap_time {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
@@ -2929,9 +1801,7 @@ impl IracingFrame {
             car_idx_p2p_count: match offsets.car_idx_p2p_count {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
@@ -2949,45 +1819,35 @@ impl IracingFrame {
             car_idx_pace_flags: match offsets.car_idx_pace_flags {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_pace_line: match offsets.car_idx_pace_line {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_pace_row: match offsets.car_idx_pace_row {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_position: match offsets.car_idx_position {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_qual_tire_compound: match offsets.car_idx_qual_tire_compound {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
@@ -3005,1792 +1865,446 @@ impl IracingFrame {
             car_idx_rpm: match offsets.car_idx_rpm {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_session_flags: match offsets.car_idx_session_flags {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_steer: match offsets.car_idx_steer {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_tire_compound: match offsets.car_idx_tire_compound {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_track_surface: match offsets.car_idx_track_surface {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
             car_idx_track_surface_material: match offsets.car_idx_track_surface_material {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const i32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            car_left_right: match offsets.car_left_right {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            chan_avg_latency: match offsets.chan_avg_latency {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            chan_clock_skew: match offsets.chan_clock_skew {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            chan_latency: match offsets.chan_latency {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            chan_partner_quality: match offsets.chan_partner_quality {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            chan_quality: match offsets.chan_quality {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            clutch: match offsets.clutch {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            clutch_raw: match offsets.clutch_raw {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            cpu_usage_bg: match offsets.cpu_usage_bg {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            cpu_usage_fg: match offsets.cpu_usage_fg {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dc_drivers_so_far: match offsets.dc_drivers_so_far {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            dc_lap_status: match offsets.dc_lap_status {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            display_units: match offsets.display_units {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            driver_marker: match offsets.driver_marker {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            engine0_rpm: match offsets.engine0_rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            engine_warnings: match offsets.engine_warnings {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            enter_exit_reset: match offsets.enter_exit_reset {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            fast_repair_available: match offsets.fast_repair_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            fast_repair_used: match offsets.fast_repair_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            fog_level: match offsets.fog_level {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            frame_rate: match offsets.frame_rate {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            front_tire_sets_available: match offsets.front_tire_sets_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            front_tire_sets_used: match offsets.front_tire_sets_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            fuel_level: match offsets.fuel_level {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            fuel_level_pct: match offsets.fuel_level_pct {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            fuel_press: match offsets.fuel_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            fuel_use_per_hour: match offsets.fuel_use_per_hour {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            gear: match offsets.gear {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            gpu_usage: match offsets.gpu_usage {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            handbrake_raw: match offsets.handbrake_raw {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            is_disk_logging_active: match offsets.is_disk_logging_active {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            is_disk_logging_enabled: match offsets.is_disk_logging_enabled {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            is_garage_visible: match offsets.is_garage_visible {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            is_in_garage: match offsets.is_in_garage {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            is_on_track: match offsets.is_on_track {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            is_on_track_car: match offsets.is_on_track_car {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            is_replay_playing: match offsets.is_replay_playing {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            lf_tires_available: match offsets.lf_tires_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lf_tires_used: match offsets.lf_tires_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            l_fbrake_line_press: match offsets.l_fbrake_line_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fcold_pressure: match offsets.l_fcold_pressure {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fodometer: match offsets.l_fodometer {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fshock_defl: match offsets.l_fshock_defl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fshock_defl_st: match offsets.l_fshock_defl_st {
+            car_left_right: match offsets.car_left_right { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            chan_avg_latency: match offsets.chan_avg_latency { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            chan_clock_skew: match offsets.chan_clock_skew { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            chan_latency: match offsets.chan_latency { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            chan_partner_quality: match offsets.chan_partner_quality { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            chan_quality: match offsets.chan_quality { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            clutch: match offsets.clutch { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            clutch_raw: match offsets.clutch_raw { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            cpu_usage_bg: match offsets.cpu_usage_bg { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            cpu_usage_fg: match offsets.cpu_usage_fg { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dc_drivers_so_far: match offsets.dc_drivers_so_far { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            dc_lap_status: match offsets.dc_lap_status { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            display_units: match offsets.display_units { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            driver_marker: match offsets.driver_marker { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            engine0_rpm: match offsets.engine0_rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            engine_warnings: match offsets.engine_warnings { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            enter_exit_reset: match offsets.enter_exit_reset { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            fast_repair_available: match offsets.fast_repair_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            fast_repair_used: match offsets.fast_repair_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            fog_level: match offsets.fog_level { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            frame_rate: match offsets.frame_rate { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            front_tire_sets_available: match offsets.front_tire_sets_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            front_tire_sets_used: match offsets.front_tire_sets_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            fuel_level: match offsets.fuel_level { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            fuel_level_pct: match offsets.fuel_level_pct { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            fuel_press: match offsets.fuel_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            fuel_use_per_hour: match offsets.fuel_use_per_hour { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            gear: match offsets.gear { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            gpu_usage: match offsets.gpu_usage { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            handbrake_raw: match offsets.handbrake_raw { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            is_disk_logging_active: match offsets.is_disk_logging_active { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            is_disk_logging_enabled: match offsets.is_disk_logging_enabled { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            is_garage_visible: match offsets.is_garage_visible { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            is_in_garage: match offsets.is_in_garage { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            is_on_track: match offsets.is_on_track { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            is_on_track_car: match offsets.is_on_track_car { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            is_replay_playing: match offsets.is_replay_playing { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            lf_tires_available: match offsets.lf_tires_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lf_tires_used: match offsets.lf_tires_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lf_brake_line_press: match offsets.lf_brake_line_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_cold_pressure: match offsets.lf_cold_pressure { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_odometer: match offsets.lf_odometer { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_shock_defl: match offsets.lf_shock_defl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_shock_defl_st: match offsets.lf_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            l_fshock_vel: match offsets.l_fshock_vel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fshock_vel_st: match offsets.l_fshock_vel_st {
+            lf_shock_vel: match offsets.lf_shock_vel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_shock_vel_st: match offsets.lf_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            l_ftemp_cl: match offsets.l_ftemp_cl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_ftemp_cm: match offsets.l_ftemp_cm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_ftemp_cr: match offsets.l_ftemp_cr {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fwear_l: match offsets.l_fwear_l {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fwear_m: match offsets.l_fwear_m {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_fwear_r: match offsets.l_fwear_r {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lr_tires_available: match offsets.lr_tires_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lr_tires_used: match offsets.lr_tires_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            l_rbrake_line_press: match offsets.l_rbrake_line_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rcold_pressure: match offsets.l_rcold_pressure {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rodometer: match offsets.l_rodometer {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rshock_defl: match offsets.l_rshock_defl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rshock_defl_st: match offsets.l_rshock_defl_st {
+            lf_temp_cl: match offsets.lf_temp_cl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_temp_cm: match offsets.lf_temp_cm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_temp_cr: match offsets.lf_temp_cr { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_wear_l: match offsets.lf_wear_l { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_wear_m: match offsets.lf_wear_m { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lf_wear_r: match offsets.lf_wear_r { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_tires_available: match offsets.lr_tires_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lr_tires_used: match offsets.lr_tires_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lr_brake_line_press: match offsets.lr_brake_line_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_cold_pressure: match offsets.lr_cold_pressure { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_odometer: match offsets.lr_odometer { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_shock_defl: match offsets.lr_shock_defl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_shock_defl_st: match offsets.lr_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            l_rshock_vel: match offsets.l_rshock_vel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rshock_vel_st: match offsets.l_rshock_vel_st {
+            lr_shock_vel: match offsets.lr_shock_vel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_shock_vel_st: match offsets.lr_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            l_rtemp_cl: match offsets.l_rtemp_cl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rtemp_cm: match offsets.l_rtemp_cm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rtemp_cr: match offsets.l_rtemp_cr {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rwear_l: match offsets.l_rwear_l {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rwear_m: match offsets.l_rwear_m {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            l_rwear_r: match offsets.l_rwear_r {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap: match offsets.lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lap_best_lap: match offsets.lap_best_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lap_best_lap_time: match offsets.lap_best_lap_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_best_n_lap_lap: match offsets.lap_best_n_lap_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lap_best_n_lap_time: match offsets.lap_best_n_lap_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_completed: match offsets.lap_completed {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lap_current_lap_time: match offsets.lap_current_lap_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_best_lap: match offsets.lap_delta_to_best_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_best_lap_dd: match offsets.lap_delta_to_best_lap_dd {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_best_lap_ok: match offsets.lap_delta_to_best_lap_ok {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            lap_delta_to_optimal_lap: match offsets.lap_delta_to_optimal_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_optimal_lap_dd: match offsets.lap_delta_to_optimal_lap_dd {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_optimal_lap_ok: match offsets.lap_delta_to_optimal_lap_ok {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            lap_delta_to_session_best_lap: match offsets.lap_delta_to_session_best_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_session_best_lap_dd: match offsets.lap_delta_to_session_best_lap_dd {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_session_best_lap_ok: match offsets.lap_delta_to_session_best_lap_ok {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            lap_delta_to_session_lastl_lap: match offsets.lap_delta_to_session_lastl_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_session_lastl_lap_dd: match offsets.lap_delta_to_session_lastl_lap_dd {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_session_lastl_lap_ok: match offsets.lap_delta_to_session_lastl_lap_ok {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            lap_delta_to_session_optimal_lap: match offsets.lap_delta_to_session_optimal_lap {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_session_optimal_lap_dd: match offsets.lap_delta_to_session_optimal_lap_dd {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_delta_to_session_optimal_lap_ok: match offsets.lap_delta_to_session_optimal_lap_ok {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            lap_dist: match offsets.lap_dist {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_dist_pct: match offsets.lap_dist_pct {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_las_n_lap_seq: match offsets.lap_las_n_lap_seq {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            lap_last_lap_time: match offsets.lap_last_lap_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lap_last_n_lap_time: match offsets.lap_last_n_lap_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            lat_accel: match offsets.lat_accel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            lr_temp_cl: match offsets.lr_temp_cl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_temp_cm: match offsets.lr_temp_cm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_temp_cr: match offsets.lr_temp_cr { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_wear_l: match offsets.lr_wear_l { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_wear_m: match offsets.lr_wear_m { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lr_wear_r: match offsets.lr_wear_r { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap: match offsets.lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lap_best_lap: match offsets.lap_best_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lap_best_lap_time: match offsets.lap_best_lap_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_best_n_lap_lap: match offsets.lap_best_n_lap_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lap_best_n_lap_time: match offsets.lap_best_n_lap_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_completed: match offsets.lap_completed { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lap_current_lap_time: match offsets.lap_current_lap_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_best_lap: match offsets.lap_delta_to_best_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_best_lap_dd: match offsets.lap_delta_to_best_lap_dd { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_best_lap_ok: match offsets.lap_delta_to_best_lap_ok { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            lap_delta_to_optimal_lap: match offsets.lap_delta_to_optimal_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_optimal_lap_dd: match offsets.lap_delta_to_optimal_lap_dd { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_optimal_lap_ok: match offsets.lap_delta_to_optimal_lap_ok { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            lap_delta_to_session_best_lap: match offsets.lap_delta_to_session_best_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_session_best_lap_dd: match offsets.lap_delta_to_session_best_lap_dd { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_session_best_lap_ok: match offsets.lap_delta_to_session_best_lap_ok { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            lap_delta_to_session_lastl_lap: match offsets.lap_delta_to_session_lastl_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_session_lastl_lap_dd: match offsets.lap_delta_to_session_lastl_lap_dd { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_session_lastl_lap_ok: match offsets.lap_delta_to_session_lastl_lap_ok { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            lap_delta_to_session_optimal_lap: match offsets.lap_delta_to_session_optimal_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_session_optimal_lap_dd: match offsets.lap_delta_to_session_optimal_lap_dd { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_delta_to_session_optimal_lap_ok: match offsets.lap_delta_to_session_optimal_lap_ok { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            lap_dist: match offsets.lap_dist { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_dist_pct: match offsets.lap_dist_pct { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_las_n_lap_seq: match offsets.lap_las_n_lap_seq { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            lap_last_lap_time: match offsets.lap_last_lap_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lap_last_n_lap_time: match offsets.lap_last_n_lap_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            lat_accel: match offsets.lat_accel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             lat_accel_st: match offsets.lat_accel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            left_tire_sets_available: match offsets.left_tire_sets_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            left_tire_sets_used: match offsets.left_tire_sets_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            load_num_textures: match offsets.load_num_textures {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            long_accel: match offsets.long_accel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            left_tire_sets_available: match offsets.left_tire_sets_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            left_tire_sets_used: match offsets.left_tire_sets_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            load_num_textures: match offsets.load_num_textures { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            long_accel: match offsets.long_accel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             long_accel_st: match offsets.long_accel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            manifold_press: match offsets.manifold_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            manual_boost: match offsets.manual_boost {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            manual_no_boost: match offsets.manual_no_boost {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            mem_page_fault_sec: match offsets.mem_page_fault_sec {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            mem_soft_page_fault_sec: match offsets.mem_soft_page_fault_sec {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            oil_level: match offsets.oil_level {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            oil_press: match offsets.oil_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            oil_temp: match offsets.oil_temp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            ok_to_reload_textures: match offsets.ok_to_reload_textures {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            on_pit_road: match offsets.on_pit_road {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            p2p_count: match offsets.p2p_count {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            p2p_status: match offsets.p2p_status {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            pace_mode: match offsets.pace_mode {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            pit_opt_repair_left: match offsets.pit_opt_repair_left {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_repair_left: match offsets.pit_repair_left {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_sv_flags: match offsets.pit_sv_flags {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            pit_sv_fuel: match offsets.pit_sv_fuel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_sv_lfp: match offsets.pit_sv_lfp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_sv_lrp: match offsets.pit_sv_lrp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_sv_rfp: match offsets.pit_sv_rfp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_sv_rrp: match offsets.pit_sv_rrp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pit_sv_tire_compound: match offsets.pit_sv_tire_compound {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            pitch: match offsets.pitch {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            pitch_rate: match offsets.pitch_rate {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            manifold_press: match offsets.manifold_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            manual_boost: match offsets.manual_boost { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            manual_no_boost: match offsets.manual_no_boost { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            mem_page_fault_sec: match offsets.mem_page_fault_sec { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            mem_soft_page_fault_sec: match offsets.mem_soft_page_fault_sec { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            oil_level: match offsets.oil_level { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            oil_press: match offsets.oil_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            oil_temp: match offsets.oil_temp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            ok_to_reload_textures: match offsets.ok_to_reload_textures { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            on_pit_road: match offsets.on_pit_road { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            p2p_count: match offsets.p2p_count { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            p2p_status: match offsets.p2p_status { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            pace_mode: match offsets.pace_mode { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            pit_opt_repair_left: match offsets.pit_opt_repair_left { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_repair_left: match offsets.pit_repair_left { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_sv_flags: match offsets.pit_sv_flags { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            pit_sv_fuel: match offsets.pit_sv_fuel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_sv_lfp: match offsets.pit_sv_lfp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_sv_lrp: match offsets.pit_sv_lrp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_sv_rfp: match offsets.pit_sv_rfp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_sv_rrp: match offsets.pit_sv_rrp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pit_sv_tire_compound: match offsets.pit_sv_tire_compound { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            pitch: match offsets.pitch { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            pitch_rate: match offsets.pitch_rate { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             pitch_rate_st: match offsets.pitch_rate_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            pits_open: match offsets.pits_open {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            pitstop_active: match offsets.pitstop_active {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            player_car_class: match offsets.player_car_class {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_class_position: match offsets.player_car_class_position {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_driver_incident_count: match offsets.player_car_driver_incident_count {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_dry_tire_set_limit: match offsets.player_car_dry_tire_set_limit {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_idx: match offsets.player_car_idx {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_in_pit_stall: match offsets.player_car_in_pit_stall {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            player_car_my_incident_count: match offsets.player_car_my_incident_count {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_pit_sv_status: match offsets.player_car_pit_sv_status {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_position: match offsets.player_car_position {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_power_adjust: match offsets.player_car_power_adjust {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_car_sl_blink_rpm: match offsets.player_car_sl_blink_rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_car_sl_first_rpm: match offsets.player_car_sl_first_rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_car_sl_last_rpm: match offsets.player_car_sl_last_rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_car_sl_shift_rpm: match offsets.player_car_sl_shift_rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_car_team_incident_count: match offsets.player_car_team_incident_count {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_car_tow_time: match offsets.player_car_tow_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_car_weight_penalty: match offsets.player_car_weight_penalty {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            player_fast_repairs_used: match offsets.player_fast_repairs_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_incidents: match offsets.player_incidents {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_tire_compound: match offsets.player_tire_compound {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_track_surface: match offsets.player_track_surface {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            player_track_surface_material: match offsets.player_track_surface_material {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            precipitation: match offsets.precipitation {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            push_to_pass: match offsets.push_to_pass {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            push_to_talk: match offsets.push_to_talk {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            rf_tires_available: match offsets.rf_tires_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            rf_tires_used: match offsets.rf_tires_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            r_fbrake_line_press: match offsets.r_fbrake_line_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fcold_pressure: match offsets.r_fcold_pressure {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fodometer: match offsets.r_fodometer {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fshock_defl: match offsets.r_fshock_defl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fshock_defl_st: match offsets.r_fshock_defl_st {
+            pits_open: match offsets.pits_open { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            pitstop_active: match offsets.pitstop_active { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            player_car_class: match offsets.player_car_class { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_class_position: match offsets.player_car_class_position { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_driver_incident_count: match offsets.player_car_driver_incident_count { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_dry_tire_set_limit: match offsets.player_car_dry_tire_set_limit { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_idx: match offsets.player_car_idx { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_in_pit_stall: match offsets.player_car_in_pit_stall { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            player_car_my_incident_count: match offsets.player_car_my_incident_count { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_pit_sv_status: match offsets.player_car_pit_sv_status { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_position: match offsets.player_car_position { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_power_adjust: match offsets.player_car_power_adjust { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_car_sl_blink_rpm: match offsets.player_car_sl_blink_rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_car_sl_first_rpm: match offsets.player_car_sl_first_rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_car_sl_last_rpm: match offsets.player_car_sl_last_rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_car_sl_shift_rpm: match offsets.player_car_sl_shift_rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_car_team_incident_count: match offsets.player_car_team_incident_count { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_car_tow_time: match offsets.player_car_tow_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_car_weight_penalty: match offsets.player_car_weight_penalty { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            player_fast_repairs_used: match offsets.player_fast_repairs_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_incidents: match offsets.player_incidents { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_tire_compound: match offsets.player_tire_compound { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_track_surface: match offsets.player_track_surface { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            player_track_surface_material: match offsets.player_track_surface_material { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            precipitation: match offsets.precipitation { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            push_to_pass: match offsets.push_to_pass { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            push_to_talk: match offsets.push_to_talk { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            rf_tires_available: match offsets.rf_tires_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            rf_tires_used: match offsets.rf_tires_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            rf_brake_line_press: match offsets.rf_brake_line_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_cold_pressure: match offsets.rf_cold_pressure { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_odometer: match offsets.rf_odometer { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_shock_defl: match offsets.rf_shock_defl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_shock_defl_st: match offsets.rf_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            r_fshock_vel: match offsets.r_fshock_vel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fshock_vel_st: match offsets.r_fshock_vel_st {
+            rf_shock_vel: match offsets.rf_shock_vel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_shock_vel_st: match offsets.rf_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            r_ftemp_cl: match offsets.r_ftemp_cl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_ftemp_cm: match offsets.r_ftemp_cm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_ftemp_cr: match offsets.r_ftemp_cr {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fwear_l: match offsets.r_fwear_l {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fwear_m: match offsets.r_fwear_m {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_fwear_r: match offsets.r_fwear_r {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            rpm: match offsets.rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            rr_tires_available: match offsets.rr_tires_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            rr_tires_used: match offsets.rr_tires_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            r_rbrake_line_press: match offsets.r_rbrake_line_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rcold_pressure: match offsets.r_rcold_pressure {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rodometer: match offsets.r_rodometer {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rshock_defl: match offsets.r_rshock_defl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rshock_defl_st: match offsets.r_rshock_defl_st {
+            rf_temp_cl: match offsets.rf_temp_cl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_temp_cm: match offsets.rf_temp_cm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_temp_cr: match offsets.rf_temp_cr { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_wear_l: match offsets.rf_wear_l { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_wear_m: match offsets.rf_wear_m { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rf_wear_r: match offsets.rf_wear_r { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rpm: match offsets.rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_tires_available: match offsets.rr_tires_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            rr_tires_used: match offsets.rr_tires_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            rr_brake_line_press: match offsets.rr_brake_line_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_cold_pressure: match offsets.rr_cold_pressure { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_odometer: match offsets.rr_odometer { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_shock_defl: match offsets.rr_shock_defl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_shock_defl_st: match offsets.rr_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            r_rshock_vel: match offsets.r_rshock_vel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rshock_vel_st: match offsets.r_rshock_vel_st {
+            rr_shock_vel: match offsets.rr_shock_vel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_shock_vel_st: match offsets.rr_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            r_rtemp_cl: match offsets.r_rtemp_cl {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rtemp_cm: match offsets.r_rtemp_cm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rtemp_cr: match offsets.r_rtemp_cr {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rwear_l: match offsets.r_rwear_l {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rwear_m: match offsets.r_rwear_m {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            r_rwear_r: match offsets.r_rwear_r {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            race_laps: match offsets.race_laps {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            radio_transmit_car_idx: match offsets.radio_transmit_car_idx {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            radio_transmit_frequency_idx: match offsets.radio_transmit_frequency_idx {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            radio_transmit_radio_idx: match offsets.radio_transmit_radio_idx {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            rear_tire_sets_available: match offsets.rear_tire_sets_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            rear_tire_sets_used: match offsets.rear_tire_sets_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            relative_humidity: match offsets.relative_humidity {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            replay_frame_num: match offsets.replay_frame_num {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            replay_frame_num_end: match offsets.replay_frame_num_end {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            replay_play_slow_motion: match offsets.replay_play_slow_motion {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            replay_play_speed: match offsets.replay_play_speed {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            replay_session_num: match offsets.replay_session_num {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            replay_session_time: match offsets.replay_session_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f64)
-                },
-                None => 0.0,
-            },
-            right_tire_sets_available: match offsets.right_tire_sets_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            right_tire_sets_used: match offsets.right_tire_sets_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            roll: match offsets.roll {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            roll_rate: match offsets.roll_rate {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            rr_temp_cl: match offsets.rr_temp_cl { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_temp_cm: match offsets.rr_temp_cm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_temp_cr: match offsets.rr_temp_cr { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_wear_l: match offsets.rr_wear_l { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_wear_m: match offsets.rr_wear_m { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            rr_wear_r: match offsets.rr_wear_r { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            race_laps: match offsets.race_laps { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            radio_transmit_car_idx: match offsets.radio_transmit_car_idx { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            radio_transmit_frequency_idx: match offsets.radio_transmit_frequency_idx { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            radio_transmit_radio_idx: match offsets.radio_transmit_radio_idx { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            rear_tire_sets_available: match offsets.rear_tire_sets_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            rear_tire_sets_used: match offsets.rear_tire_sets_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            relative_humidity: match offsets.relative_humidity { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            replay_frame_num: match offsets.replay_frame_num { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            replay_frame_num_end: match offsets.replay_frame_num_end { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            replay_play_slow_motion: match offsets.replay_play_slow_motion { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            replay_play_speed: match offsets.replay_play_speed { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            replay_session_num: match offsets.replay_session_num { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            replay_session_time: match offsets.replay_session_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f64) }, None => 0.0 },
+            right_tire_sets_available: match offsets.right_tire_sets_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            right_tire_sets_used: match offsets.right_tire_sets_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            roll: match offsets.roll { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            roll_rate: match offsets.roll_rate { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             roll_rate_st: match offsets.roll_rate_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            session_flags: match offsets.session_flags {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_joker_laps_remain: match offsets.session_joker_laps_remain {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_laps_remain: match offsets.session_laps_remain {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_laps_remain_ex: match offsets.session_laps_remain_ex {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_laps_total: match offsets.session_laps_total {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_num: match offsets.session_num {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_on_joker_lap: match offsets.session_on_joker_lap {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            session_state: match offsets.session_state {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_tick: match offsets.session_tick {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            session_time: match offsets.session_time {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f64)
-                },
-                None => 0.0,
-            },
-            session_time_of_day: match offsets.session_time_of_day {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            session_time_remain: match offsets.session_time_remain {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f64)
-                },
-                None => 0.0,
-            },
-            session_time_total: match offsets.session_time_total {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f64)
-                },
-                None => 0.0,
-            },
-            session_unique_id: match offsets.session_unique_id {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            shift_grind_rpm: match offsets.shift_grind_rpm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            shift_indicator_pct: match offsets.shift_indicator_pct {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            shift_power_pct: match offsets.shift_power_pct {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            shifter: match offsets.shifter {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            skies: match offsets.skies {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            solar_altitude: match offsets.solar_altitude {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            solar_azimuth: match offsets.solar_azimuth {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            speed: match offsets.speed {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_ffb_enabled: match offsets.steering_ffb_enabled {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            steering_wheel_angle: match offsets.steering_wheel_angle {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_angle_max: match offsets.steering_wheel_angle_max {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_limiter: match offsets.steering_wheel_limiter {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_max_force_nm: match offsets.steering_wheel_max_force_nm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_pct_damper: match offsets.steering_wheel_pct_damper {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_pct_intensity: match offsets.steering_wheel_pct_intensity {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_pct_smoothing: match offsets.steering_wheel_pct_smoothing {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_pct_torque: match offsets.steering_wheel_pct_torque {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_pct_torque_sign: match offsets.steering_wheel_pct_torque_sign {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_pct_torque_sign_stops: match offsets.steering_wheel_pct_torque_sign_stops
-            {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_peak_force_nm: match offsets.steering_wheel_peak_force_nm {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            steering_wheel_torque: match offsets.steering_wheel_torque {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            session_flags: match offsets.session_flags { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_joker_laps_remain: match offsets.session_joker_laps_remain { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_laps_remain: match offsets.session_laps_remain { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_laps_remain_ex: match offsets.session_laps_remain_ex { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_laps_total: match offsets.session_laps_total { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_num: match offsets.session_num { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_on_joker_lap: match offsets.session_on_joker_lap { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            session_state: match offsets.session_state { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_tick: match offsets.session_tick { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            session_time: match offsets.session_time { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f64) }, None => 0.0 },
+            session_time_of_day: match offsets.session_time_of_day { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            session_time_remain: match offsets.session_time_remain { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f64) }, None => 0.0 },
+            session_time_total: match offsets.session_time_total { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f64) }, None => 0.0 },
+            session_unique_id: match offsets.session_unique_id { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            shift_grind_rpm: match offsets.shift_grind_rpm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            shift_indicator_pct: match offsets.shift_indicator_pct { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            shift_power_pct: match offsets.shift_power_pct { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            shifter: match offsets.shifter { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            skies: match offsets.skies { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            solar_altitude: match offsets.solar_altitude { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            solar_azimuth: match offsets.solar_azimuth { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            speed: match offsets.speed { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_ffb_enabled: match offsets.steering_ffb_enabled { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            steering_wheel_angle: match offsets.steering_wheel_angle { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_angle_max: match offsets.steering_wheel_angle_max { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_limiter: match offsets.steering_wheel_limiter { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_max_force_nm: match offsets.steering_wheel_max_force_nm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_pct_damper: match offsets.steering_wheel_pct_damper { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_pct_intensity: match offsets.steering_wheel_pct_intensity { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_pct_smoothing: match offsets.steering_wheel_pct_smoothing { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_pct_torque: match offsets.steering_wheel_pct_torque { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_pct_torque_sign: match offsets.steering_wheel_pct_torque_sign { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_pct_torque_sign_stops: match offsets.steering_wheel_pct_torque_sign_stops { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_peak_force_nm: match offsets.steering_wheel_peak_force_nm { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            steering_wheel_torque: match offsets.steering_wheel_torque { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             steering_wheel_torque_st: match offsets.steering_wheel_torque_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            steering_wheel_use_linear: match offsets.steering_wheel_use_linear {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            throttle: match offsets.throttle {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            throttle_raw: match offsets.throttle_raw {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            tire_lf_rumble_pitch: match offsets.tire_lf_rumble_pitch {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            tire_lr_rumble_pitch: match offsets.tire_lr_rumble_pitch {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            tire_rf_rumble_pitch: match offsets.tire_rf_rumble_pitch {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            tire_rr_rumble_pitch: match offsets.tire_rr_rumble_pitch {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            tire_sets_available: match offsets.tire_sets_available {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            tire_sets_used: match offsets.tire_sets_used {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            track_temp: match offsets.track_temp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            track_temp_crew: match offsets.track_temp_crew {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            track_wetness: match offsets.track_wetness {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
-                },
-                None => 0,
-            },
-            velocity_x: match offsets.velocity_x {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            steering_wheel_use_linear: match offsets.steering_wheel_use_linear { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            throttle: match offsets.throttle { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            throttle_raw: match offsets.throttle_raw { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            tire_lf_rumble_pitch: match offsets.tire_lf_rumble_pitch { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            tire_lr_rumble_pitch: match offsets.tire_lr_rumble_pitch { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            tire_rf_rumble_pitch: match offsets.tire_rf_rumble_pitch { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            tire_rr_rumble_pitch: match offsets.tire_rr_rumble_pitch { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            tire_sets_available: match offsets.tire_sets_available { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            tire_sets_used: match offsets.tire_sets_used { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            track_temp: match offsets.track_temp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            track_temp_crew: match offsets.track_temp_crew { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            track_wetness: match offsets.track_wetness { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const i32) }, None => 0 },
+            velocity_x: match offsets.velocity_x { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             velocity_x_st: match offsets.velocity_x_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            velocity_y: match offsets.velocity_y {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            velocity_y: match offsets.velocity_y { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             velocity_y_st: match offsets.velocity_y_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            velocity_z: match offsets.velocity_z {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            velocity_z: match offsets.velocity_z { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             velocity_z_st: match offsets.velocity_z_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            vert_accel: match offsets.vert_accel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            vert_accel: match offsets.vert_accel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             vert_accel_st: match offsets.vert_accel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            vid_cap_active: match offsets.vid_cap_active {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            vid_cap_enabled: match offsets.vid_cap_enabled {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            voltage: match offsets.voltage {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            water_level: match offsets.water_level {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            water_temp: match offsets.water_temp {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            weather_declared_wet: match offsets.weather_declared_wet {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            wind_dir: match offsets.wind_dir {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            wind_vel: match offsets.wind_vel {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            yaw: match offsets.yaw {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            yaw_north: match offsets.yaw_north {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            yaw_rate: match offsets.yaw_rate {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            vid_cap_active: match offsets.vid_cap_active { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            vid_cap_enabled: match offsets.vid_cap_enabled { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            voltage: match offsets.voltage { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            water_level: match offsets.water_level { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            water_temp: match offsets.water_temp { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            weather_declared_wet: match offsets.weather_declared_wet { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            wind_dir: match offsets.wind_dir { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            wind_vel: match offsets.wind_vel { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            yaw: match offsets.yaw { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            yaw_north: match offsets.yaw_north { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            yaw_rate: match offsets.yaw_rate { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
             yaw_rate_st: match offsets.yaw_rate_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
-                    (0..off.count)
-                        .map(|i| std::ptr::read_unaligned(src.add(i)))
-                        .collect()
+                    (0..off.count).map(|i| std::ptr::read_unaligned(src.add(i))).collect()
                 },
                 None => Vec::new(),
             },
-            dc_abs: match offsets.dc_abs {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dc_brake_bias: match offsets.dc_brake_bias {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dc_headlight_flash: match offsets.dc_headlight_flash {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            dc_pit_speed_limiter_toggle: match offsets.dc_pit_speed_limiter_toggle {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            dc_starter: match offsets.dc_starter {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            dc_toggle_windshield_wipers: match offsets.dc_toggle_windshield_wipers {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            dc_traction_control: match offsets.dc_traction_control {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dc_trigger_windshield_wipers: match offsets.dc_trigger_windshield_wipers {
-                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
-                None => false,
-            },
-            dp_fast_repair: match offsets.dp_fast_repair {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_fuel_add_kg: match offsets.dp_fuel_add_kg {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_fuel_auto_fill_active: match offsets.dp_fuel_auto_fill_active {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_fuel_auto_fill_enabled: match offsets.dp_fuel_auto_fill_enabled {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_fuel_fill: match offsets.dp_fuel_fill {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_lf_tire_change: match offsets.dp_lf_tire_change {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_lf_tire_cold_press: match offsets.dp_lf_tire_cold_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_lr_tire_change: match offsets.dp_lr_tire_change {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_lr_tire_cold_press: match offsets.dp_lr_tire_cold_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_rf_tire_change: match offsets.dp_rf_tire_change {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_rf_tire_cold_press: match offsets.dp_rf_tire_cold_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_rr_tire_change: match offsets.dp_rr_tire_change {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_rr_tire_cold_press: match offsets.dp_rr_tire_cold_press {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
-            dp_windshield_tearoff: match offsets.dp_windshield_tearoff {
-                Some(ref off) => unsafe {
-                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
-                },
-                None => 0.0,
-            },
+            dc_abs: match offsets.dc_abs { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dc_brake_bias: match offsets.dc_brake_bias { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dc_headlight_flash: match offsets.dc_headlight_flash { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            dc_pit_speed_limiter_toggle: match offsets.dc_pit_speed_limiter_toggle { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            dc_starter: match offsets.dc_starter { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            dc_throttle_shape: match offsets.dc_throttle_shape { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dc_toggle_windshield_wipers: match offsets.dc_toggle_windshield_wipers { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            dc_traction_control: match offsets.dc_traction_control { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dc_trigger_windshield_wipers: match offsets.dc_trigger_windshield_wipers { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 }, None => false },
+            dp_fast_repair: match offsets.dp_fast_repair { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_fuel_add_kg: match offsets.dp_fuel_add_kg { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_fuel_auto_fill_active: match offsets.dp_fuel_auto_fill_active { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_fuel_auto_fill_enabled: match offsets.dp_fuel_auto_fill_enabled { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_fuel_fill: match offsets.dp_fuel_fill { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_lf_tire_change: match offsets.dp_lf_tire_change { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_lf_tire_cold_press: match offsets.dp_lf_tire_cold_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_lr_tire_change: match offsets.dp_lr_tire_change { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_lr_tire_cold_press: match offsets.dp_lr_tire_cold_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_rf_tire_change: match offsets.dp_rf_tire_change { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_rf_tire_cold_press: match offsets.dp_rf_tire_cold_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_rr_tire_change: match offsets.dp_rr_tire_change { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_rr_tire_cold_press: match offsets.dp_rr_tire_cold_press { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
+            dp_windshield_tearoff: match offsets.dp_windshield_tearoff { Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset) as *const f32) }, None => 0.0 },
         }
     }
 }

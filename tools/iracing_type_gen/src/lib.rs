@@ -22,7 +22,48 @@ struct VarFile {
     var: Vec<VarDef>,
 }
 
+/// iRacing names that defeat mechanical CamelCase splitting (irregular
+/// acronym/word boundaries). Checked before the generic conversion.
+const SNAKE_OVERRIDES: &[(&str, &str)] = &[("BrakeABSactive", "brake_abs_active")];
+
+/// Tire/corner prefixes: `LFtempCL` means "LF temp CL", so the two-letter
+/// corner code is one word (`lf_temp_cl`), not the generic split (`l_ftemp_cl`).
+const CORNER_PREFIXES: &[&str] = &["LF", "LR", "RF", "RR"];
+
 pub fn camel_to_snake(name: &str) -> String {
+    if let Some((_, snake)) = SNAKE_OVERRIDES
+        .iter()
+        .find(|(original, _)| *original == name)
+    {
+        return (*snake).to_string();
+    }
+
+    for prefix in CORNER_PREFIXES {
+        let rest = match name.strip_prefix(prefix) {
+            Some(rest) => rest,
+            None => continue,
+        };
+
+        if rest.starts_with(|c: char| c.is_lowercase()) {
+            let mut out = prefix.to_lowercase();
+            out.push('_');
+            // Capitalize the first letter so the tail converts as a normal word.
+            let mut tail_chars = rest.chars();
+            let mut tail = String::new();
+            if let Some(first) = tail_chars.next() {
+                tail.extend(first.to_uppercase());
+            }
+            tail.extend(tail_chars);
+            out.push_str(&camel_to_snake_generic(&tail));
+
+            return out;
+        }
+    }
+
+    camel_to_snake_generic(name)
+}
+
+fn camel_to_snake_generic(name: &str) -> String {
     let mut out = String::new();
 
     let chars: Vec<char> = name.chars().collect();
@@ -32,8 +73,11 @@ pub fn camel_to_snake(name: &str) -> String {
             let prev_lower = i > 0 && chars[i - 1].is_lowercase();
             let next_lower = i + 1 < chars.len() && chars[i + 1].is_lowercase();
             let prev_upper = i > 0 && chars[i - 1].is_uppercase();
+            let prev_digit = i > 0 && chars[i - 1].is_ascii_digit();
 
-            if i > 0 && (prev_lower || (next_lower && prev_upper)) {
+            // `next_lower && prev_digit` splits "F2Time" → f2_time while
+            // keeping acronym runs like "P2P_Status" → p2p_status intact.
+            if i > 0 && (prev_lower || (next_lower && (prev_upper || prev_digit))) {
                 out.push('_');
             }
 

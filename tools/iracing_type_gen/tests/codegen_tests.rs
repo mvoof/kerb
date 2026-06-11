@@ -15,6 +15,30 @@ fn camel_to_snake_compound() {
 }
 
 #[test]
+fn camel_to_snake_digit_word_boundary() {
+    assert_eq!(camel_to_snake("CarIdxF2Time"), "car_idx_f2_time");
+    assert_eq!(camel_to_snake("CarIdxP2P_Status"), "car_idx_p2p_status");
+    assert_eq!(camel_to_snake("CarIdxP2P_Count"), "car_idx_p2p_count");
+}
+
+#[test]
+fn camel_to_snake_acronym_overrides() {
+    assert_eq!(camel_to_snake("BrakeABSactive"), "brake_abs_active");
+}
+
+#[test]
+fn camel_to_snake_corner_prefixes() {
+    assert_eq!(camel_to_snake("LFtempCL"), "lf_temp_cl");
+    assert_eq!(camel_to_snake("LFtempCM"), "lf_temp_cm");
+    assert_eq!(camel_to_snake("RRwearR"), "rr_wear_r");
+    assert_eq!(camel_to_snake("LRshockDefl_ST"), "lr_shock_defl_st");
+    assert_eq!(camel_to_snake("RFcoldPressure"), "rf_cold_pressure");
+    assert_eq!(camel_to_snake("LFbrakeLinePress"), "lf_brake_line_press");
+    assert_eq!(camel_to_snake("LFodometer"), "lf_odometer");
+    assert_eq!(camel_to_snake("LFshockVel"), "lf_shock_vel");
+}
+
+#[test]
 fn generate_f32_field() {
     let toml = r#"
 [[var]]

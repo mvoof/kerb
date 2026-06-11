@@ -6,3 +6,4 @@ publish = false
 
 [dependencies]
 kerb = { path = "..", features = ["iracing", "ac-evo", "lmu"] }
+serde_yaml = "0.9"
