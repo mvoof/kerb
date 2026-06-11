@@ -49,8 +49,11 @@ pub fn camel_to_snake(name: &str) -> String {
             out.push('_');
             // Capitalize the first letter so the tail converts as a normal word.
             let mut tail_chars = rest.chars();
-            let first = tail_chars.next().unwrap().to_uppercase().next().unwrap();
-            let tail: String = std::iter::once(first).chain(tail_chars).collect();
+            let mut tail = String::new();
+            if let Some(first) = tail_chars.next() {
+                tail.extend(first.to_uppercase());
+            }
+            tail.extend(tail_chars);
             out.push_str(&camel_to_snake_generic(&tail));
 
             return out;
