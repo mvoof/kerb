@@ -60,6 +60,19 @@ impl_has_snapshot!(
 );
 
 #[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
+impl<T: HasSnapshot> HasSnapshot for Box<T> {
+    fn telemetry_snapshot(
+        &self,
+    ) -> std::collections::HashMap<String, crate::types::TelemetryValue> {
+        (**self).telemetry_snapshot()
+    }
+
+    fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta> {
+        (**self).var_list_snapshot()
+    }
+}
+
+#[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 impl HasSnapshot for crate::connection::Connection {
     fn telemetry_snapshot(
         &self,

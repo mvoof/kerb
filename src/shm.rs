@@ -68,6 +68,11 @@ impl SharedMemRegion {
         }
     }
 
+    /// Return `true` if the mapped region reports a size of zero bytes.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Create a mock `SharedMemRegion` pointing to an externally-owned buffer (for tests only).
     ///
     /// # Safety

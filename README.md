@@ -63,8 +63,19 @@ fn main() -> Result<(), SimError> {
 > [!IMPORTANT]
 > The variants present in `Connection` depend on which features are enabled in your `Cargo.toml`. With `default-features = false, features = ["iracing"]` only `Connection::IRacing` exists — add `_ => {}` to handle any variants you don't care about.
 
-> [!IMPORTANT]
-> AC Evo and LMU frames use `#[repr(C, packed)]` structs mapped directly from shared memory. Rust forbids taking a reference to unaligned packed fields, so **always copy fields to local variables before using them** (e.g. in `println!`, arithmetic, or function calls). Accessing them directly will be a compile error.
+## Threading
+
+All connection types (`IRsdkConnection`, `AcEvoConnection`, `LmuConnection` — and therefore `Connection`) are **not `Send`**. This is a deliberate API contract: they hold raw shared-memory pointers, Win32 handles, and interior-mutability caches. Create and use a connection on a single thread.
+
+The standard pattern for GUI apps and overlays is a dedicated telemetry thread that owns the connection and forwards normalized data via channels or events:
+
+```rust
+std::thread::spawn(move || {
+    // The connection must be created INSIDE the thread that uses it.
+    let conn = kerb::SimConnection::connect().unwrap();
+    // … read loop, send data out through a channel …
+});
+```
 
 ## Connection Loop
 
@@ -224,7 +235,8 @@ kerb::save_telemetry_snapshot(&conn, "ac_snapshot.txt")?;
 
 | Method                       | Returns                           | Scope           | Notes                                                                         |
 | ---------------------------- | --------------------------------- | --------------- | ----------------------------------------------------------------------------- |
-| `frame()`                    | `Box<LmuFrame>`                   | all cars        | ~500 KB struct; boxed to avoid stack overflow                                 |
+| `frame()`                    | `Box<LmuFrame>`                   | all cars        | ~500 KB struct; boxed to avoid stack overflow; allocates per call             |
+| `frame_into(&mut LmuFrame)`  | `Result<(), SimError>`            | all cars        | Allocation-free read into a reused buffer (`LmuFrame::new_boxed()`)           |
 | `frame.player_telemetry()`   | `Option<&LmuVehicleTelemetry>`    | **player only** | Cross-references scoring + telemetry by vehicle ID; returns None if not found |
 | `frame.player_scoring_idx()` | `Option<usize>`                   | **player only** | Index into `frame.vehicles_scoring` for the player's entry                    |
 | `telemetry_snapshot()`       | `HashMap<String, TelemetryValue>` | **player only** | Field names from `LmuVehicleTelemetry`                                        |
@@ -255,6 +267,18 @@ Connection::Lmu(conn) => {
     let track = &frame.scoring_info.track_name;
     let temp = frame.scoring_info.track_temp;
     println!("track: {}  temp: {:.1}°C", track, temp);
+}
+```
+
+For hot paths (e.g. 60 Hz overlay polling) reuse one buffer instead of allocating ~500 KB per frame:
+
+```rust
+let mut frame = kerb::lmu::types::LmuFrame::new_boxed();
+while conn.is_connected() {
+    conn.wait_for_data(16);
+    if conn.frame_into(&mut frame).is_ok() {
+        // read frame.player_telemetry(), frame.vehicles_scoring(), …
+    }
 }
 ```
 

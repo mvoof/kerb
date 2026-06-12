@@ -23,6 +23,14 @@ fn parse_c_str(bytes: &[u8]) -> String {
 ///
 /// Holds the shared-memory region, an optional data-ready event used for
 /// efficient frame-synchronised waiting, and the parsed variable header table.
+///
+/// # Threading
+///
+/// Not [`Send`] — and this is a deliberate API contract, not an oversight:
+/// the struct holds raw shared-memory pointers, a Win32 event `HANDLE`, and a
+/// `RefCell` session cache. Create and use the connection on a single thread;
+/// for GUI apps spawn a dedicated telemetry `std::thread` that owns the
+/// connection and sends normalized data out through channels or events.
 pub struct IRsdkConnection {
     shm: crate::shm::SharedMemRegion,
     h_event: HANDLE,
