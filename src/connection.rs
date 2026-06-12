@@ -56,7 +56,7 @@ pub enum SimType {
 #[non_exhaustive]
 pub enum Connection {
     #[cfg(feature = "iracing")]
-    IRacing(crate::iracing::connection::IRsdkConnection),
+    IRacing(Box<crate::iracing::connection::IRsdkConnection>),
     #[cfg(feature = "ac-evo")]
     AcEvo(crate::ac_evo::connection::AcEvoConnection),
     #[cfg(feature = "lmu")]
@@ -76,7 +76,7 @@ impl SimConnection {
         #[cfg(feature = "iracing")]
         {
             if let Ok(c) = crate::iracing::connection::IRsdkConnection::connect() {
-                return Ok(Connection::IRacing(c));
+                return Ok(Connection::IRacing(Box::new(c)));
             }
         }
         #[cfg(feature = "ac-evo")]
@@ -94,9 +94,8 @@ impl SimConnection {
     pub fn connect_to(sim: SimType) -> Result<Connection, SimError> {
         match sim {
             #[cfg(feature = "iracing")]
-            SimType::IRacing => {
-                crate::iracing::connection::IRsdkConnection::connect().map(Connection::IRacing)
-            }
+            SimType::IRacing => crate::iracing::connection::IRsdkConnection::connect()
+                .map(|c| Connection::IRacing(Box::new(c))),
             #[cfg(feature = "ac-evo")]
             SimType::AcEvo => {
                 crate::ac_evo::connection::AcEvoConnection::connect().map(Connection::AcEvo)
