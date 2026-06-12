@@ -9,43 +9,45 @@ const SHM_TELEMETRY: &str = "$rFactor2SMMP_Telemetry$";
 const SHM_SCORING: &str = "$rFactor2SMMP_Scoring$";
 const SHM_EXTENDED: &str = "$rFactor2SMMP_Extended$";
 
-/// Read a consistent snapshot of `T` from a shared-memory region guarded by
-/// `version_update_begin` / `version_update_end` seqlock counters.
+/// Allocate a zero-initialized `Box<T>` directly on the heap.
 ///
-/// Spins until both counters match and are even (no write in progress).
-/// Returns `Err` after 100 retries to avoid an infinite loop if the sim hangs.
+/// Used for the large rF2/LMU structs (hundreds of KB) — `Box::new(T::default())`
+/// would construct the value on the stack first and overflow it.
+///
+/// # Safety
+/// `T` must be valid when all-zeroed (plain numeric data and byte arrays).
+unsafe fn alloc_zeroed_box<T>() -> Box<T> {
+    let layout = std::alloc::Layout::new::<T>();
+    let ptr = unsafe { std::alloc::alloc_zeroed(layout) as *mut T };
+    if ptr.is_null() {
+        std::alloc::handle_alloc_error(layout);
+    }
+    unsafe { Box::from_raw(ptr) }
+}
+
+/// Read a consistent snapshot of `T` from a shared-memory region into `out`,
+/// guarded by `version_update_begin` / `version_update_end` seqlock counters.
+///
+/// Uses the classic seqlock reader pattern:
+///   1. Read `begin` counter; skip the copy if a write is in progress (begin != end)
+///   2. Copy region into `out`
+///   3. Read `end` counter
+///   4. If begin still equals end → consistent, return
+///
+/// Writes into a caller-provided buffer so hot paths can reuse the allocation.
+/// Gives up after ~100 ms of torn reads to avoid an infinite loop if the sim hangs.
 ///
 /// # Safety
 /// Caller must ensure `begin_offset` and `end_offset` are valid byte offsets into
 /// the region, and that the region is at least `size_of::<T>()` bytes large.
-/// Read a consistent snapshot of `T` from a shared-memory region into a heap-allocated Box.
-///
-/// Allocating on the heap avoids stack overflow for large structs (e.g. rF2Telemetry
-/// with 128 vehicles). Spins until the seqlock counters match and are even.
-/// Returns `Err` after 100 retries to avoid an infinite loop if the sim hangs.
-/// Read a consistent snapshot of `T` from a shared-memory region into a heap-allocated Box.
-///
-/// Uses the classic seqlock reader pattern:
-///   1. Read `begin` counter
-///   2. Copy region into heap buffer
-///   3. Read `end` counter
-///   4. If begin == end and both even → consistent, return
-///
-/// Allocating on the heap avoids stack overflow for large structs (e.g. rF2Telemetry).
-/// Retries up to 1000 times before giving up.
-unsafe fn read_region_consistent<T: Copy>(
+unsafe fn read_region_consistent_into<T: Copy>(
     region: &crate::shm::SharedMemRegion,
     begin_offset: usize,
     end_offset: usize,
-) -> Result<Box<T>, crate::error::SimError> {
+    out: &mut T,
+) -> Result<(), crate::error::SimError> {
     let ptr = region.as_ptr();
-
-    // Pre-allocate the destination buffer once outside the retry loop.
-    let layout = std::alloc::Layout::new::<T>();
-    let raw = unsafe { std::alloc::alloc(layout) as *mut T };
-    if raw.is_null() {
-        std::alloc::handle_alloc_error(layout);
-    }
+    let raw = out as *mut T;
 
     let start = std::time::Instant::now();
     let mut retries = 0u32;
@@ -58,7 +60,6 @@ unsafe fn read_region_consistent<T: Copy>(
             retries += 1;
             if retries.is_multiple_of(1000) {
                 if start.elapsed() > std::time::Duration::from_millis(100) {
-                    unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
                     return Err(crate::error::SimError::InvalidHeader(
                         "Torn read timeout in LMU region".into(),
                     ));
@@ -78,13 +79,12 @@ unsafe fn read_region_consistent<T: Copy>(
 
         // Step 4: consistent if end still matches begin.
         if begin == end {
-            return Ok(unsafe { Box::from_raw(raw) });
+            return Ok(());
         }
 
         retries += 1;
         if retries.is_multiple_of(1000) {
             if start.elapsed() > std::time::Duration::from_millis(100) {
-                unsafe { std::alloc::dealloc(raw as *mut u8, layout) };
                 return Err(crate::error::SimError::InvalidHeader(
                     "Torn read timeout in LMU region".into(),
                 ));
@@ -96,16 +96,47 @@ unsafe fn read_region_consistent<T: Copy>(
     }
 }
 
+/// Reusable destination buffers for the raw shared-memory snapshots.
+///
+/// Allocated lazily on the first `frame_into` call and reused for the lifetime
+/// of the connection, so the hot read path performs no heap allocations.
+struct LmuScratch {
+    telemetry: Box<rF2Telemetry>,
+    scoring: Box<rF2Scoring>,
+    extended: Box<rF2Extended>,
+}
+
+impl LmuScratch {
+    fn new() -> Self {
+        // SAFETY: the rF2* structs are plain `#[repr(C)]` numeric data and byte
+        // arrays — all-zero bytes are a valid value.
+        unsafe {
+            Self {
+                telemetry: alloc_zeroed_box(),
+                scoring: alloc_zeroed_box(),
+                extended: alloc_zeroed_box(),
+            }
+        }
+    }
+}
+
 /// Live connection to Le Mans Ultimate via the rFactor 2 shared-memory plugin.
 ///
 /// Holds handles to the three memory-mapped files exposed by
 /// `rFactor2SharedMemoryMapPlugin` (telemetry, scoring, extended).
 ///
 /// Install `rFactor2SharedMemoryMapPlugin64.dll` to `<LMU>/Plugins/` before connecting.
+///
+/// # Threading
+///
+/// Not [`Send`]: holds raw shared-memory pointers and an interior-mutability
+/// scratch buffer. Create and use the connection on a single thread (e.g. a
+/// dedicated telemetry thread).
 pub struct LmuConnection {
     telemetry: SharedMemRegion,
     scoring: SharedMemRegion,
     extended: SharedMemRegion,
+    scratch: std::cell::RefCell<Option<LmuScratch>>,
 }
 
 impl LmuConnection {
@@ -114,50 +145,80 @@ impl LmuConnection {
     /// Returns a `Box<LmuFrame>` because `LmuFrame` holds 128-vehicle arrays and
     /// is too large to safely live on the stack. Each region is read with
     /// seqlock consistency — the read retries if a write was in progress.
+    ///
+    /// Allocates a fresh `LmuFrame` (~500 KB) per call. On hot paths (60 Hz
+    /// polling) prefer [`frame_into`](Self::frame_into) with a reused buffer.
     pub fn frame(&self) -> Result<Box<LmuFrame>, crate::error::SimError> {
+        let mut frame = LmuFrame::new_boxed();
+        self.frame_into(&mut frame)?;
+        Ok(frame)
+    }
+
+    /// Read a consistent snapshot into a caller-owned `LmuFrame`, without
+    /// allocating.
+    ///
+    /// Allocation-free on the hot path: the raw shared-memory snapshots go into
+    /// internal scratch buffers (allocated once, lazily) and the converted data
+    /// is written into `out`. Allocate the buffer once with
+    /// [`LmuFrame::new_boxed`] and reuse it across calls:
+    ///
+    /// ```ignore
+    /// let mut frame = kerb::lmu::types::LmuFrame::new_boxed();
+    /// while conn.is_connected() {
+    ///     conn.wait_for_data(16);
+    ///     if conn.frame_into(&mut frame).is_ok() {
+    ///         // read frame.player_telemetry(), frame.vehicles_scoring(), …
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// On success every public field of `out` is overwritten; vehicle entries
+    /// beyond `num_vehicles` may hold stale data — use the
+    /// [`vehicles_telemetry()`](LmuFrame::vehicles_telemetry) /
+    /// [`vehicles_scoring()`](LmuFrame::vehicles_scoring) slice accessors.
+    /// On error `out` is left in an unspecified (but initialized) state.
+    pub fn frame_into(&self, out: &mut LmuFrame) -> Result<(), crate::error::SimError> {
         use crate::lmu::structs::{RF2_MAX_VEHICLES, rF2ScoringHeader, rF2TelemetryHeader};
+
+        let mut scratch_slot = self.scratch.borrow_mut();
+        let scratch = scratch_slot.get_or_insert_with(LmuScratch::new);
+
         unsafe {
-            let raw_telemetry = read_region_consistent::<rF2Telemetry>(
+            read_region_consistent_into::<rF2Telemetry>(
                 &self.telemetry,
                 std::mem::offset_of!(rF2Telemetry, header)
                     + std::mem::offset_of!(rF2TelemetryHeader, version_update_begin),
                 std::mem::offset_of!(rF2Telemetry, header)
                     + std::mem::offset_of!(rF2TelemetryHeader, version_update_end),
+                &mut scratch.telemetry,
             )?;
-            let raw_scoring = read_region_consistent::<rF2Scoring>(
+            read_region_consistent_into::<rF2Scoring>(
                 &self.scoring,
                 std::mem::offset_of!(rF2Scoring, header)
                     + std::mem::offset_of!(rF2ScoringHeader, version_update_begin),
                 std::mem::offset_of!(rF2Scoring, header)
                     + std::mem::offset_of!(rF2ScoringHeader, version_update_end),
+                &mut scratch.scoring,
             )?;
-            let raw_extended = read_region_consistent::<rF2Extended>(
+            read_region_consistent_into::<rF2Extended>(
                 &self.extended,
                 std::mem::offset_of!(rF2Extended, version_update_begin),
                 std::mem::offset_of!(rF2Extended, version_update_end),
+                &mut scratch.extended,
             )?;
-
-            let num = (raw_scoring.scoring_info.num_vehicles as usize).min(RF2_MAX_VEHICLES);
-
-            let mut frame = {
-                let layout = std::alloc::Layout::new::<LmuFrame>();
-                let ptr = std::alloc::alloc_zeroed(layout) as *mut LmuFrame;
-                if ptr.is_null() {
-                    std::alloc::handle_alloc_error(layout);
-                }
-                Box::from_raw(ptr)
-            };
-
-            for i in 0..num {
-                frame.vehicles_telemetry[i] = LmuVehicleTelemetry::from(raw_telemetry.vehicles[i]);
-                frame.vehicles_scoring[i] = LmuVehicleScoring::from(raw_scoring.vehicles[i]);
-            }
-            frame.num_vehicles = num;
-            frame.scoring_info = LmuScoringInfo::from(raw_scoring.scoring_info);
-            frame.extended = LmuExtended::from(*raw_extended);
-
-            Ok(frame)
         }
+
+        let num = (scratch.scoring.scoring_info.num_vehicles as usize).min(RF2_MAX_VEHICLES);
+
+        for i in 0..num {
+            out.vehicles_telemetry[i] = LmuVehicleTelemetry::from(scratch.telemetry.vehicles[i]);
+            out.vehicles_scoring[i] = LmuVehicleScoring::from(scratch.scoring.vehicles[i]);
+        }
+        out.num_vehicles = num;
+        out.scoring_info = LmuScoringInfo::from(scratch.scoring.scoring_info);
+        out.extended = LmuExtended::from(*scratch.extended);
+
+        Ok(())
     }
 
     /// All player telemetry variables as a flat `HashMap<String, TelemetryValue>`.
@@ -235,6 +296,7 @@ impl LmuConnection {
             telemetry,
             scoring,
             extended,
+            scratch: std::cell::RefCell::new(None),
         })
     }
 }

@@ -13,6 +13,21 @@ pub enum SimType {
 
 /// A connected simulator. Match on the variant to access its API.
 ///
+/// # Threading
+///
+/// `Connection` (and every per-sim connection inside it) is **not [`Send`]** —
+/// this is a deliberate API contract: the connections hold raw shared-memory
+/// pointers, Win32 handles, and `RefCell` caches. Create the connection on the
+/// thread that will use it. The standard pattern for GUI apps is a dedicated
+/// `std::thread` that owns the connection and forwards data via channels/events:
+///
+/// ```ignore
+/// std::thread::spawn(move || {
+///     let conn = kerb::SimConnection::connect().unwrap(); // created IN the thread
+///     // … read loop, send normalized frames out …
+/// });
+/// ```
+///
 /// # Example
 ///
 /// ```ignore

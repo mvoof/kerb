@@ -718,6 +718,25 @@ impl Default for LmuFrame {
 }
 
 impl LmuFrame {
+    /// Allocate a zero-initialized `LmuFrame` directly on the heap.
+    ///
+    /// `LmuFrame` is ~500 KB — `Box::new(LmuFrame::default())` would construct
+    /// it on the stack first and risk a stack overflow. Use this with
+    /// [`frame_into`](crate::lmu::connection::LmuConnection::frame_into) to
+    /// reuse one buffer across reads.
+    pub fn new_boxed() -> Box<Self> {
+        // SAFETY: LmuFrame only contains numeric types, SimString<N> ([u8;N]),
+        // and arrays thereof — all valid when zeroed.
+        unsafe {
+            let layout = std::alloc::Layout::new::<Self>();
+            let ptr = std::alloc::alloc_zeroed(layout) as *mut Self;
+            if ptr.is_null() {
+                std::alloc::handle_alloc_error(layout);
+            }
+            Box::from_raw(ptr)
+        }
+    }
+
     /// Slice of valid vehicle telemetry entries (length = `num_vehicles`).
     pub fn vehicles_telemetry(&self) -> &[LmuVehicleTelemetry] {
         &self.vehicles_telemetry[..self.num_vehicles]

@@ -21,6 +21,11 @@ pub struct AcEvoFrame {
 }
 
 /// Live connection to Assetto Corsa Evo.
+///
+/// # Threading
+///
+/// Not [`Send`]: holds raw shared-memory pointers. Create and use the
+/// connection on a single thread (e.g. a dedicated telemetry thread).
 pub struct AcEvoConnection {
     physics: SharedMemRegion,
     graphics: SharedMemRegion,
