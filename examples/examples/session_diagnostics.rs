@@ -84,12 +84,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if let Ok(frame) = conn.frame() {
-        println!("car_idx_lap_dist_pct  len = {}", frame.car_idx_lap_dist_pct.len());
-        println!("car_idx_position      len = {}", frame.car_idx_position.len());
-        println!("car_idx_class_position len = {}", frame.car_idx_class_position.len());
-        println!("car_idx_on_pit_road   len = {}", frame.car_idx_on_pit_road.len());
-        println!("car_idx_est_time      len = {}", frame.car_idx_est_time.len());
-        println!("car_idx_session_flags len = {}", frame.car_idx_session_flags.len());
+        println!(
+            "car_idx_lap_dist_pct  len = {}",
+            frame.car_idx_lap_dist_pct.len()
+        );
+        println!(
+            "car_idx_position      len = {}",
+            frame.car_idx_position.len()
+        );
+        println!(
+            "car_idx_class_position len = {}",
+            frame.car_idx_class_position.len()
+        );
+        println!(
+            "car_idx_on_pit_road   len = {}",
+            frame.car_idx_on_pit_road.len()
+        );
+        println!(
+            "car_idx_est_time      len = {}",
+            frame.car_idx_est_time.len()
+        );
+        println!(
+            "car_idx_session_flags len = {}",
+            frame.car_idx_session_flags.len()
+        );
         println!(
             "engine_warnings = {}  session_flags = {}  car_left_right = {}",
             frame.engine_warnings, frame.session_flags, frame.car_left_right
