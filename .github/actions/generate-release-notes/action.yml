@@ -1,0 +1,39 @@
+name: 'Generate Release Notes'
+description: 'Extracts release notes for the current version from CHANGELOG.md'
+inputs:
+  tag_name:
+    description: 'Tag name (e.g. v0.1.1). If empty, uses GITHUB_REF.'
+    required: false
+outputs:
+  release_body:
+    description: 'The extracted release notes'
+    value: ${{ steps.generate.outputs.body }}
+runs:
+  using: "composite"
+  steps:
+    - name: Generate Notes
+      id: generate
+      shell: bash
+      env:
+        INPUT_TAG: ${{ inputs.tag_name }}
+      run: |
+        if [ -n "$INPUT_TAG" ]; then
+          CURRENT_TAG="$INPUT_TAG"
+        else
+          CURRENT_TAG="${GITHUB_REF#refs/tags/}"
+        fi
+
+        VERSION="${CURRENT_TAG#v}"
+        echo "Extracting CHANGELOG.md section for version: $VERSION"
+
+        NOTES=$(awk -v ver="## [$VERSION]" 'index($0, ver) == 1 {found=1; next} found && /^## \[/ {exit} found {print}' CHANGELOG.md)
+
+        if [ -z "$NOTES" ]; then
+          echo "::warning::No section found in CHANGELOG.md for version $VERSION"
+          NOTES="_No changelog entry found for this version._"
+        fi
+
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "body<<$EOF" >> $GITHUB_OUTPUT
+        echo "$NOTES" >> $GITHUB_OUTPUT
+        echo "$EOF" >> $GITHUB_OUTPUT
