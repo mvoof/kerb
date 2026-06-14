@@ -29,7 +29,7 @@ runs:
         NOTES=$(awk -v ver="## [$VERSION]" 'index($0, ver) == 1 {found=1; next} found && /^## \[/ {exit} found {print}' CHANGELOG.md)
 
         if [ -z "$NOTES" ]; then
-          echo "WARNING: No section found in CHANGELOG.md for version $VERSION"
+          echo "::warning::No section found in CHANGELOG.md for version $VERSION"
           NOTES="_No changelog entry found for this version._"
         fi
 
