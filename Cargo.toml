@@ -1,6 +1,6 @@
 [package]
 name = "kerb"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "Real-time telemetry from racing simulators — iRacing, AC Evo, Le Mans Ultimate"
 repository = "https://github.com/mvoof/kerb"
