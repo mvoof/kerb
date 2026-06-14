@@ -1,5 +1,11 @@
 # kerb
 
+<div align="center">
+
+[![Crates.io](https://img.shields.io/crates/v/kerb.svg)](https://crates.io/crates/kerb) [![Crates.io Downloads](https://img.shields.io/crates/d/kerb.svg)](https://crates.io/crates/kerb) [![docs.rs](https://docs.rs/kerb/badge.svg)](https://docs.rs/kerb) [![Platform: Windows](https://img.shields.io/badge/platform-Windows-blue?logo=windows)](https://crates.io/crates/kerb) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+</div>
+
 Rust crate for reading real-time telemetry from racing simulators via Windows Shared Memory.
 Add a single dependency, enable feature flags for the simulators you want, and call `SimConnection::connect()`.
 

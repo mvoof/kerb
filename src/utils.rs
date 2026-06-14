@@ -20,9 +20,15 @@ pub fn decode_cp1252(bytes: &[u8]) -> String {
 /// connection directly — `&IRsdkConnection`, `&LmuConnection`, `&AcEvoConnection`, or `&Connection`.
 #[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 pub trait HasSnapshot {
+    /// Capture all current telemetry variables as a `name → value` map.
+    ///
+    /// Variable names are sim-native (e.g. `"Speed"` for iRacing, `"speedKmh"` for AC Evo).
     fn telemetry_snapshot(&self)
     -> std::collections::HashMap<String, crate::types::TelemetryValue>;
 
+    /// Return metadata for every telemetry variable the sim currently exposes.
+    ///
+    /// Includes name, type, unit, description, and array count for each variable.
     fn var_list_snapshot(&self) -> Vec<crate::types::VarMeta>;
 }
 
