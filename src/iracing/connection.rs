@@ -4,6 +4,7 @@ use std::time::Duration;
 use windows_sys::Win32::Foundation::{CloseHandle, FALSE, HANDLE, WAIT_OBJECT_0};
 use windows_sys::Win32::System::Threading::{OpenEventW, WaitForSingleObject};
 
+use crate::connection::ReadResult;
 use crate::iracing::structs::{IRSDK_MAX_BUFS, VarType, irsdk_header, irsdk_varHeader};
 use crate::types::TelemetryValue;
 
@@ -122,7 +123,7 @@ impl IRsdkConnection {
     }
 
     /// Returns `true` when the iRacing sim is actively broadcasting telemetry (status bit 0).
-    pub fn is_connected(&self) -> bool {
+    pub(crate) fn is_connected(&self) -> bool {
         unsafe {
             let offset = std::mem::offset_of!(irsdk_header, status);
             let status = std::ptr::read_unaligned(self.shm.as_ptr().add(offset) as *const i32);
@@ -136,7 +137,7 @@ impl IRsdkConnection {
     /// Falls back to a 16 ms sleep when the event handle is unavailable, then checks
     /// `is_connected()` — callers receive `false` as soon as the sim closes even without
     /// a Win32 event to wake them.
-    pub fn wait_for_data(&self, timeout_ms: u32) -> bool {
+    pub(crate) fn wait_for_data(&self, timeout_ms: u32) -> bool {
         unsafe {
             if self.h_event.is_null() {
                 sleep(Duration::from_millis(16));
@@ -400,7 +401,9 @@ impl IRsdkConnection {
     }
 
     /// Capture a full telemetry frame. Reads all variables from shared memory in one pass.
-    pub fn frame(&self) -> Result<crate::iracing::types::IracingFrame, crate::error::SimError> {
+    pub(crate) fn frame(
+        &self,
+    ) -> Result<crate::iracing::types::IracingFrame, crate::error::SimError> {
         let data_ptr = self
             .get_latest_data_ptr()
             .ok_or_else(|| crate::error::SimError::InvalidHeader("No valid data buffer".into()))?;
@@ -408,6 +411,35 @@ impl IRsdkConnection {
             data_ptr,
             &self.offsets,
         ))
+    }
+
+    /// Read the next telemetry frame, blocking up to `timeout_ms`.
+    ///
+    /// iRacing is **event-driven**: the call blocks on a Win32 data-ready
+    /// event and returns as soon as new data arrives (often <1 ms at 60 Hz).
+    /// Pass `0` for a non-blocking read.
+    ///
+    /// - [`ReadResult::Frame`] — new data arrived and was read successfully.
+    /// - [`ReadResult::NotReady`] — `timeout_ms` expired without new data
+    ///   (sim may be paused or loading).
+    /// - [`ReadResult::Disconnected`] — iRacing stopped broadcasting.
+    pub fn read_frame(&self, timeout_ms: u32) -> ReadResult<crate::iracing::types::IracingFrame> {
+        if !self.wait_for_data(timeout_ms) {
+            if !self.is_connected() {
+                return ReadResult::Disconnected;
+            }
+
+            return ReadResult::NotReady;
+        }
+
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        match self.frame() {
+            Ok(frame) => ReadResult::Frame(frame),
+            Err(_) => ReadResult::NotReady,
+        }
     }
 
     /// Parse the current session-info YAML into an `IracingSession`.

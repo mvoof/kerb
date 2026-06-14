@@ -36,27 +36,29 @@ kerb = { version = "0.1", default-features = false, features = ["iracing"] }
 Call `SimConnection::connect()` — it auto-detects whichever sim is running and returns it wrapped in a `Connection` enum. Match on the variant to access each sim's full API:
 
 ```rust
-use kerb::{Connection, SimConnection, SimError};
+use kerb::{Connection, ReadResult, SimConnection, SimError};
 
 fn main() -> Result<(), SimError> {
     let conn = SimConnection::connect()?;
 
     match conn {
         Connection::IRacing(c) => {
-            c.wait_for_data(16);
-            let frame = c.frame();
-            println!("rpm={:.0}  gear={}", frame.rpm, frame.gear);
+            if let ReadResult::Frame(frame) = c.read_frame(16) {
+                println!("rpm={:.0}  gear={}", frame.rpm, frame.gear);
+            }
         }
         Connection::AcEvo(c) => {
-            let frame = c.frame()?;
-            println!("rpm={}  gear={}", frame.physics.rpms, frame.physics.gear);
+            if let ReadResult::Frame(frame) = c.read_frame(0) {
+                println!("rpm={}  gear={}", frame.physics.rpms, frame.physics.gear);
+            }
         }
         Connection::Lmu(c) => {
-            let frame = c.frame()?;
-            if let Some(player) = frame.player_telemetry() {
-                let rpm = player.engine_rpm;
-                let gear = player.gear;
-                println!("rpm={:.0}  gear={}", rpm, gear);
+            if let ReadResult::Frame(frame) = c.read_frame(0) {
+                if let Some(player) = frame.player_telemetry() {
+                    let rpm = player.engine_rpm;
+                    let gear = player.gear;
+                    println!("rpm={:.0}  gear={}", rpm, gear);
+                }
             }
         }
         _ => {}
@@ -88,7 +90,7 @@ std::thread::spawn(move || {
 For overlays that need to reconnect automatically:
 
 ```rust
-use kerb::{Connection, SimConnection};
+use kerb::{Connection, ReadResult, SimConnection};
 use std::io::{self, Write};
 
 fn main() {
@@ -103,14 +105,20 @@ fn main() {
                     println!("Track: {}", track);
                 }
 
-                while conn.is_connected() {
-                    conn.wait_for_data(100);
-                    let f = conn.frame();
-                    print!("\r[{}] {:.0} rpm  {:.1} km/h",
-                        f.gear, f.rpm, f.speed * 3.6);
-                    let _ = io::stdout().flush();
+                loop {
+                    match conn.read_frame(100) {
+                        ReadResult::Frame(f) => {
+                            print!("\r[{}] {:.0} rpm  {:.1} km/h",
+                                f.gear, f.rpm, f.speed * 3.6);
+                            let _ = io::stdout().flush();
+                        }
+                        ReadResult::NotReady => continue,
+                        ReadResult::Disconnected => {
+                            println!("\nDisconnected.");
+                            break;
+                        }
+                    }
                 }
-                println!("\nDisconnected.");
             }
             Ok(_) => {
                 // different sim connected
@@ -150,25 +158,22 @@ All features are enabled by default. Use `default-features = false` to opt in se
 
 **Connection:** `IRsdkConnection` (via `Connection::IRacing`)
 
-| Method                 | Returns                           | Scope         | Notes                                                       |
-| ---------------------- | --------------------------------- | ------------- | ----------------------------------------------------------- |
-| `frame()`              | `IracingFrame`                    | player's car  | ~90 typed fields; IDE autocomplete works                    |
-| `session_info()`       | `Option<IracingSession>`          | whole session | Parsed YAML; cached until iRacing reports a change          |
-| `session_yaml()`       | `Option<String>`                  | whole session | Raw YAML string for manual parsing                          |
-| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car  | Dynamic access by iRacing variable name                     |
-| `var_list_snapshot()`  | `Vec<VarMeta>`                    | —             | All variable names, types, units, and descriptions          |
-| `wait_for_data(ms)`    | `bool`                            | —             | Blocks until new data or timeout; uses Win32 event (0% CPU) |
-| `is_connected()`       | `bool`                            | —             | `true` when iRacing is broadcasting telemetry               |
+| Method                 | Returns                           | Scope         | Notes                                                                   |
+| ---------------------- | --------------------------------- | ------------- | ----------------------------------------------------------------------- |
+| `read_frame(ms)`       | `ReadResult<IracingFrame>`        | player's car  | Blocks up to timeout for data; returns Frame, NotReady, or Disconnected |
+| `session_info()`       | `Option<IracingSession>`          | whole session | Parsed YAML; cached until iRacing reports a change                      |
+| `session_yaml()`       | `Option<String>`                  | whole session | Raw YAML string for manual parsing                                      |
+| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car  | Dynamic access by iRacing variable name                                 |
+| `var_list_snapshot()`  | `Vec<VarMeta>`                    | —             | All variable names, types, units, and descriptions                      |
 
 `IracingFrame` is a typed struct with one pub field per variable — your IDE autocomplete shows all ~90 available fields directly. Fields use snake_case (`SteeringWheelAngle` → `steering_wheel_angle`).
 
 ```rust
 Connection::IRacing(conn) => {
-    conn.wait_for_data(16);
-    let f = conn.frame();
-
-    println!("rpm={:.0}  speed={:.1} km/h  gear={}  throttle={:.0}%",
-        f.rpm, f.speed * 3.6, f.gear, f.throttle * 100.0);
+    if let ReadResult::Frame(f) = conn.read_frame(16) {
+        println!("rpm={:.0}  speed={:.1} km/h  gear={}  throttle={:.0}%",
+            f.rpm, f.speed * 3.6, f.gear, f.throttle * 100.0);
+    }
 
     if let Some(session) = conn.session_info() {
         let driver = session.get_value("DriverInfo.Drivers.0.UserName");
@@ -187,13 +192,11 @@ kerb::save_session(&conn, "session.yaml")?;
 
 **Connection:** `AcEvoConnection` (via `Connection::AcEvo`)
 
-| Method                 | Returns                           | Scope        | Notes                                                           |
-| ---------------------- | --------------------------------- | ------------ | --------------------------------------------------------------- |
-| `frame()`              | `Result<AcEvoFrame>`              | player's car | Plain struct with `physics`, `graphics`, `static_data`          |
-| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car | Keys are field names from the physics/graphics/static structs   |
-| `var_list_snapshot()`  | `Vec<VarMeta>`                    | —            | All available field names                                       |
-| `is_connected()`       | `bool`                            | —            | `true` when status == `AC_STATUS_LIVE` (not paused, not replay) |
-| `wait_for_data(ms)`    | —                                 | —            | Sleep up to 16 ms; AC Evo has no data-ready event               |
+| Method                 | Returns                           | Scope        | Notes                                                         |
+| ---------------------- | --------------------------------- | ------------ | ------------------------------------------------------------- |
+| `read_frame(ms)`       | `ReadResult<AcEvoFrame>`          | player's car | Sleep timeout then read; returns Frame or Disconnected        |
+| `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car | Keys are field names from the physics/graphics/static structs |
+| `var_list_snapshot()`  | `Vec<VarMeta>`                    | —            | All available field names                                     |
 
 **`AcEvoFrame` contents by page:**
 
@@ -205,27 +208,27 @@ kerb::save_session(&conn, "session.yaml")?;
 
 ```rust
 Connection::AcEvo(conn) => {
-    let frame = conn.frame()?;
+    if let ReadResult::Frame(frame) = conn.read_frame(0) {
+        let rpms = frame.physics.rpms;
+        let gear = frame.physics.gear;
+        let speed = frame.physics.speed_kmh;
+        println!("{rpms:.0} rpm  gear {gear}  {speed:.1} km/h");
 
-    let rpms = frame.physics.rpms;
-    let gear = frame.physics.gear;
-    let speed = frame.physics.speed_kmh;
-    println!("{rpms:.0} rpm  gear {gear}  {speed:.1} km/h");
+        // Electronics settings
+        let abs = frame.graphics.electronics.abs_level;
+        let tc  = frame.graphics.electronics.tc_level;
+        let bb  = frame.physics.brake_bias;
+        println!("ABS={abs}  TC={tc}  BB={bb:.3}");
 
-    // Electronics settings
-    let abs = frame.graphics.electronics.abs_level;
-    let tc  = frame.graphics.electronics.tc_level;
-    let bb  = frame.physics.brake_bias;
-    println!("ABS={abs}  TC={tc}  BB={bb:.3}");
+        // Session info
+        let track = &frame.static_data.track;
+        let lap   = frame.graphics.session_state.current_lap;
+        println!("track={track}  lap={lap}");
 
-    // Session info
-    let track = &frame.static_data.track;
-    let lap   = frame.graphics.session_state.current_lap;
-    println!("track={track}  lap={lap}");
-
-    // Brake pad life
-    let pad_fl = frame.physics.pad_life[0];
-    println!("pad FL: {pad_fl:.0}%");
+        // Brake pad life
+        let pad_fl = frame.physics.pad_life[0];
+        println!("pad FL: {pad_fl:.0}%");
+    }
 }
 ```
 
@@ -241,38 +244,36 @@ kerb::save_telemetry_snapshot(&conn, "ac_snapshot.txt")?;
 
 | Method                       | Returns                           | Scope           | Notes                                                                         |
 | ---------------------------- | --------------------------------- | --------------- | ----------------------------------------------------------------------------- |
-| `frame()`                    | `Box<LmuFrame>`                   | all cars        | ~500 KB struct; boxed to avoid stack overflow; allocates per call             |
-| `frame_into(&mut LmuFrame)`  | `Result<(), SimError>`            | all cars        | Allocation-free read into a reused buffer (`LmuFrame::new_boxed()`)           |
+| `read_frame(ms)`             | `ReadResult<Box<LmuFrame>>`       | all cars        | Sleep timeout then read; returns Frame or Disconnected                        |
+| `read_frame_into(out, ms)`   | `ReadResult<()>`                  | all cars        | Allocation-free variant using a reused buffer                                 |
 | `frame.player_telemetry()`   | `Option<&LmuVehicleTelemetry>`    | **player only** | Cross-references scoring + telemetry by vehicle ID; returns None if not found |
 | `frame.player_scoring_idx()` | `Option<usize>`                   | **player only** | Index into `frame.vehicles_scoring` for the player's entry                    |
 | `telemetry_snapshot()`       | `HashMap<String, TelemetryValue>` | **player only** | Field names from `LmuVehicleTelemetry`                                        |
 | `var_list_snapshot()`        | `Vec<VarMeta>`                    | —               | All field names from `LmuVehicleTelemetry`                                    |
-| `is_connected()`             | `bool`                            | —               | `true` when plugin is loaded and session has started                          |
-| `wait_for_data(ms)`          | —                                 | —               | Sleep up to 16 ms; LMU has no data-ready event                                |
 
 ```rust
 Connection::Lmu(conn) => {
-    let frame = conn.frame()?;
+    if let ReadResult::Frame(frame) = conn.read_frame(0) {
+        if let Some(player) = frame.player_telemetry() {
+            let rpm = player.engine_rpm;
+            let gear = player.gear;
+            println!("{:.0} rpm  gear {}", rpm, gear);
+        }
 
-    if let Some(player) = frame.player_telemetry() {
-        let rpm = player.engine_rpm;
-        let gear = player.gear;
-        println!("{:.0} rpm  gear {}", rpm, gear);
+        if let Some(idx) = frame.player_scoring_idx() {
+            let place = frame.vehicles_scoring[idx].place;
+            let last_lap = frame.vehicles_scoring[idx].last_lap_time;
+            println!("P{}  last lap {:.3}s", place, last_lap);
+        }
+
+        for v in frame.vehicles_scoring() {
+            println!("  place {}", v.place);
+        }
+
+        let track = &frame.scoring_info.track_name;
+        let temp = frame.scoring_info.track_temp;
+        println!("track: {}  temp: {:.1}°C", track, temp);
     }
-
-    if let Some(idx) = frame.player_scoring_idx() {
-        let place = frame.vehicles_scoring[idx].place;
-        let last_lap = frame.vehicles_scoring[idx].last_lap_time;
-        println!("P{}  last lap {:.3}s", place, last_lap);
-    }
-
-    for v in frame.vehicles_scoring() {
-        println!("  place {}", v.place);
-    }
-
-    let track = &frame.scoring_info.track_name;
-    let temp = frame.scoring_info.track_temp;
-    println!("track: {}  temp: {:.1}°C", track, temp);
 }
 ```
 
@@ -280,10 +281,13 @@ For hot paths (e.g. 60 Hz overlay polling) reuse one buffer instead of allocatin
 
 ```rust
 let mut frame = kerb::lmu::types::LmuFrame::new_boxed();
-while conn.is_connected() {
-    conn.wait_for_data(16);
-    if conn.frame_into(&mut frame).is_ok() {
-        // read frame.player_telemetry(), frame.vehicles_scoring(), …
+loop {
+    match conn.read_frame_into(&mut frame, 16) {
+        ReadResult::Frame(()) => {
+            // read frame.player_telemetry(), frame.vehicles_scoring(), …
+        }
+        ReadResult::NotReady => continue,
+        ReadResult::Disconnected => break,
     }
 }
 ```

@@ -1,7 +1,8 @@
 //! Le Mans Ultimate telemetry example.
 
-use kerb::{Connection, SimConnection, SimError};
+use kerb::{Connection, ReadResult, SimConnection, SimError};
 use std::io::{self, Write};
+use std::time::Duration;
 
 fn main() -> Result<(), SimError> {
     println!("Waiting for Le Mans Ultimate...");
@@ -11,23 +12,26 @@ fn main() -> Result<(), SimError> {
             Ok(Connection::Lmu(conn)) => {
                 println!("Connected to LMU");
 
-                while conn.is_connected() {
-                    conn.wait_for_data(16);
+                loop {
+                    match conn.read_frame(16) {
+                        ReadResult::Frame(frame) => {
+                            if let Some(player) = frame.player_telemetry() {
+                                let rpm = player.engine_rpm;
+                                let gear = player.gear;
+                                print!("\r{:.0} rpm  gear {}", rpm, gear);
+                                let _ = io::stdout().flush();
+                            }
+                        }
 
-                    let frame = match conn.frame() {
-                        Ok(f) => f,
-                        Err(_) => continue,
-                    };
+                        ReadResult::NotReady => continue,
 
-                    if let Some(player) = frame.player_telemetry() {
-                        let rpm = player.engine_rpm;
-                        let gear = player.gear;
-                        print!("\r{:.0} rpm  gear {}", rpm, gear);
-                        let _ = io::stdout().flush();
+                        ReadResult::Disconnected => {
+                            println!("\nDisconnected.");
+
+                            break;
+                        }
                     }
                 }
-
-                println!("\nDisconnected.");
             }
 
             Ok(_) => {
@@ -38,7 +42,7 @@ fn main() -> Result<(), SimError> {
             Err(e) => {
                 print!("\r{e}");
                 let _ = io::stdout().flush();
-                std::thread::sleep(std::time::Duration::from_secs(2));
+                std::thread::sleep(Duration::from_secs(2));
             }
         }
     }
