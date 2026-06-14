@@ -456,15 +456,13 @@ mod tests {
     use std::mem;
 
     fn make_header(status: i32) -> Vec<u8> {
-        let mut buf = vec![0u8; mem::size_of::<irsdk_header>()];
-        let hdr = buf.as_mut_ptr() as *mut irsdk_header;
-        unsafe {
-            (*hdr).ver = 2;
-            (*hdr).status = status;
-            (*hdr).num_vars = 0;
-            (*hdr).var_header_offset = mem::size_of::<irsdk_header>() as i32;
-        }
-        buf
+        let mut hdr = unsafe { mem::zeroed::<irsdk_header>() };
+        hdr.ver = 2;
+        hdr.status = status;
+        hdr.num_vars = 0;
+        hdr.var_header_offset = mem::size_of::<irsdk_header>() as i32;
+        let ptr = &hdr as *const irsdk_header as *const u8;
+        unsafe { std::slice::from_raw_parts(ptr, mem::size_of::<irsdk_header>()) }.to_vec()
     }
 
     /// When status bit 0 is set (sim active), `wait_for_data` with no event handle
