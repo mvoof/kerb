@@ -131,13 +131,17 @@ impl IRsdkConnection {
     }
 
     /// Block until the sim signals new data, or until `timeout_ms` elapses.
-    /// Falls back to a 16 ms sleep if the event handle is unavailable.
+    ///
+    /// Returns `true` when data is (likely) available, `false` on timeout or disconnect.
+    /// Falls back to a 16 ms sleep when the event handle is unavailable, then checks
+    /// `is_connected()` — callers receive `false` as soon as the sim closes even without
+    /// a Win32 event to wake them.
     pub fn wait_for_data(&self, timeout_ms: u32) -> bool {
         unsafe {
             if self.h_event.is_null() {
                 sleep(Duration::from_millis(16));
 
-                true
+                self.is_connected()
             } else {
                 let wait_result = WaitForSingleObject(self.h_event, timeout_ms);
 
@@ -441,5 +445,57 @@ impl Drop for IRsdkConnection {
                 CloseHandle(self.h_event);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::iracing::structs::irsdk_header;
+    use std::collections::HashMap;
+    use std::mem;
+
+    fn make_header(status: i32) -> Vec<u8> {
+        let mut buf = vec![0u8; mem::size_of::<irsdk_header>()];
+        let hdr = buf.as_mut_ptr() as *mut irsdk_header;
+        unsafe {
+            (*hdr).ver = 2;
+            (*hdr).status = status;
+            (*hdr).num_vars = 0;
+            (*hdr).var_header_offset = mem::size_of::<irsdk_header>() as i32;
+        }
+        buf
+    }
+
+    /// When status bit 0 is set (sim active), `wait_for_data` with no event handle
+    /// must sleep ~16 ms and return `true`.
+    #[test]
+    fn wait_for_data_no_event_connected_returns_true() {
+        let mut buf = make_header(1);
+        let conn = unsafe { IRsdkConnection::new_mock(buf.as_mut_ptr() as _, HashMap::new()) };
+        assert!(conn.wait_for_data(100));
+    }
+
+    /// When status bit 0 is clear (sim closed), `wait_for_data` with no event handle
+    /// must return `false` — not `true` as the old code did unconditionally.
+    #[test]
+    fn wait_for_data_no_event_disconnected_returns_false() {
+        let mut buf = make_header(0);
+        let conn = unsafe { IRsdkConnection::new_mock(buf.as_mut_ptr() as _, HashMap::new()) };
+        assert!(!conn.wait_for_data(100));
+    }
+
+    /// `is_connected` reflects the status bit independently of the event handle.
+    #[test]
+    fn is_connected_reads_status_bit() {
+        let mut buf_on = make_header(1);
+        let conn_on =
+            unsafe { IRsdkConnection::new_mock(buf_on.as_mut_ptr() as _, HashMap::new()) };
+        assert!(conn_on.is_connected());
+
+        let mut buf_off = make_header(0);
+        let conn_off =
+            unsafe { IRsdkConnection::new_mock(buf_off.as_mut_ptr() as _, HashMap::new()) };
+        assert!(!conn_off.is_connected());
     }
 }

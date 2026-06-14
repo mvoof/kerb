@@ -19,9 +19,7 @@ fn main() -> Result<(), SimError> {
                     println!("Track: {}", track);
                 }
 
-                while conn.is_connected() {
-                    conn.wait_for_data(100);
-
+                while conn.wait_for_data(100) {
                     let frame = conn.frame()?;
 
                     let gear = match frame.gear {

@@ -16,7 +16,7 @@ fn telemetry_value_display_bitfield() {
 fn var_meta_fields() {
     let m = VarMeta {
         name: "RPM".into(),
-        type_name: "f32".into(),
+        type_name: "f32",
         unit: "rev/min".into(),
         desc: "Engine RPM".into(),
         count: 1,
