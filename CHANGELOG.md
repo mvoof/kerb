@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.2] - 2026-06-14
+
+### Fixed
+- **iRacing: `wait_for_data` now correctly signals disconnect when `h_event` is null.**
+  When `OpenEventW` failed (insufficient privileges or the event not yet created), `wait_for_data` fell back to `sleep(16ms)` and unconditionally returned `true` — callers could never detect a disconnect through this path. It now returns `is_connected()` after the sleep, so callers see `false` as soon as iRacing closes, matching the behaviour of the `WaitForSingleObject` path.
+- Fixed alignment UB in the `make_header` test helper.
+
+### Tests
+- Added three unit tests via `new_mock`: connected status → `true`, disconnected status → `false`, `is_connected` bit reading.
+
 ## [0.1.1] - 2026-06-14
 
 ### Added
