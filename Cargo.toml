@@ -1,12 +1,18 @@
 [package]
 name = "kerb"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
-description = "Real-time telemetry from racing simulators — iRacing, Assetto Corsa, AC Evo, Le Mans Ultimate"
+description = "Real-time telemetry from racing simulators — iRacing, AC Evo, Le Mans Ultimate"
 repository = "https://github.com/mvoof/kerb"
 license = "MIT"
-keywords = ["iracing", "telemetry", "sim-racing", "assetto-corsa"]
+keywords = ["iracing", "telemetry", "sim-racing", "assetto-corsa-evo", "lmu"]
+homepage = "https://github.com/mvoof/kerb"
+
 categories = ["game-development"]
+
+[package.metadata.docs.rs]
+targets = ["x86_64-pc-windows-msvc"]
+all-features = true
 
 [features]
 default = ["iracing", "ac-evo", "lmu"]

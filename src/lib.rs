@@ -66,6 +66,7 @@ pub mod ac_evo;
 pub mod lmu;
 
 #[doc(hidden)]
+#[allow(missing_docs)]
 pub mod shm;
 
 pub use connection::{Connection, SimConnection, SimType};
