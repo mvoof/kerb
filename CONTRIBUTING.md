@@ -14,6 +14,7 @@ Before creating an issue please ensure that the problem is not [already reported
    ```sh
    git clone https://github.com/your-username/kerb.git
    cd kerb
+   git remote add upstream https://github.com/mvoof/kerb.git
    ```
 
 2. **Create a New Branch**
@@ -78,8 +79,8 @@ Before creating an issue please ensure that the problem is not [already reported
    Before pushing, make sure your branch is rebased on top of the latest `main` to avoid merge conflicts and keep the history clean:
 
    ```sh
-   git fetch origin
-   git rebase origin/main
+   git fetch upstream
+   git rebase upstream/main
    ```
 
    If conflicts arise, resolve them, then continue:
