@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0] - 2026-06-15
+
+### Added
+- `ReadResult<F>` — unified return type for all simulators with three variants: `Frame(f)`, `NotReady`, `Disconnected`. Re-exported from the crate root.
+- `read_frame(timeout_ms)` on `IRsdkConnection`, `AcEvoConnection`, and `LmuConnection` — combines wait, connectivity check, and frame read into one call.
+- `read_frame_into(out, timeout_ms)` on `LmuConnection` — allocation-free variant using a caller-owned buffer.
+
+### Changed
+- `frame()`, `frame_into()`, `is_connected()`, and `wait_for_data()` narrowed to `pub(crate)` on all connectors. Use `read_frame()` instead.
+- `wait_for_data(0)` on iRacing no longer sleeps 16 ms when the event handle is null — a non-blocking poll now returns immediately.
+- `read_frame()` on AC Evo and LMU checks `is_connected()` before sleeping, avoiding an unnecessary delay when the sim is already gone.
+
+### Breaking
+- `frame()`, `frame_into()`, `is_connected()`, `wait_for_data()` are no longer public.
+
 ## [0.1.2] - 2026-06-14
 
 ### Fixed
