@@ -3,25 +3,27 @@
 //! # Quick start
 //!
 //! ```no_run
-//! use kerb::{Connection, SimConnection};
+//! use kerb::{Connection, ReadResult, SimConnection};
 //!
 //! let conn = SimConnection::connect().expect("no sim running");
 //! match conn {
 //!     #[cfg(feature = "iracing")]
 //!     Connection::IRacing(c) => {
-//!         c.wait_for_data(16);
-//!         let frame = c.frame().expect("failed to read frame");
-//!         println!("rpm={} gear={}", frame.rpm, frame.gear);
+//!         if let ReadResult::Frame(frame) = c.read_frame(16) {
+//!             println!("rpm={} gear={}", frame.rpm, frame.gear);
+//!         }
 //!     }
 //!     #[cfg(feature = "ac-evo")]
 //!     Connection::AcEvo(c) => {
-//!         let frame = c.frame().expect("failed to read frame");
-//!         println!("rpm={} gear={}", frame.physics.rpms, frame.physics.gear);
+//!         if let ReadResult::Frame(frame) = c.read_frame(0) {
+//!             println!("rpm={} gear={}", frame.physics.rpms, frame.physics.gear);
+//!         }
 //!     }
 //!     #[cfg(feature = "lmu")]
 //!     Connection::Lmu(c) => {
-//!         let frame = c.frame().expect("failed to read frame");
-//!         let _ = frame;
+//!         if let ReadResult::Frame(frame) = c.read_frame(0) {
+//!             let _ = frame;
+//!         }
 //!     }
 //!     _ => {}
 //! }
@@ -69,7 +71,7 @@ pub mod lmu;
 #[allow(missing_docs)]
 pub mod shm;
 
-pub use connection::{Connection, SimConnection, SimType};
+pub use connection::{Connection, ReadResult, SimConnection, SimType};
 pub use error::SimError;
 pub use sim_string::{SimString, SimStringU16};
 pub use types::{TelemetryValue, VarMeta};

@@ -2,6 +2,7 @@ use crate::ac_evo::structs::{
     AC_STATUS_LIVE, SPageFileGraphicsEvo, SPageFilePhysicsEvo, SPageFileStaticEvo,
 };
 use crate::ac_evo::types::{AcGraphicsData, AcPhysicsData, AcStaticData};
+use crate::connection::ReadResult;
 use crate::error::SimError;
 use crate::shm::SharedMemRegion;
 
@@ -48,7 +49,7 @@ impl AcEvoConnection {
     }
 
     /// Read a point-in-time snapshot from AC Evo shared memory.
-    pub fn frame(&self) -> Result<AcEvoFrame, SimError> {
+    pub(crate) fn frame(&self) -> Result<AcEvoFrame, SimError> {
         unsafe {
             let raw_p =
                 std::ptr::read_unaligned(self.physics.as_ptr() as *const SPageFilePhysicsEvo);
@@ -61,6 +62,35 @@ impl AcEvoConnection {
                 graphics: AcGraphicsData::from(raw_g),
                 static_data: AcStaticData::from(raw_s),
             })
+        }
+    }
+
+    /// Read the next telemetry frame after sleeping `timeout_ms`.
+    ///
+    /// AC Evo is **poll-based**: shared memory is always readable, so this
+    /// method sleeps for `timeout_ms` to rate-limit, then reads. Pass `0`
+    /// to read immediately without sleeping (useful when you have your own
+    /// frame timing).
+    ///
+    /// - [`ReadResult::Frame`] — always returned when connected.
+    /// - [`ReadResult::NotReady`] — never returned for AC Evo.
+    /// - [`ReadResult::Disconnected`] — AC Evo is no longer in a live session.
+    pub fn read_frame(&self, timeout_ms: u32) -> ReadResult<AcEvoFrame> {
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        if timeout_ms > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
+        }
+
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        match self.frame() {
+            Ok(frame) => ReadResult::Frame(frame),
+            Err(_) => ReadResult::Disconnected,
         }
     }
 
@@ -83,18 +113,11 @@ impl AcEvoConnection {
     }
 
     /// Returns `true` when AC Evo is in a live driving session.
-    pub fn is_connected(&self) -> bool {
+    pub(crate) fn is_connected(&self) -> bool {
         unsafe {
             let offset = std::mem::offset_of!(SPageFileGraphicsEvo, status);
             let status = std::ptr::read_unaligned(self.graphics.as_ptr().add(offset) as *const i32);
             status == AC_STATUS_LIVE
         }
-    }
-
-    /// Sleep for up to `timeout_ms` milliseconds.
-    ///
-    /// AC Evo does not expose a data-ready event; use this in your polling loop.
-    pub fn wait_for_data(&self, timeout_ms: u32) {
-        std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
     }
 }

@@ -1,3 +1,4 @@
+use crate::connection::ReadResult;
 use crate::error::SimError;
 use crate::lmu::structs::{rF2Extended, rF2Scoring, rF2Telemetry};
 use crate::lmu::types::{
@@ -148,7 +149,7 @@ impl LmuConnection {
     ///
     /// Allocates a fresh `LmuFrame` (~500 KB) per call. On hot paths (60 Hz
     /// polling) prefer [`frame_into`](Self::frame_into) with a reused buffer.
-    pub fn frame(&self) -> Result<Box<LmuFrame>, crate::error::SimError> {
+    pub(crate) fn frame(&self) -> Result<Box<LmuFrame>, crate::error::SimError> {
         let mut frame = LmuFrame::new_boxed();
         self.frame_into(&mut frame)?;
         Ok(frame)
@@ -177,7 +178,7 @@ impl LmuConnection {
     /// [`vehicles_telemetry()`](LmuFrame::vehicles_telemetry) /
     /// [`vehicles_scoring()`](LmuFrame::vehicles_scoring) slice accessors.
     /// On error `out` is left in an unspecified (but initialized) state.
-    pub fn frame_into(&self, out: &mut LmuFrame) -> Result<(), crate::error::SimError> {
+    pub(crate) fn frame_into(&self, out: &mut LmuFrame) -> Result<(), crate::error::SimError> {
         use crate::lmu::structs::{RF2_MAX_VEHICLES, rF2ScoringHeader, rF2TelemetryHeader};
 
         let mut scratch_slot = self.scratch.borrow_mut();
@@ -219,6 +220,72 @@ impl LmuConnection {
         out.extended = LmuExtended::from(*scratch.extended);
 
         Ok(())
+    }
+
+    /// Read the next telemetry frame after sleeping `timeout_ms`.
+    ///
+    /// LMU is **poll-based**: shared memory is always readable, so this
+    /// method sleeps for `timeout_ms` to rate-limit, then reads. Pass `0`
+    /// to read immediately without sleeping.
+    ///
+    /// Allocates ~500 KB per call. For hot paths (60 Hz polling) use
+    /// [`read_frame_into`](Self::read_frame_into) with a reused buffer.
+    ///
+    /// - [`ReadResult::Frame`] — always returned when connected.
+    /// - [`ReadResult::NotReady`] — never returned for LMU.
+    /// - [`ReadResult::Disconnected`] — LMU plugin is not active or
+    ///   session hasn't started.
+    pub fn read_frame(&self, timeout_ms: u32) -> ReadResult<Box<LmuFrame>> {
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        if timeout_ms > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
+        }
+
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        match self.frame() {
+            Ok(frame) => ReadResult::Frame(frame),
+            Err(_) => ReadResult::Disconnected,
+        }
+    }
+
+    /// Allocation-free variant of [`read_frame`](Self::read_frame).
+    ///
+    /// Reads into a caller-owned `LmuFrame` buffer. Allocate once with
+    /// [`LmuFrame::new_boxed()`] and reuse across calls:
+    ///
+    /// ```ignore
+    /// let mut frame = kerb::lmu::types::LmuFrame::new_boxed();
+    /// loop {
+    ///     match conn.read_frame_into(&mut frame, 16) {
+    ///         ReadResult::Frame(()) => { /* read frame.player_telemetry() */ }
+    ///         ReadResult::NotReady  => continue,
+    ///         ReadResult::Disconnected => break,
+    ///     }
+    /// }
+    /// ```
+    pub fn read_frame_into(&self, out: &mut LmuFrame, timeout_ms: u32) -> ReadResult<()> {
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        if timeout_ms > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
+        }
+
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
+        match self.frame_into(out) {
+            Ok(()) => ReadResult::Frame(()),
+            Err(_) => ReadResult::Disconnected,
+        }
     }
 
     /// All player telemetry variables as a flat `HashMap<String, TelemetryValue>`.
@@ -265,15 +332,8 @@ impl LmuConnection {
     /// Returns `true` when the plugin is active **and** a session has started.
     ///
     /// Equivalent to `is_plugin_active() && is_session_started()`.
-    pub fn is_connected(&self) -> bool {
+    pub(crate) fn is_connected(&self) -> bool {
         self.is_plugin_active() && self.is_session_started()
-    }
-
-    /// Sleep for up to `timeout_ms` milliseconds.
-    ///
-    /// LMU does not expose a data-ready event; this is a simple sleep.
-    pub fn wait_for_data(&self, timeout_ms: u32) {
-        std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
     }
 }
 

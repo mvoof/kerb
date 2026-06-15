@@ -11,6 +11,34 @@ pub enum SimType {
     Lmu,
 }
 
+/// Result of a single [`read_frame`] call.
+///
+/// Unifies the wait-for-data / is-connected / read-frame sequence into one
+/// return value, so callers can drive any simulator with a single `match`:
+///
+/// ```ignore
+/// loop {
+///     match conn.read_frame(16) {
+///         ReadResult::Frame(f) => { /* process */ }
+///         ReadResult::NotReady  => continue,
+///         ReadResult::Disconnected => break,
+///     }
+/// }
+/// ```
+#[derive(Debug)]
+pub enum ReadResult<F> {
+    /// A telemetry frame was read successfully.
+    Frame(F),
+    /// No new data arrived within `timeout_ms`.
+    ///
+    /// Returned only by **event-driven** sims (iRacing). Poll-based sims
+    /// (AC Evo, LMU) always have data available in shared memory and will
+    /// return [`Frame`](ReadResult::Frame) whenever the sim is connected.
+    NotReady,
+    /// The simulator has disconnected (session ended or game closed).
+    Disconnected,
+}
+
 /// A connected simulator. Match on the variant to access its API.
 ///
 /// # Threading
@@ -31,25 +59,28 @@ pub enum SimType {
 /// # Example
 ///
 /// ```ignore
-/// use kerb::{SimConnection, Connection, ac_evo::connection::AcEvoFrame};
+/// use kerb::{SimConnection, Connection, ReadResult};
 ///
 /// let conn = SimConnection::connect().expect("no sim running");
 /// match conn {
 ///     Connection::IRacing(c) => {
-///         c.wait_for_data(16);
-///         let frame = c.frame();
-///         println!("rpm={}", frame.rpm);
+///         if let ReadResult::Frame(frame) = c.read_frame(16) {
+///             println!("rpm={}", frame.rpm);
+///         }
 ///     }
 ///     Connection::AcEvo(c) => {
-///         let frame = c.frame().unwrap();
-///         println!("{:.0} rpm  gear {}", frame.physics.rpms, frame.physics.gear);
-///         println!("abs={} tc={}", frame.graphics.electronics.abs_level, frame.graphics.electronics.tc_level);
+///         if let ReadResult::Frame(frame) = c.read_frame(0) {
+///             println!("{:.0} rpm  gear {}", frame.physics.rpms, frame.physics.gear);
+///             println!("abs={} tc={}", frame.graphics.electronics.abs_level, frame.graphics.electronics.tc_level);
+///         }
 ///     }
 ///     Connection::Lmu(c) => {
-///         let frame = c.frame();
-///         let player = frame.player_telemetry();
-///         let rpm = player.engine_rpm;
-///         println!("rpm={}", rpm);
+///         if let ReadResult::Frame(frame) = c.read_frame(0) {
+///             if let Some(player) = frame.player_telemetry() {
+///                 let rpm = player.engine_rpm;
+///                 println!("rpm={}", rpm);
+///             }
+///         }
 ///     }
 /// }
 /// ```

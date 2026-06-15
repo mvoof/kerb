@@ -1,7 +1,8 @@
 //! Assetto Corsa Evo telemetry example.
 
-use kerb::{Connection, SimConnection, SimError};
+use kerb::{Connection, ReadResult, SimConnection, SimError};
 use std::io::{self, Write};
+use std::time::Duration;
 
 fn main() -> Result<(), SimError> {
     println!("Waiting for Assetto Corsa Evo...");
@@ -11,24 +12,30 @@ fn main() -> Result<(), SimError> {
             Ok(Connection::AcEvo(conn)) => {
                 println!("Connected to AC Evo");
 
-                while conn.is_connected() {
-                    conn.wait_for_data(16);
+                loop {
+                    match conn.read_frame(16) {
+                        ReadResult::Frame(frame) => {
+                            let rpms = frame.physics.rpms;
+                            let gear = frame.physics.gear;
+                            let speed = frame.physics.speed_kmh;
+                            let pad_fl = frame.physics.pad_life[0];
+                            print!(
+                                "\r{:.0} rpm  gear {}  {:.1} km/h  pad_fl={:.0}%",
+                                rpms, gear, speed, pad_fl
+                            );
 
-                    let frame = conn.frame()?;
+                            let _ = io::stdout().flush();
+                        }
 
-                    let rpms = frame.physics.rpms;
-                    let gear = frame.physics.gear;
-                    let speed = frame.physics.speed_kmh;
-                    let pad_fl = frame.physics.pad_life[0];
-                    print!(
-                        "\r{:.0} rpm  gear {}  {:.1} km/h  pad_fl={:.0}%",
-                        rpms, gear, speed, pad_fl
-                    );
+                        ReadResult::NotReady => continue,
 
-                    let _ = io::stdout().flush();
+                        ReadResult::Disconnected => {
+                            println!("\nDisconnected.");
+
+                            break;
+                        }
+                    }
                 }
-
-                println!("\nDisconnected.");
             }
 
             Ok(_) => {
@@ -39,7 +46,7 @@ fn main() -> Result<(), SimError> {
             Err(e) => {
                 print!("\r{e}");
                 let _ = io::stdout().flush();
-                std::thread::sleep(std::time::Duration::from_secs(2));
+                std::thread::sleep(Duration::from_secs(2));
             }
         }
     }

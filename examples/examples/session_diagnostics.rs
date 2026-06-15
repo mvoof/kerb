@@ -6,7 +6,7 @@
 //!
 //! Run with iRacing open: `cargo run --example session_diagnostics`
 
-use kerb::{Connection, SimConnection};
+use kerb::{Connection, ReadResult, SimConnection};
 
 const SCALAR_PATHS: &[&str] = &[
     "WeekendInfo.TrackDisplayName",
@@ -83,7 +83,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    if let Ok(frame) = conn.frame() {
+    if let ReadResult::Frame(frame) = conn.read_frame(0) {
         println!(
             "car_idx_lap_dist_pct  len = {}",
             frame.car_idx_lap_dist_pct.len()

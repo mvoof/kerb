@@ -1,7 +1,8 @@
 //! iRacing telemetry example — connect via SimConnection and read typed fields.
 
-use kerb::{Connection, SimConnection, SimError};
+use kerb::{Connection, ReadResult, SimConnection, SimError};
 use std::io::{self, Write};
+use std::time::Duration;
 
 fn main() -> Result<(), SimError> {
     println!("Waiting for iRacing...");
@@ -19,28 +20,36 @@ fn main() -> Result<(), SimError> {
                     println!("Track: {}", track);
                 }
 
-                while conn.wait_for_data(100) {
-                    let frame = conn.frame()?;
+                loop {
+                    match conn.read_frame(100) {
+                        ReadResult::Frame(frame) => {
+                            let gear = match frame.gear {
+                                -1 => "R".to_string(),
+                                0 => "N".to_string(),
+                                g => g.to_string(),
+                            };
 
-                    let gear = match frame.gear {
-                        -1 => "R".to_string(),
-                        0 => "N".to_string(),
-                        g => g.to_string(),
-                    };
+                            print!(
+                                "\r[{}] {:.0} rpm  {:.1} km/h  Gas {:.0}%  Brake {:.0}%",
+                                gear,
+                                frame.rpm,
+                                frame.speed * 3.6,
+                                frame.throttle * 100.0,
+                                frame.brake * 100.0,
+                            );
 
-                    print!(
-                        "\r[{}] {:.0} rpm  {:.1} km/h  Gas {:.0}%  Brake {:.0}%",
-                        gear,
-                        frame.rpm,
-                        frame.speed * 3.6,
-                        frame.throttle * 100.0,
-                        frame.brake * 100.0,
-                    );
+                            let _ = io::stdout().flush();
+                        }
 
-                    let _ = io::stdout().flush();
+                        ReadResult::NotReady => continue,
+
+                        ReadResult::Disconnected => {
+                            println!("\nDisconnected.");
+
+                            break;
+                        }
+                    }
                 }
-
-                println!("\nDisconnected.");
             }
 
             Ok(_) => {
@@ -54,7 +63,7 @@ fn main() -> Result<(), SimError> {
 
                 let _ = io::stdout().flush();
 
-                std::thread::sleep(std::time::Duration::from_secs(2));
+                std::thread::sleep(Duration::from_secs(2));
             }
         }
     }
