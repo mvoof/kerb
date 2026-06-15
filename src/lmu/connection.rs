@@ -236,6 +236,10 @@ impl LmuConnection {
     /// - [`ReadResult::Disconnected`] — LMU plugin is not active or
     ///   session hasn't started.
     pub fn read_frame(&self, timeout_ms: u32) -> ReadResult<Box<LmuFrame>> {
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
         if timeout_ms > 0 {
             std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
         }
@@ -266,6 +270,10 @@ impl LmuConnection {
     /// }
     /// ```
     pub fn read_frame_into(&self, out: &mut LmuFrame, timeout_ms: u32) -> ReadResult<()> {
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
         if timeout_ms > 0 {
             std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
         }

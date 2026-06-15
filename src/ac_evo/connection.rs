@@ -76,6 +76,10 @@ impl AcEvoConnection {
     /// - [`ReadResult::NotReady`] — never returned for AC Evo.
     /// - [`ReadResult::Disconnected`] — AC Evo is no longer in a live session.
     pub fn read_frame(&self, timeout_ms: u32) -> ReadResult<AcEvoFrame> {
+        if !self.is_connected() {
+            return ReadResult::Disconnected;
+        }
+
         if timeout_ms > 0 {
             std::thread::sleep(std::time::Duration::from_millis(timeout_ms as u64));
         }
