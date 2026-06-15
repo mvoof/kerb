@@ -140,7 +140,9 @@ impl IRsdkConnection {
     pub(crate) fn wait_for_data(&self, timeout_ms: u32) -> bool {
         unsafe {
             if self.h_event.is_null() {
-                sleep(Duration::from_millis(16));
+                if timeout_ms > 0 {
+                    sleep(Duration::from_millis(16));
+                }
 
                 self.is_connected()
             } else {
