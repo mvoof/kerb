@@ -129,8 +129,8 @@ fn bench_iracing(c: &mut Criterion) {
 
     let conn = unsafe { IRsdkConnection::new_mock(buf.as_mut_ptr() as *mut _, vars) };
 
-    group.bench_function("frame() — typed IracingFrame", |b| {
-        b.iter(|| black_box(black_box(&conn).frame()))
+    group.bench_function("read_frame() — typed IracingFrame", |b| {
+        b.iter(|| black_box(black_box(&conn).read_frame(0)))
     });
 
     group.bench_function("read_variable(\"RPM\") — dynamic lookup", |b| {
@@ -224,8 +224,8 @@ fn bench_iracing(c: &mut Criterion) {
     let array_conn =
         unsafe { IRsdkConnection::new_mock(array_buf.as_mut_ptr() as *mut _, array_vars) };
 
-    group.bench_function("frame() — 4xf32[64] + 2xi32[64] + 1xbool[64]", |b| {
-        b.iter(|| black_box(black_box(&array_conn).frame()))
+    group.bench_function("read_frame() — 4xf32[64] + 2xi32[64] + 1xbool[64]", |b| {
+        b.iter(|| black_box(black_box(&array_conn).read_frame(0)))
     });
 
     group.finish();
