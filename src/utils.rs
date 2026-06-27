@@ -27,12 +27,12 @@ fn system_acp_encoding() -> &'static encoding_rs::Encoding {
             1256 => encoding_rs::WINDOWS_1256,
             1257 => encoding_rs::WINDOWS_1257,
             1258 => encoding_rs::WINDOWS_1258,
-            874  => encoding_rs::WINDOWS_874,
-            932  => encoding_rs::SHIFT_JIS,
-            936  => encoding_rs::GBK,
-            949  => encoding_rs::EUC_KR,
-            950  => encoding_rs::BIG5,
-            _    => encoding_rs::WINDOWS_1252,
+            874 => encoding_rs::WINDOWS_874,
+            932 => encoding_rs::SHIFT_JIS,
+            936 => encoding_rs::GBK,
+            949 => encoding_rs::EUC_KR,
+            950 => encoding_rs::BIG5,
+            _ => encoding_rs::WINDOWS_1252,
         }
     }
     #[cfg(not(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu"))))]
