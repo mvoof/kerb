@@ -1,14 +1,7 @@
 #[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 use crate::error::SimError;
 
-/// Decode a byte slice from the Windows system ANSI code page into a Rust `String`.
-///
-/// iRacing stores shared-memory strings using the system ACP (Active Code Page).
-/// On Western-locale Windows this is CP-1252; on Russian Windows it is CP-1251, etc.
-/// We query `GetACP()` at runtime to pick the right decoder so that Cyrillic (and
-/// other non-Latin) names are not corrupted into `?` characters.
-///
-/// Falls back to CP-1252 on non-Windows or when the ACP is not recognized by encoding_rs.
+/// Decode a byte slice using the Windows system ACP (e.g. CP-1251 on Russian Windows, CP-1252 on Western).
 pub fn decode_cp1252(bytes: &[u8]) -> String {
     if bytes.iter().all(|&b| b < 0x80) {
         // SAFETY: all bytes are valid ASCII, which is a subset of UTF-8
@@ -19,13 +12,10 @@ pub fn decode_cp1252(bytes: &[u8]) -> String {
     decoded.into_owned()
 }
 
-/// Return the encoding_rs `Encoding` that corresponds to the Windows system ACP.
-///
-/// Queries `GetACP()` on Windows; returns CP-1252 on other platforms.
 fn system_acp_encoding() -> &'static encoding_rs::Encoding {
     #[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
     {
-        // SAFETY: GetACP() is always safe to call, takes no parameters, and never fails.
+        // SAFETY: GetACP() is always safe to call and never fails.
         let acp = unsafe { windows_sys::Win32::Globalization::GetACP() };
         match acp {
             1251 => encoding_rs::WINDOWS_1251,

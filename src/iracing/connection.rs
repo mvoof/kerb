@@ -344,10 +344,7 @@ impl IRsdkConnection {
             let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
             let data = &bytes[..len];
 
-            // iRacing signals UTF-8 session strings via the `irsdkUTF8SessionStr` telemetry
-            // variable. When that variable is present and non-zero, the session YAML is
-            // UTF-8 encoded (supports non-Latin driver/track names). Older builds or builds
-            // where the flag is absent fall back to the system ACP (CP-1252 on Western Windows).
+            // `irsdkUTF8SessionStr` non-zero means the session YAML is UTF-8; otherwise use system ACP.
             let is_utf8 = self
                 .read_variable("irsdkUTF8SessionStr")
                 .map(|v| matches!(v, TelemetryValue::Bool(true) | TelemetryValue::Int(1..)))
