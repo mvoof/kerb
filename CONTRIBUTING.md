@@ -7,7 +7,34 @@ Before creating an issue please ensure that the problem is not [already reported
 
 ## How to Contribute
 
-1. **Fork and Clone the Repository**
+1. **Install Git Hooks (Lefthook)**
+
+   This project uses [Lefthook](https://github.com/evilmartians/lefthook) to enforce formatting, linting, and tests automatically on commit and push.
+
+   Install Lefthook once (globally):
+
+   ```sh
+   # macOS / Linux
+   brew install lefthook
+
+   # Windows
+   winget install Evilmartians.Lefthook
+   ```
+
+   Then activate the hooks in your local clone (run once after cloning):
+
+   ```sh
+   lefthook install
+   ```
+
+   After this, every `git commit` will automatically run `cargo fmt` and `cargo clippy`, and every `git push` will run `cargo test`. To verify the hooks are working:
+
+   ```sh
+   lefthook run pre-commit
+   lefthook run pre-push
+   ```
+
+2. **Fork and Clone the Repository**
 
    First, create your own copy of the repository by clicking the "Fork" button on GitHub. Then, clone your fork to your local machine:
 
