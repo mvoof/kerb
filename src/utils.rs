@@ -15,7 +15,7 @@ pub fn decode_cp1252(bytes: &[u8]) -> String {
 fn system_acp_encoding() -> &'static encoding_rs::Encoding {
     static ENCODING: std::sync::OnceLock<&'static encoding_rs::Encoding> =
         std::sync::OnceLock::new();
-    *ENCODING.get_or_init(|| {
+    ENCODING.get_or_init(|| {
         #[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
         {
             // SAFETY: GetACP() is always safe to call and never fails.
