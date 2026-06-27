@@ -23,7 +23,7 @@ All simulators are enabled by default. Add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-kerb = "0.1"
+kerb = "0.2.1"
 ```
 
 To include only specific simulators, disable defaults:
