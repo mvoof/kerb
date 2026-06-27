@@ -23,14 +23,14 @@ All simulators are enabled by default. Add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-kerb = "0.1"
+kerb = "0.2.1"
 ```
 
 To include only specific simulators, disable defaults:
 
 ```toml
 [dependencies]
-kerb = { version = "0.1", default-features = false, features = ["iracing"] }
+kerb = { version = "0.2.1", default-features = false, features = ["iracing"] }
 ```
 
 Call `SimConnection::connect()` — it auto-detects whichever sim is running and returns it wrapped in a `Connection` enum. Match on the variant to access each sim's full API:

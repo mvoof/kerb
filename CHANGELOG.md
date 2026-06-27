@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1] - 2026-06-27
+
+### Fixed
+- **iRacing: non-Latin driver names no longer appear as `???` in session YAML.** Driver name strings from shared memory are now decoded using `decode_cp1252` instead of lossy UTF-8 conversion.
+
 ## [0.2.0] - 2026-06-15
 
 ### Added
