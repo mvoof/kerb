@@ -342,8 +342,19 @@ impl IRsdkConnection {
             let bytes = std::slice::from_raw_parts(info_ptr, header.session_info_len as usize);
 
             let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
+            let data = &bytes[..len];
 
-            Some(crate::decode_cp1252(&bytes[..len]))
+            // `irsdkUTF8SessionStr` non-zero means the session YAML is UTF-8; otherwise use system ACP.
+            let is_utf8 = self
+                .read_variable("irsdkUTF8SessionStr")
+                .map(|v| matches!(v, TelemetryValue::Bool(true) | TelemetryValue::Int(1..)))
+                .unwrap_or(false);
+
+            if is_utf8 {
+                Some(String::from_utf8_lossy(data).into_owned())
+            } else {
+                Some(crate::decode_cp1252(data))
+            }
         }
     }
 
