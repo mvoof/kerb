@@ -34,7 +34,7 @@ Before creating an issue please ensure that the problem is not [already reported
    lefthook run pre-push
    ```
 
-2. **Fork and Clone the Repository**
+1. **Fork and Clone the Repository**
 
    First, create your own copy of the repository by clicking the "Fork" button on GitHub. Then, clone your fork to your local machine:
 
@@ -44,16 +44,16 @@ Before creating an issue please ensure that the problem is not [already reported
    git remote add upstream https://github.com/mvoof/kerb.git
    ```
 
-2. **Create a New Branch**
+1. **Create a New Branch**
 
    ```sh
    git checkout -b feature/short-description
    ```
 
-3. **Make Changes**
+1. **Make Changes**
    Implement your feature or fix the bug. Be sure to follow the project's coding style, add tests, and add/adjust benchmarks if necessary.
 
-4. **Verify and Format Your Code (Crucial!)**
+1. **Verify and Format Your Code (Crucial!)**
 
    Before committing, ensure your code is clean, formatted, and fully functional. Please run the following checks locally:
    - **Formatting**: Make sure the code style conforms to standards. Run the Rust formatter:
@@ -73,7 +73,7 @@ Before creating an issue please ensure that the problem is not [already reported
      cargo bench --all-features
      ```
 
-5. **Commit Changes**
+1. **Commit Changes**
 
    Once everything is verified and passes cleanly, commit your changes. We follow the **[Conventional Commits](https://www.conventionalcommits.org/)** specification for commit messages. This helps in keeping the repository history clean, understandable, and ready for automated changelog generation.
 
@@ -101,7 +101,7 @@ Before creating an issue please ensure that the problem is not [already reported
    git commit -m "feat(iracing): implement async connection check"
    ```
 
-6. **Keep Your Branch Up to Date**
+1. **Keep Your Branch Up to Date**
 
    Before pushing, make sure your branch is rebased on top of the latest `main` to avoid merge conflicts and keep the history clean:
 
@@ -116,7 +116,7 @@ Before creating an issue please ensure that the problem is not [already reported
    git rebase --continue
    ```
 
-7. **Push Changes**
+1. **Push Changes**
 
    ```sh
    git push -u origin feature/short-description
