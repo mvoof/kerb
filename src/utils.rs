@@ -1,17 +1,54 @@
 #[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 use crate::error::SimError;
 
-/// Decode a byte slice from Windows-1252 (CP-1252) into a Rust `String`.
+/// Decode a byte slice from the Windows system ANSI code page into a Rust `String`.
 ///
-/// iRacing stores all shared-memory strings in CP-1252. Use this wherever
-/// raw bytes from iRacing shared memory are converted to `String`.
+/// iRacing stores shared-memory strings using the system ACP (Active Code Page).
+/// On Western-locale Windows this is CP-1252; on Russian Windows it is CP-1251, etc.
+/// We query `GetACP()` at runtime to pick the right decoder so that Cyrillic (and
+/// other non-Latin) names are not corrupted into `?` characters.
+///
+/// Falls back to CP-1252 on non-Windows or when the ACP is not recognized by encoding_rs.
 pub fn decode_cp1252(bytes: &[u8]) -> String {
     if bytes.iter().all(|&b| b < 0x80) {
         // SAFETY: all bytes are valid ASCII, which is a subset of UTF-8
         return unsafe { String::from_utf8_unchecked(bytes.to_vec()) };
     }
-    let (decoded, _, _) = encoding_rs::WINDOWS_1252.decode(bytes);
+    let encoding = system_acp_encoding();
+    let (decoded, _, _) = encoding.decode(bytes);
     decoded.into_owned()
+}
+
+/// Return the encoding_rs `Encoding` that corresponds to the Windows system ACP.
+///
+/// Queries `GetACP()` on Windows; returns CP-1252 on other platforms.
+fn system_acp_encoding() -> &'static encoding_rs::Encoding {
+    #[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
+    {
+        // SAFETY: GetACP() is always safe to call, takes no parameters, and never fails.
+        let acp = unsafe { windows_sys::Win32::Globalization::GetACP() };
+        match acp {
+            1251 => encoding_rs::WINDOWS_1251,
+            1252 => encoding_rs::WINDOWS_1252,
+            1250 => encoding_rs::WINDOWS_1250,
+            1253 => encoding_rs::WINDOWS_1253,
+            1254 => encoding_rs::WINDOWS_1254,
+            1255 => encoding_rs::WINDOWS_1255,
+            1256 => encoding_rs::WINDOWS_1256,
+            1257 => encoding_rs::WINDOWS_1257,
+            1258 => encoding_rs::WINDOWS_1258,
+            874  => encoding_rs::WINDOWS_874,
+            932  => encoding_rs::SHIFT_JIS,
+            936  => encoding_rs::GBK,
+            949  => encoding_rs::EUC_KR,
+            950  => encoding_rs::BIG5,
+            _    => encoding_rs::WINDOWS_1252,
+        }
+    }
+    #[cfg(not(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu"))))]
+    {
+        encoding_rs::WINDOWS_1252
+    }
 }
 
 /// Implemented by every connection type that can produce a telemetry snapshot.

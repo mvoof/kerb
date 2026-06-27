@@ -26,6 +26,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_yaml = { version = "0.9", optional = true }
 windows-sys = { version = "0.61.2", features = [
     "Win32_Foundation",
+    "Win32_Globalization",
     "Win32_System_Memory",
     "Win32_System_Threading",
 ], optional = true }
