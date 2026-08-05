@@ -26,7 +26,7 @@
 //! replay_search(ReplaySearch::PrevIncident);
 //! ```
 
-use std::sync::OnceLock;
+use std::sync::atomic::{AtomicU32, Ordering};
 
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     HWND_BROADCAST, RegisterWindowMessageW, SendNotifyMessageW,
@@ -254,16 +254,30 @@ impl CameraState {
     }
 }
 
-static MESSAGE_ID: OnceLock<u32> = OnceLock::new();
+/// Caches the registered id. Zero doubles as "not resolved yet", which is sound
+/// because Windows never hands out atom 0.
+static MESSAGE_ID: AtomicU32 = AtomicU32::new(0);
 
-/// The registered id of `IRSDK_BROADCASTMSG`, resolved once per process.
+/// The registered id of `IRSDK_BROADCASTMSG`, resolved on first use and cached
+/// for the rest of the process.
 ///
 /// `None` means Windows refused to register the message, which is the only way
-/// sending can fail up front. A non-zero id does **not** mean iRacing is running.
+/// sending can fail up front. A failure is not cached — the next call tries
+/// again. A non-zero id does **not** mean iRacing is running.
 pub fn broadcast_msg_id() -> Option<u32> {
+    let cached = MESSAGE_ID.load(Ordering::Relaxed);
+    if cached != 0 {
+        return Some(cached);
+    }
+
     // SAFETY: RegisterWindowMessageW only reads the NUL-terminated string.
-    let id =
-        *MESSAGE_ID.get_or_init(|| unsafe { RegisterWindowMessageW(BROADCAST_MSG_NAME.as_ptr()) });
+    let id = unsafe { RegisterWindowMessageW(BROADCAST_MSG_NAME.as_ptr()) };
+
+    // Racing threads all register the same name, and the call is idempotent, so
+    // they can only ever store the same atom.
+    if id != 0 {
+        MESSAGE_ID.store(id, Ordering::Relaxed);
+    }
 
     (id != 0).then_some(id)
 }
@@ -512,7 +526,8 @@ mod tests {
     }
 
     #[test]
-    fn wparam_packs_the_command_into_the_high_word() {
+    fn wparam_packs_msg_low_and_subcommand_high() {
+        // 9 is BroadcastMsg::PitCommand, 2 is PitCommand::Fuel.
         assert_eq!(make_wparam(9, 2), 0x0002_0009);
         assert_eq!(make_wparam(9, 12), 0x000C_0009);
     }
