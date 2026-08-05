@@ -368,6 +368,40 @@ cargo run -p kerb-examples --example facade_ac_evo
 cargo run -p kerb-examples --example facade_lmu
 ```
 
+## Remote Control (iRacing)
+
+`kerb` reads telemetry; the one exception is `iracing::broadcast`, which sends
+commands *into* the sim over the SDK's `IRSDK_BROADCASTMSG` window message. It
+needs no connection and no handle — calls are fire-and-forget and do nothing
+when iRacing is not running.
+
+```rust
+use kerb::iracing::{PitCommand, ReplaySearch, send_pit_command, replay_search};
+
+// Pit service — only accepted while the driver is in the car.
+send_pit_command(PitCommand::Fuel, 26);   // add 26 liters
+send_pit_command(PitCommand::Lf, 159);    // change LF at 159 kPa
+
+// Cameras and replay — only accepted while out of the car.
+replay_search(ReplaySearch::PrevIncident);
+```
+
+| Area      | Entry points                                                                                                      |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| Pit       | `send_pit_command` + `PitCommand`                                                                                   |
+| Chat      | `send_chat_macro` (slots 1–15), `send_chat_command`                                                                 |
+| Cameras   | `camera_switch_position`, `camera_switch_number`, `camera_set_state`, `pad_car_num`                                 |
+| Replay    | `replay_set_play_speed`, `replay_set_position`, `replay_search`, `replay_search_session_time`, `replay_set_state`   |
+| Recording | `send_telemetry_command`, `send_video_capture`                                                                      |
+| Other     | `send_ffb_command`, `reload_textures`                                                                               |
+
+For anything not wrapped yet, `send_broadcast`, `send_broadcast3` and
+`send_broadcast_float` take a raw `BroadcastMsg`.
+
+Every call returns `bool`: `true` means the message was posted, **not** that the
+sim acted on it. `SendNotifyMessage` never reports back, so the only way to
+confirm a pit order is to read `PitSvFlags` from telemetry afterwards.
+
 ## Simulator SDK References
 
 | Simulator         | Documentation                                                                                                                                                                                                                                                                         |
@@ -378,4 +412,6 @@ cargo run -p kerb-examples --example facade_lmu
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE).
+
+Interface provenance and iRacing attribution: [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES.md).
