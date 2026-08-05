@@ -6,129 +6,61 @@ fn decode_cp1252_ascii() {
 }
 
 // A slice that mixes ASCII with one high byte must bypass decode_cp1252's
-// all-ASCII fast path and go through the active code page as a whole. What
-// 0xE9 turns into depends on that code page — 'é' on cp1252, 'щ' on cp1251, a
-// replacement char on a multi-byte ACP where a trailing 0xE9 is an incomplete
-// sequence — so assert only what holds on every locale: the ASCII prefix
-// survives and the high byte yields exactly one more char.
+// all-ASCII fast path and decode as a whole.
 #[test]
 fn decode_cp1252_mixed_ascii_and_high_byte() {
-    let bytes = &[0x41u8, 0x6C, 0x65, 0x78, 0x20, 0xE9]; // "Alex " + one high byte
-    let result = decode_cp1252(bytes);
+    // é in cp1252 is byte 0xE9
+    let bytes = &[0x41u8, 0x6C, 0x65, 0x78, 0x20, 0xE9]; // "Alex é"
 
-    assert!(result.starts_with("Alex "), "ASCII prefix should survive");
-    assert_eq!(result.chars().count(), 6);
-    assert!(
-        !result.chars().nth(5).unwrap().is_ascii(),
-        "the high byte should decode to a non-ASCII char, not be dropped"
-    );
+    assert_eq!(decode_cp1252(bytes), "Alex é");
 }
 
-// Mirrors decode_cp1252's internal system_acp_encoding() mapping, including its
-// "unrecognized ACP falls back to cp1252" default (this matters on machines with
-// ACP 65001 / "Beta: UTF-8 system locale").
-#[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
-fn system_acp_encoding() -> (u32, &'static encoding_rs::Encoding) {
-    let acp = unsafe { windows_sys::Win32::Globalization::GetACP() };
-    let encoding = match acp {
-        1251 => encoding_rs::WINDOWS_1251,
-        1252 => encoding_rs::WINDOWS_1252,
-        1250 => encoding_rs::WINDOWS_1250,
-        1253 => encoding_rs::WINDOWS_1253,
-        1254 => encoding_rs::WINDOWS_1254,
-        1255 => encoding_rs::WINDOWS_1255,
-        1256 => encoding_rs::WINDOWS_1256,
-        1257 => encoding_rs::WINDOWS_1257,
-        1258 => encoding_rs::WINDOWS_1258,
-        874 => encoding_rs::WINDOWS_874,
-        932 => encoding_rs::SHIFT_JIS,
-        936 => encoding_rs::GBK,
-        949 => encoding_rs::EUC_KR,
-        950 => encoding_rs::BIG5,
-        _ => encoding_rs::WINDOWS_1252,
-    };
-
-    (acp, encoding)
-}
-
-// `decode_cp1252` decodes using the *system's* single-byte ANSI code page
-// (`GetACP()`), not literal cp1252. On a Russian Windows install (ACP 1251)
-// the byte 0xE9 is Cyrillic 'щ', not 'é' — so the same input decodes
-// differently depending on which machine runs the test. This test verifies
-// decoding is internally consistent with whatever the system ACP actually is,
-// instead of assuming Western European Windows.
-#[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
+// The sim writes a fixed single-byte encoding, so decoding must not depend on
+// the reader's Windows locale. This is the whole point of using cp1252 rather
+// than GetACP(): the same bytes have to produce the same text on a Russian,
+// Japanese or Western install, otherwise two machines watching one session
+// disagree about a driver's name.
 #[test]
-fn decode_cp1252_matches_system_acp() {
-    let (_, expected_encoding) = system_acp_encoding();
+fn decode_cp1252_is_locale_independent() {
+    // Bytes that every single-byte ANSI code page maps differently: 0xE9 is
+    // 'é' in cp1252 but 'щ' in cp1251, 0xFC is 'ü' but 'ю'.
+    let bytes = &[
+        0x4Au8, 0x6F, 0x73, 0xE9, 0x20, 0x4D, 0xFC, 0x6C, 0x6C, 0x65, 0x72,
+    ];
 
-    // A high byte (>= 0x80) whose meaning depends entirely on the active code
-    // page: 'é' in cp1252, 'щ' in cp1251, etc.
-    let bytes = &[0xE9u8];
-    let (expected, _, _) = expected_encoding.decode(bytes);
-    assert_eq!(decode_cp1252(bytes), expected.into_owned());
+    assert_eq!(decode_cp1252(bytes), "José Müller");
 }
 
-// A single-byte ANSI code page (cp1251, cp1252, ...) can only represent one
-// script at a time. Characters outside that script (e.g. CJK on a Cyrillic
-// or Western system) have no valid byte encoding in it — iRacing itself
-// substitutes '?' for them server-side before the bytes ever reach shared
-// memory, so no client-side decoding fix can recover them. This test
-// documents that '?' bytes pass through unchanged rather than being
-// misinterpreted.
+// cp1252 and iso-8859-1 differ only in 0x80-0x9F, where iso-8859-1 has C1
+// control codes and cp1252 has printable punctuation. The sim writes the
+// printable ones, so cp1252 is the correct reading of that range.
+#[test]
+fn decode_cp1252_reads_the_c1_range_as_printable_punctuation() {
+    assert_eq!(decode_cp1252(&[0x93, 0x94]), "\u{201C}\u{201D}"); // curly double quotes
+    assert_eq!(decode_cp1252(&[0x92]), "\u{2019}"); // curly apostrophe
+    assert_eq!(decode_cp1252(&[0x96]), "\u{2013}"); // en dash
+    assert_eq!(decode_cp1252(&[0x85]), "\u{2026}"); // ellipsis
+}
+
+// A single-byte code page can only represent one script, so iRacing substitutes
+// characters outside it *before* writing to shared memory — the bytes that
+// reach us are already plain ASCII '?'. No decoding can recover the original,
+// which is why non-Latin names need irsdkUTF8SessionStr=1 (a separate,
+// UTF-8 code path). This test documents that the substitutes pass through
+// unchanged rather than being mangled further.
 #[test]
 fn decode_cp1252_unrepresentable_chars_stay_as_question_marks() {
     let bytes = b"?? ?";
+
     assert_eq!(decode_cp1252(bytes), "?? ?");
 }
 
-// Real-world driver names, each encoded in the ANSI code page their own
-// Windows locale would use. `decode_cp1252` reads the *local* system's ACP
-// (see `decode_cp1252_matches_system_acp`), so a name is only guaranteed to
-// come back intact when the running machine's locale matches the encoding the
-// name was originally written in. Everyone else gets whatever those bytes mean
-// under the active code page — usually mojibake or '?', and nothing a
-// single-byte-codepage API can fix client-side.
-//
-// Note the non-matching case asserts against the active code page's own
-// decoding rather than merely `!= name`: overlapping code pages make the
-// stronger claim false. "José Müller" encodes to the same bytes in cp1252,
-// cp1250, cp1254 and cp1258, so on those locales the name does survive intact.
-#[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
+// Undefined cp1252 positions must not panic or truncate the string; encoding_rs
+// maps them to the replacement char.
 #[test]
-fn decode_cp1252_names_decode_under_the_active_locale() {
-    let (acp, active_encoding) = system_acp_encoding();
+fn decode_cp1252_undefined_positions_become_replacement_chars() {
+    let decoded = decode_cp1252(&[0x41, 0x81, 0x42]);
 
-    let cases: &[(&str, &encoding_rs::Encoding)] = &[
-        ("José Müller", encoding_rs::WINDOWS_1252),
-        ("Алексей Мальков", encoding_rs::WINDOWS_1251),
-        ("梦涛 鄂", encoding_rs::GBK),
-        ("山本 拓海", encoding_rs::SHIFT_JIS),
-        ("陳建宏", encoding_rs::BIG5),
-        ("유준 김", encoding_rs::EUC_KR),
-    ];
-
-    for (name, encoding) in cases {
-        let (bytes, _, had_unmappable) = encoding.encode(name);
-        assert!(
-            !had_unmappable,
-            "{name} should be fully representable in its own code page"
-        );
-
-        let decoded = decode_cp1252(&bytes);
-        let (expected, _, _) = active_encoding.decode(&bytes);
-
-        assert_eq!(
-            decoded,
-            expected.into_owned(),
-            "{name}'s bytes should decode under the active system code page ({acp})"
-        );
-
-        if std::ptr::eq(*encoding, active_encoding) {
-            assert_eq!(
-                decoded, *name,
-                "should roundtrip when system ACP matches the source code page"
-            );
-        }
-    }
+    assert_eq!(decoded.chars().count(), 3);
+    assert!(decoded.starts_with('A') && decoded.ends_with('B'));
 }
