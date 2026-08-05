@@ -322,6 +322,20 @@ kerb = { git = "https://github.com/mvoof/kerb", default-features = false, featur
 
 iRacing uses Windows-1252 for all strings. The crate decodes them automatically. Use `decode_cp1252(bytes)` if you need to decode raw bytes yourself.
 
+### Non-Latin driver names
+
+By default the session YAML is iso-8859-1, and **iRacing replaces every non-Latin character before writing it to shared memory**. Cyrillic, Chinese, Japanese and Korean driver names therefore arrive already destroyed — the sim's own UI renders them correctly because it draws from its internal Unicode data, but the SDK never sees those characters. No decoding on the reader's side can recover them.
+
+To get them intact, set this in iRacing's `app.ini`:
+
+```ini
+irsdkUTF8SessionStr=1
+```
+
+`0` (the default) selects iso-8859-1 with substitution; `1` selects UTF-8. The sim announces the change by writing `Encoding: UTF8` into the YAML header, and the crate switches decoding automatically — no code change needed on your side.
+
+This option was added to the iRacing SDK in June 2026, alongside the 2026 Season 3 Unicode work. On older builds it does not exist, and non-Latin names cannot be retrieved at all.
+
 ## Le Mans Ultimate — Plugin Setup
 
 LMU does not expose telemetry by default. Install the

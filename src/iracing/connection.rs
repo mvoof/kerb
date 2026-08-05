@@ -20,6 +20,27 @@ fn parse_c_str(bytes: &[u8]) -> String {
     crate::decode_cp1252(&bytes[..len])
 }
 
+/// How far into the session YAML the encoding marker is searched for. The
+/// marker sits on the second line, so this is generous.
+const UTF8_MARKER_SCAN_LEN: usize = 256;
+
+/// The marker iRacing writes into `WeekendInfo` when `irsdkUTF8SessionStr=1`.
+const UTF8_MARKER: &[u8] = b"Encoding: UTF8";
+
+/// Whether the session YAML is UTF-8 rather than the default iso-8859-1.
+///
+/// The sim announces UTF-8 in the YAML header itself (`WeekendInfo: Encoding:
+/// UTF8`), so the answer travels with the very bytes being decoded. That
+/// matters: the alternative signal, the `irsdkUTF8SessionStr` telemetry
+/// variable, lives in the telemetry buffer and reads as absent until the first
+/// tick arrives — which would misdecode the session string on every call made
+/// before then.
+fn session_yaml_is_utf8(data: &[u8]) -> bool {
+    let head = &data[..data.len().min(UTF8_MARKER_SCAN_LEN)];
+
+    head.windows(UTF8_MARKER.len()).any(|w| w == UTF8_MARKER)
+}
+
 /// Live connection to the iRacing telemetry service via Win32 shared memory.
 ///
 /// Holds the shared-memory region, an optional data-ready event used for
@@ -329,6 +350,15 @@ impl IRsdkConnection {
     }
 
     /// Raw YAML session string from iRacing shared memory.
+    ///
+    /// The sim writes this string in one of two encodings, selected by
+    /// `irsdkUTF8SessionStr` in `app.ini`: 0 (the default) is iso-8859-1, 1 is
+    /// UTF-8. The sim announces the latter in the YAML header itself.
+    ///
+    /// Under the default the sim replaces every non-Latin character *before*
+    /// writing, so non-Latin driver names arrive already destroyed and no
+    /// amount of decoding here can recover them. Users who need them must set
+    /// `irsdkUTF8SessionStr=1`.
     pub fn session_yaml(&self) -> Option<String> {
         unsafe {
             let shared_mem = self.shm.as_ptr();
@@ -344,13 +374,7 @@ impl IRsdkConnection {
             let len = bytes.iter().position(|&x| x == 0).unwrap_or(bytes.len());
             let data = &bytes[..len];
 
-            // `irsdkUTF8SessionStr` non-zero means the session YAML is UTF-8; otherwise use system ACP.
-            let is_utf8 = self
-                .read_variable("irsdkUTF8SessionStr")
-                .map(|v| matches!(v, TelemetryValue::Bool(true) | TelemetryValue::Int(1..)))
-                .unwrap_or(false);
-
-            if is_utf8 {
+            if session_yaml_is_utf8(data) {
                 Some(String::from_utf8_lossy(data).into_owned())
             } else {
                 Some(crate::decode_cp1252(data))
@@ -499,6 +523,37 @@ mod tests {
     use crate::iracing::structs::irsdk_header;
     use std::collections::HashMap;
     use std::mem;
+
+    #[test]
+    fn utf8_marker_detected_in_the_yaml_header() {
+        let yaml = b"---\nWeekendInfo:\n Encoding: UTF8\n TrackName: spa\n";
+
+        assert!(session_yaml_is_utf8(yaml));
+    }
+
+    #[test]
+    fn missing_utf8_marker_means_iso_8859_1() {
+        let yaml = b"---\nWeekendInfo:\n TrackName: spa\n";
+
+        assert!(!session_yaml_is_utf8(yaml));
+    }
+
+    #[test]
+    fn utf8_marker_is_not_searched_past_the_header() {
+        // A driver could put the literal marker in their name; only the header
+        // region counts, so a late occurrence must not flip the encoding.
+        let mut yaml = b"---\nWeekendInfo:\n TrackName: spa\n".to_vec();
+        yaml.resize(UTF8_MARKER_SCAN_LEN, b' ');
+        yaml.extend_from_slice(b" UserName: Encoding: UTF8\n");
+
+        assert!(!session_yaml_is_utf8(&yaml));
+    }
+
+    #[test]
+    fn utf8_detection_handles_yaml_shorter_than_the_scan_window() {
+        assert!(!session_yaml_is_utf8(b""));
+        assert!(session_yaml_is_utf8(b"Encoding: UTF8"));
+    }
 
     fn make_header(status: i32) -> Vec<u8> {
         let mut hdr = unsafe { mem::zeroed::<irsdk_header>() };
