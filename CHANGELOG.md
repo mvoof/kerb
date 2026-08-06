@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2026-08-06
 
 ### Added
 - **iRacing remote control** — `iracing::broadcast`, a write-side counterpart to telemetry reading, wrapping the SDK's `IRSDK_BROADCASTMSG` channel. Covers pit service (`send_pit_command`), chat macros (`send_chat_macro`), cameras (`camera_switch_position`, `camera_switch_number`, `camera_set_state`), replay (`replay_search`, `replay_set_position`, `replay_set_play_speed`, `replay_search_session_time`, `replay_set_state`), telemetry and video recording, FFB and texture reloads. Raw escape hatches: `send_broadcast`, `send_broadcast3`, `send_broadcast_float`.
