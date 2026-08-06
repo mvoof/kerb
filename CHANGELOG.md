@@ -1,5 +1,22 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **iRacing remote control** — `iracing::broadcast`, a write-side counterpart to telemetry reading, wrapping the SDK's `IRSDK_BROADCASTMSG` channel. Covers pit service (`send_pit_command`), chat macros (`send_chat_macro`), cameras (`camera_switch_position`, `camera_switch_number`, `camera_set_state`), replay (`replay_search`, `replay_set_position`, `replay_set_play_speed`, `replay_search_session_time`, `replay_set_state`), telemetry and video recording, FFB and texture reloads. Raw escape hatches: `send_broadcast`, `send_broadcast3`, `send_broadcast_float`.
+- `pad_car_num` — encodes car numbers carrying leading zeros, for the camera commands.
+- `THIRD-PARTY-NOTICES.md` — records that the iRacing interfaces are reimplemented rather than copied, and disclaims any affiliation.
+
+### Changed
+- `windows-sys` gains the `Win32_UI_WindowsAndMessaging` feature, needed to register and post the broadcast message. `Win32_Globalization` is dropped, no longer needed now that decoding does not query the system code page.
+- **`decode_cp1252` now always decodes cp1252 instead of the reader's Windows ANSI code page.** iRacing specifies a fixed encoding for the non-UTF-8 session string (`irsdkUTF8SessionStr=0` selects iso-8859-1), so it does not vary by locale. Reading it as the local ACP corrupted Latin text with diacritics on non-Western installs — `é` became `щ` on a Russian system — and could not recover non-Latin names anyway, since the sim substitutes those before writing. cp1252 rather than strict iso-8859-1 because the two differ only in `0x80-0x9F`, where the sim writes the printable punctuation cp1252 defines.
+
+### Fixed
+- **iRacing: session YAML no longer misdecodes before the first telemetry tick.** The UTF-8 encoding was detected by reading the `irsdkUTF8SessionStr` telemetry variable, which is unavailable until telemetry starts ticking, and "unknown" was treated as "not UTF-8". Detection now sniffs the `Encoding: UTF8` marker the sim writes into the YAML header, which travels with the bytes being decoded and needs no telemetry.
+
+### Documentation
+- README documents that `irsdkUTF8SessionStr=0`, iRacing's default, makes the sim substitute non-Latin characters before they reach shared memory, so non-Latin driver names cannot be recovered by any reader and require opting into UTF-8.
+
 ## [0.2.1] - 2026-06-27
 
 ### Fixed

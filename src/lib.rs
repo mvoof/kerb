@@ -40,6 +40,12 @@
 //! Enable multiple features if your overlay supports several sims.
 //! [`SimConnection::connect`] tries each enabled sim in order and returns the
 //! first one running.
+//!
+//! # Sending commands back
+//!
+//! The crate is read-only with one deliberate exception: [`iracing::broadcast`]
+//! wraps the iRacing SDK broadcast channel, which lets an external process order
+//! pit service. It needs no connection and is fire-and-forget.
 
 #[cfg(not(any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
 compile_error!(

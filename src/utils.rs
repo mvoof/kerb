@@ -1,48 +1,26 @@
 #[cfg(any(feature = "iracing", feature = "ac-evo", feature = "lmu"))]
 use crate::error::SimError;
 
-/// Decode a byte slice using the Windows system ACP (e.g. CP-1251 on Russian Windows, CP-1252 on Western).
+/// Decode a byte slice written by a sim in the fixed single-byte encoding its
+/// SDK specifies.
+///
+/// That encoding does not depend on the reader's Windows locale. iRacing
+/// documents its non-UTF-8 session string as iso-8859-1 and selects it with
+/// `irsdkUTF8SessionStr=0`; cp1252 is used here because it is identical to
+/// iso-8859-1 except in the 0x80-0x9F range, where iso-8859-1 has unusable
+/// control codes and the sim writes the printable characters cp1252 defines
+/// there (curly quotes, dashes, ellipsis).
+///
+/// Non-Latin characters never reach this function: the sim substitutes them
+/// before writing. Recovering them means opting into UTF-8 in `app.ini`, which
+/// takes a different code path — see [`crate::iracing`].
 pub fn decode_cp1252(bytes: &[u8]) -> String {
     if bytes.iter().all(|&b| b < 0x80) {
         // SAFETY: all bytes are valid ASCII, which is a subset of UTF-8
         return unsafe { String::from_utf8_unchecked(bytes.to_vec()) };
     }
-    let encoding = system_acp_encoding();
-    let (decoded, _, _) = encoding.decode(bytes);
+    let (decoded, _, _) = encoding_rs::WINDOWS_1252.decode(bytes);
     decoded.into_owned()
-}
-
-fn system_acp_encoding() -> &'static encoding_rs::Encoding {
-    static ENCODING: std::sync::OnceLock<&'static encoding_rs::Encoding> =
-        std::sync::OnceLock::new();
-    ENCODING.get_or_init(|| {
-        #[cfg(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu")))]
-        {
-            // SAFETY: GetACP() is always safe to call and never fails.
-            let acp = unsafe { windows_sys::Win32::Globalization::GetACP() };
-            match acp {
-                1251 => encoding_rs::WINDOWS_1251,
-                1252 => encoding_rs::WINDOWS_1252,
-                1250 => encoding_rs::WINDOWS_1250,
-                1253 => encoding_rs::WINDOWS_1253,
-                1254 => encoding_rs::WINDOWS_1254,
-                1255 => encoding_rs::WINDOWS_1255,
-                1256 => encoding_rs::WINDOWS_1256,
-                1257 => encoding_rs::WINDOWS_1257,
-                1258 => encoding_rs::WINDOWS_1258,
-                874 => encoding_rs::WINDOWS_874,
-                932 => encoding_rs::SHIFT_JIS,
-                936 => encoding_rs::GBK,
-                949 => encoding_rs::EUC_KR,
-                950 => encoding_rs::BIG5,
-                _ => encoding_rs::WINDOWS_1252,
-            }
-        }
-        #[cfg(not(all(windows, any(feature = "iracing", feature = "ac-evo", feature = "lmu"))))]
-        {
-            encoding_rs::WINDOWS_1252
-        }
-    })
 }
 
 /// Implemented by every connection type that can produce a telemetry snapshot.

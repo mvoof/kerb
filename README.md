@@ -322,6 +322,20 @@ kerb = { git = "https://github.com/mvoof/kerb", default-features = false, featur
 
 iRacing uses Windows-1252 for all strings. The crate decodes them automatically. Use `decode_cp1252(bytes)` if you need to decode raw bytes yourself.
 
+### Non-Latin driver names
+
+By default the session YAML is iso-8859-1, and **iRacing replaces every non-Latin character before writing it to shared memory**. Cyrillic, Chinese, Japanese and Korean driver names therefore arrive already destroyed — the sim's own UI renders them correctly because it draws from its internal Unicode data, but the SDK never sees those characters. No decoding on the reader's side can recover them.
+
+To get them intact, set this in iRacing's `app.ini`:
+
+```ini
+irsdkUTF8SessionStr=1
+```
+
+`0` (the default) selects iso-8859-1 with substitution; `1` selects UTF-8. The sim announces the change by writing `Encoding: UTF8` into the YAML header, and the crate switches decoding automatically — no code change needed on your side.
+
+This option was added to the iRacing SDK in June 2026, alongside the 2026 Season 3 Unicode work. On older builds it does not exist, and non-Latin names cannot be retrieved at all.
+
 ## Le Mans Ultimate — Plugin Setup
 
 LMU does not expose telemetry by default. Install the
@@ -368,14 +382,50 @@ cargo run -p kerb-examples --example facade_ac_evo
 cargo run -p kerb-examples --example facade_lmu
 ```
 
+## Remote Control (iRacing)
+
+`kerb` reads telemetry; the one exception is `iracing::broadcast`, which sends
+commands *into* the sim over the SDK's `IRSDK_BROADCASTMSG` window message. It
+needs no connection and no handle — calls are fire-and-forget and do nothing
+when iRacing is not running.
+
+```rust
+use kerb::iracing::{PitCommand, ReplaySearch, send_pit_command, replay_search};
+
+// Pit service — only accepted while the driver is in the car.
+send_pit_command(PitCommand::Fuel, 26);   // add 26 liters
+send_pit_command(PitCommand::Lf, 159);    // change LF at 159 kPa
+
+// Cameras and replay — only accepted while out of the car.
+replay_search(ReplaySearch::PrevIncident);
+```
+
+| Area      | Entry points                                                                                                      |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| Pit       | `send_pit_command` + `PitCommand`                                                                                   |
+| Chat      | `send_chat_macro` (slots 1–15), `send_chat_command`                                                                 |
+| Cameras   | `camera_switch_position`, `camera_switch_number`, `camera_set_state`, `pad_car_num`                                 |
+| Replay    | `replay_set_play_speed`, `replay_set_position`, `replay_search`, `replay_search_session_time`, `replay_set_state`   |
+| Recording | `send_telemetry_command`, `send_video_capture`                                                                      |
+| Other     | `send_ffb_command`, `reload_textures`                                                                               |
+
+For anything not wrapped yet, `send_broadcast`, `send_broadcast3` and
+`send_broadcast_float` take a raw `BroadcastMsg`.
+
+Every call returns `bool`: `true` means the message was posted, **not** that the
+sim acted on it. `SendNotifyMessage` never reports back, so the only way to
+confirm a pit order is to read `PitSvFlags` from telemetry afterwards.
+
 ## Simulator SDK References
 
 | Simulator         | Documentation                                                                                                                                                                                                                                                                         |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| iRacing           | [iRacing SDK](https://members.iracing.com/jforum/posts/list/1470675.page) (login required). Community reference: [irsdkdocs](https://sajax.github.io/irsdkdocs/)                                                                                                                      |
+| iRacing           | [iRacing SDK](https://forums.iracing.com/discussion/62/iracing-sdk/p1) (login required). Community reference: [irsdkdocs](https://sajax.github.io/irsdkdocs/)                                                                                                                      |
 | Assetto Corsa Evo | [Shared Memory API Documentation](https://www.assettocorsa.net/forum/index.php?threads/shared-memory-api-documentation.83659/) — official Kunos thread; [struct reference](https://docs.google.com/document/d/1WzqMLkW2o_C0LGcvdMRelAV31ZIifux0CSHD9k6ddz0/edit?tab=t.0) — Google Doc |
 | Le Mans Ultimate  | Uses [rF2SharedMemoryMapPlugin](https://github.com/TheIronWolfModding/rF2SharedMemoryMapPlugin) — community plugin built on ISI/S397 internals sample                                                                                                                                 |
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE).
+
+Interface provenance and iRacing attribution: [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES.md).
