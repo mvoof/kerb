@@ -586,6 +586,32 @@ type = "bool"
 desc = "0=replay not playing  1=replay playing"
 
 [[var]]
+name = "LFSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "LFSH shock deflection"
+
+[[var]]
+name = "LFSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "LFSH shock deflection at 360 Hz"
+
+[[var]]
+name = "LFSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "LFSH shock velocity"
+
+[[var]]
+name = "LFSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "LFSH shock velocity at 360 Hz"
+
+[[var]]
 name = "LFTiresAvailable"
 type = "i32"
 desc = "How many left front tires are remaining  255 is unlimited"
@@ -674,6 +700,32 @@ name = "LFwearR"
 type = "f32"
 unit = "%"
 desc = "LF tire right percent tread remaining"
+
+[[var]]
+name = "LRSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "LRSH shock deflection"
+
+[[var]]
+name = "LRSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "LRSH shock deflection at 360 Hz"
+
+[[var]]
+name = "LRSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "LRSH shock velocity"
+
+[[var]]
+name = "LRSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "LRSH shock velocity at 360 Hz"
 
 [[var]]
 name = "LRTiresAvailable"
@@ -1260,6 +1312,32 @@ type = "bool"
 desc = "Push to talk button state"
 
 [[var]]
+name = "RFSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "RFSH shock deflection"
+
+[[var]]
+name = "RFSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "RFSH shock deflection at 360 Hz"
+
+[[var]]
+name = "RFSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "RFSH shock velocity"
+
+[[var]]
+name = "RFSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "RFSH shock velocity at 360 Hz"
+
+[[var]]
 name = "RFTiresAvailable"
 type = "i32"
 desc = "How many right front tires are remaining  255 is unlimited"
@@ -1354,6 +1432,32 @@ name = "RPM"
 type = "f32"
 unit = "revs/min"
 desc = "Engine rpm"
+
+[[var]]
+name = "RRSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "RRSH shock deflection"
+
+[[var]]
+name = "RRSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "RRSH shock deflection at 360 Hz"
+
+[[var]]
+name = "RRSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "RRSH shock velocity"
+
+[[var]]
+name = "RRSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "RRSH shock velocity at 360 Hz"
 
 [[var]]
 name = "RRTiresAvailable"
@@ -2093,6 +2197,11 @@ unit = "Pa"
 desc = "Pitstop lr tire cold pressure adjustment"
 
 [[var]]
+name = "dpLTireChange"
+type = "f32"
+desc = "Pitstop left tire change request"
+
+[[var]]
 name = "dpRFTireChange"
 type = "f32"
 desc = "Pitstop rf tire change request"
@@ -2113,6 +2222,11 @@ name = "dpRRTireColdPress"
 type = "f32"
 unit = "Pa"
 desc = "Pitstop rr cold tire pressure adjustment"
+
+[[var]]
+name = "dpRTireChange"
+type = "f32"
+desc = "Pitstop right tire change request"
 
 [[var]]
 name = "dpTireChange"

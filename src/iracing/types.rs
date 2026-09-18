@@ -27,21 +27,21 @@ pub struct IracingOffsets {
     /// Raw brake input 0=brake released to 1=max pedal force [%]
     pub brake_raw: Option<IracingOffset>,
     /// CF shock deflection [m]
-    pub c_fshock_defl: Option<IracingOffset>,
+    pub cf_shock_defl: Option<IracingOffset>,
     /// CF shock deflection at 360 Hz [m]
-    pub c_fshock_defl_st: Option<IracingOffset>,
+    pub cf_shock_defl_st: Option<IracingOffset>,
     /// CF shock velocity [m/s]
-    pub c_fshock_vel: Option<IracingOffset>,
+    pub cf_shock_vel: Option<IracingOffset>,
     /// CF shock velocity at 360 Hz [m/s]
-    pub c_fshock_vel_st: Option<IracingOffset>,
+    pub cf_shock_vel_st: Option<IracingOffset>,
     /// CR shock deflection [m]
-    pub c_rshock_defl: Option<IracingOffset>,
+    pub cr_shock_defl: Option<IracingOffset>,
     /// CR shock deflection at 360 Hz [m]
-    pub c_rshock_defl_st: Option<IracingOffset>,
+    pub cr_shock_defl_st: Option<IracingOffset>,
     /// CR shock velocity [m/s]
-    pub c_rshock_vel: Option<IracingOffset>,
+    pub cr_shock_vel: Option<IracingOffset>,
     /// CR shock velocity at 360 Hz [m/s]
-    pub c_rshock_vel_st: Option<IracingOffset>,
+    pub cr_shock_vel_st: Option<IracingOffset>,
     /// Active camera number
     pub cam_camera_number: Option<IracingOffset>,
     /// State of camera system [irsdk_CameraState]
@@ -177,21 +177,21 @@ pub struct IracingOffsets {
     /// Percent of available time gpu took with a 1 sec avg [%]
     pub gpu_usage: Option<IracingOffset>,
     /// HF shock deflection [m]
-    pub h_fshock_defl: Option<IracingOffset>,
+    pub hf_shock_defl: Option<IracingOffset>,
     /// HF shock deflection at 360 Hz [m]
-    pub h_fshock_defl_st: Option<IracingOffset>,
+    pub hf_shock_defl_st: Option<IracingOffset>,
     /// HF shock velocity [m/s]
-    pub h_fshock_vel: Option<IracingOffset>,
+    pub hf_shock_vel: Option<IracingOffset>,
     /// HF shock velocity at 360 Hz [m/s]
-    pub h_fshock_vel_st: Option<IracingOffset>,
+    pub hf_shock_vel_st: Option<IracingOffset>,
     /// HR shock deflection [m]
-    pub h_rshock_defl: Option<IracingOffset>,
+    pub hr_shock_defl: Option<IracingOffset>,
     /// HR shock deflection at 360 Hz [m]
-    pub h_rshock_defl_st: Option<IracingOffset>,
+    pub hr_shock_defl_st: Option<IracingOffset>,
     /// HR shock velocity [m/s]
-    pub h_rshock_vel: Option<IracingOffset>,
+    pub hr_shock_vel: Option<IracingOffset>,
     /// HR shock velocity at 360 Hz [m/s]
-    pub h_rshock_vel_st: Option<IracingOffset>,
+    pub hr_shock_vel_st: Option<IracingOffset>,
     /// Raw handbrake input 0=handbrake released to 1=max force [%]
     pub handbrake_raw: Option<IracingOffset>,
     /// 0=disk based telemetry file not being written  1=being written
@@ -208,6 +208,14 @@ pub struct IracingOffsets {
     pub is_on_track_car: Option<IracingOffset>,
     /// 0=replay not playing  1=replay playing
     pub is_replay_playing: Option<IracingOffset>,
+    /// LFSH shock deflection [m]
+    pub lfsh_shock_defl: Option<IracingOffset>,
+    /// LFSH shock deflection at 360 Hz [m]
+    pub lfsh_shock_defl_st: Option<IracingOffset>,
+    /// LFSH shock velocity [m/s]
+    pub lfsh_shock_vel: Option<IracingOffset>,
+    /// LFSH shock velocity at 360 Hz [m/s]
+    pub lfsh_shock_vel_st: Option<IracingOffset>,
     /// How many left front tires are remaining  255 is unlimited
     pub lf_tires_available: Option<IracingOffset>,
     /// How many left front tires used so far
@@ -238,6 +246,14 @@ pub struct IracingOffsets {
     pub lf_wear_m: Option<IracingOffset>,
     /// LF tire right percent tread remaining [%]
     pub lf_wear_r: Option<IracingOffset>,
+    /// LRSH shock deflection [m]
+    pub lrsh_shock_defl: Option<IracingOffset>,
+    /// LRSH shock deflection at 360 Hz [m]
+    pub lrsh_shock_defl_st: Option<IracingOffset>,
+    /// LRSH shock velocity [m/s]
+    pub lrsh_shock_vel: Option<IracingOffset>,
+    /// LRSH shock velocity at 360 Hz [m/s]
+    pub lrsh_shock_vel_st: Option<IracingOffset>,
     /// How many left rear tires are remaining  255 is unlimited
     pub lr_tires_available: Option<IracingOffset>,
     /// How many left rear tires used so far
@@ -444,6 +460,14 @@ pub struct IracingOffsets {
     pub push_to_pass: Option<IracingOffset>,
     /// Push to talk button state
     pub push_to_talk: Option<IracingOffset>,
+    /// RFSH shock deflection [m]
+    pub rfsh_shock_defl: Option<IracingOffset>,
+    /// RFSH shock deflection at 360 Hz [m]
+    pub rfsh_shock_defl_st: Option<IracingOffset>,
+    /// RFSH shock velocity [m/s]
+    pub rfsh_shock_vel: Option<IracingOffset>,
+    /// RFSH shock velocity at 360 Hz [m/s]
+    pub rfsh_shock_vel_st: Option<IracingOffset>,
     /// How many right front tires are remaining  255 is unlimited
     pub rf_tires_available: Option<IracingOffset>,
     /// How many right front tires used so far
@@ -476,6 +500,14 @@ pub struct IracingOffsets {
     pub rf_wear_r: Option<IracingOffset>,
     /// Engine rpm [revs/min]
     pub rpm: Option<IracingOffset>,
+    /// RRSH shock deflection [m]
+    pub rrsh_shock_defl: Option<IracingOffset>,
+    /// RRSH shock deflection at 360 Hz [m]
+    pub rrsh_shock_defl_st: Option<IracingOffset>,
+    /// RRSH shock velocity [m/s]
+    pub rrsh_shock_vel: Option<IracingOffset>,
+    /// RRSH shock velocity at 360 Hz [m/s]
+    pub rrsh_shock_vel_st: Option<IracingOffset>,
     /// How many right rear tires are remaining  255 is unlimited
     pub rr_tires_available: Option<IracingOffset>,
     /// How many right rear tires used so far
@@ -738,6 +770,8 @@ pub struct IracingOffsets {
     pub dp_lr_tire_change: Option<IracingOffset>,
     /// Pitstop lr tire cold pressure adjustment [Pa]
     pub dp_lr_tire_cold_press: Option<IracingOffset>,
+    /// Pitstop left tire change request
+    pub dp_l_tire_change: Option<IracingOffset>,
     /// Pitstop rf tire change request
     pub dp_rf_tire_change: Option<IracingOffset>,
     /// Pitstop rf cold tire pressure adjustment [Pa]
@@ -746,6 +780,8 @@ pub struct IracingOffsets {
     pub dp_rr_tire_change: Option<IracingOffset>,
     /// Pitstop rr cold tire pressure adjustment [Pa]
     pub dp_rr_tire_cold_press: Option<IracingOffset>,
+    /// Pitstop right tire change request
+    pub dp_r_tire_change: Option<IracingOffset>,
     /// Pitstop all tire change request
     pub dp_tire_change: Option<IracingOffset>,
     /// Pitstop windshield tearoff
@@ -785,35 +821,35 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_fshock_defl: vars.get("CFshockDefl").map(|v| IracingOffset {
+            cf_shock_defl: vars.get("CFshockDefl").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_fshock_defl_st: vars.get("CFshockDefl_ST").map(|v| IracingOffset {
+            cf_shock_defl_st: vars.get("CFshockDefl_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_fshock_vel: vars.get("CFshockVel").map(|v| IracingOffset {
+            cf_shock_vel: vars.get("CFshockVel").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_fshock_vel_st: vars.get("CFshockVel_ST").map(|v| IracingOffset {
+            cf_shock_vel_st: vars.get("CFshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_rshock_defl: vars.get("CRshockDefl").map(|v| IracingOffset {
+            cr_shock_defl: vars.get("CRshockDefl").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_rshock_defl_st: vars.get("CRshockDefl_ST").map(|v| IracingOffset {
+            cr_shock_defl_st: vars.get("CRshockDefl_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_rshock_vel: vars.get("CRshockVel").map(|v| IracingOffset {
+            cr_shock_vel: vars.get("CRshockVel").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            c_rshock_vel_st: vars.get("CRshockVel_ST").map(|v| IracingOffset {
+            cr_shock_vel_st: vars.get("CRshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1093,35 +1129,35 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_fshock_defl: vars.get("HFshockDefl").map(|v| IracingOffset {
+            hf_shock_defl: vars.get("HFshockDefl").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_fshock_defl_st: vars.get("HFshockDefl_ST").map(|v| IracingOffset {
+            hf_shock_defl_st: vars.get("HFshockDefl_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_fshock_vel: vars.get("HFshockVel").map(|v| IracingOffset {
+            hf_shock_vel: vars.get("HFshockVel").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_fshock_vel_st: vars.get("HFshockVel_ST").map(|v| IracingOffset {
+            hf_shock_vel_st: vars.get("HFshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_rshock_defl: vars.get("HRshockDefl").map(|v| IracingOffset {
+            hr_shock_defl: vars.get("HRshockDefl").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_rshock_defl_st: vars.get("HRshockDefl_ST").map(|v| IracingOffset {
+            hr_shock_defl_st: vars.get("HRshockDefl_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_rshock_vel: vars.get("HRshockVel").map(|v| IracingOffset {
+            hr_shock_vel: vars.get("HRshockVel").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
-            h_rshock_vel_st: vars.get("HRshockVel_ST").map(|v| IracingOffset {
+            hr_shock_vel_st: vars.get("HRshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1154,6 +1190,22 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             is_replay_playing: vars.get("IsReplayPlaying").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lfsh_shock_defl: vars.get("LFSHshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lfsh_shock_defl_st: vars.get("LFSHshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lfsh_shock_vel: vars.get("LFSHshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lfsh_shock_vel_st: vars.get("LFSHshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1214,6 +1266,22 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             lf_wear_r: vars.get("LFwearR").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lrsh_shock_defl: vars.get("LRSHshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lrsh_shock_defl_st: vars.get("LRSHshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lrsh_shock_vel: vars.get("LRSHshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            lrsh_shock_vel_st: vars.get("LRSHshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1661,6 +1729,22 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            rfsh_shock_defl: vars.get("RFSHshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rfsh_shock_defl_st: vars.get("RFSHshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rfsh_shock_vel: vars.get("RFSHshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rfsh_shock_vel_st: vars.get("RFSHshockVel_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             rf_tires_available: vars.get("RFTiresAvailable").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
@@ -1722,6 +1806,22 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             rpm: vars.get("RPM").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rrsh_shock_defl: vars.get("RRSHshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rrsh_shock_defl_st: vars.get("RRSHshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rrsh_shock_vel: vars.get("RRSHshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rrsh_shock_vel_st: vars.get("RRSHshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -2271,6 +2371,10 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            dp_l_tire_change: vars.get("dpLTireChange").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             dp_rf_tire_change: vars.get("dpRFTireChange").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
@@ -2284,6 +2388,10 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             dp_rr_tire_cold_press: vars.get("dpRRTireColdPress").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dp_r_tire_change: vars.get("dpRTireChange").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -2323,21 +2431,21 @@ pub struct IracingFrame {
     /// Raw brake input 0=brake released to 1=max pedal force [%]
     pub brake_raw: f32,
     /// CF shock deflection [m]
-    pub c_fshock_defl: f32,
+    pub cf_shock_defl: f32,
     /// CF shock deflection at 360 Hz [m]
-    pub c_fshock_defl_st: Vec<f32>,
+    pub cf_shock_defl_st: Vec<f32>,
     /// CF shock velocity [m/s]
-    pub c_fshock_vel: f32,
+    pub cf_shock_vel: f32,
     /// CF shock velocity at 360 Hz [m/s]
-    pub c_fshock_vel_st: Vec<f32>,
+    pub cf_shock_vel_st: Vec<f32>,
     /// CR shock deflection [m]
-    pub c_rshock_defl: f32,
+    pub cr_shock_defl: f32,
     /// CR shock deflection at 360 Hz [m]
-    pub c_rshock_defl_st: Vec<f32>,
+    pub cr_shock_defl_st: Vec<f32>,
     /// CR shock velocity [m/s]
-    pub c_rshock_vel: f32,
+    pub cr_shock_vel: f32,
     /// CR shock velocity at 360 Hz [m/s]
-    pub c_rshock_vel_st: Vec<f32>,
+    pub cr_shock_vel_st: Vec<f32>,
     /// Active camera number
     pub cam_camera_number: i32,
     /// State of camera system [irsdk_CameraState]
@@ -2473,21 +2581,21 @@ pub struct IracingFrame {
     /// Percent of available time gpu took with a 1 sec avg [%]
     pub gpu_usage: f32,
     /// HF shock deflection [m]
-    pub h_fshock_defl: f32,
+    pub hf_shock_defl: f32,
     /// HF shock deflection at 360 Hz [m]
-    pub h_fshock_defl_st: Vec<f32>,
+    pub hf_shock_defl_st: Vec<f32>,
     /// HF shock velocity [m/s]
-    pub h_fshock_vel: f32,
+    pub hf_shock_vel: f32,
     /// HF shock velocity at 360 Hz [m/s]
-    pub h_fshock_vel_st: Vec<f32>,
+    pub hf_shock_vel_st: Vec<f32>,
     /// HR shock deflection [m]
-    pub h_rshock_defl: f32,
+    pub hr_shock_defl: f32,
     /// HR shock deflection at 360 Hz [m]
-    pub h_rshock_defl_st: Vec<f32>,
+    pub hr_shock_defl_st: Vec<f32>,
     /// HR shock velocity [m/s]
-    pub h_rshock_vel: f32,
+    pub hr_shock_vel: f32,
     /// HR shock velocity at 360 Hz [m/s]
-    pub h_rshock_vel_st: Vec<f32>,
+    pub hr_shock_vel_st: Vec<f32>,
     /// Raw handbrake input 0=handbrake released to 1=max force [%]
     pub handbrake_raw: f32,
     /// 0=disk based telemetry file not being written  1=being written
@@ -2504,6 +2612,14 @@ pub struct IracingFrame {
     pub is_on_track_car: bool,
     /// 0=replay not playing  1=replay playing
     pub is_replay_playing: bool,
+    /// LFSH shock deflection [m]
+    pub lfsh_shock_defl: f32,
+    /// LFSH shock deflection at 360 Hz [m]
+    pub lfsh_shock_defl_st: Vec<f32>,
+    /// LFSH shock velocity [m/s]
+    pub lfsh_shock_vel: f32,
+    /// LFSH shock velocity at 360 Hz [m/s]
+    pub lfsh_shock_vel_st: Vec<f32>,
     /// How many left front tires are remaining  255 is unlimited
     pub lf_tires_available: i32,
     /// How many left front tires used so far
@@ -2534,6 +2650,14 @@ pub struct IracingFrame {
     pub lf_wear_m: f32,
     /// LF tire right percent tread remaining [%]
     pub lf_wear_r: f32,
+    /// LRSH shock deflection [m]
+    pub lrsh_shock_defl: f32,
+    /// LRSH shock deflection at 360 Hz [m]
+    pub lrsh_shock_defl_st: Vec<f32>,
+    /// LRSH shock velocity [m/s]
+    pub lrsh_shock_vel: f32,
+    /// LRSH shock velocity at 360 Hz [m/s]
+    pub lrsh_shock_vel_st: Vec<f32>,
     /// How many left rear tires are remaining  255 is unlimited
     pub lr_tires_available: i32,
     /// How many left rear tires used so far
@@ -2740,6 +2864,14 @@ pub struct IracingFrame {
     pub push_to_pass: bool,
     /// Push to talk button state
     pub push_to_talk: bool,
+    /// RFSH shock deflection [m]
+    pub rfsh_shock_defl: f32,
+    /// RFSH shock deflection at 360 Hz [m]
+    pub rfsh_shock_defl_st: Vec<f32>,
+    /// RFSH shock velocity [m/s]
+    pub rfsh_shock_vel: f32,
+    /// RFSH shock velocity at 360 Hz [m/s]
+    pub rfsh_shock_vel_st: Vec<f32>,
     /// How many right front tires are remaining  255 is unlimited
     pub rf_tires_available: i32,
     /// How many right front tires used so far
@@ -2772,6 +2904,14 @@ pub struct IracingFrame {
     pub rf_wear_r: f32,
     /// Engine rpm [revs/min]
     pub rpm: f32,
+    /// RRSH shock deflection [m]
+    pub rrsh_shock_defl: f32,
+    /// RRSH shock deflection at 360 Hz [m]
+    pub rrsh_shock_defl_st: Vec<f32>,
+    /// RRSH shock velocity [m/s]
+    pub rrsh_shock_vel: f32,
+    /// RRSH shock velocity at 360 Hz [m/s]
+    pub rrsh_shock_vel_st: Vec<f32>,
     /// How many right rear tires are remaining  255 is unlimited
     pub rr_tires_available: i32,
     /// How many right rear tires used so far
@@ -3034,6 +3174,8 @@ pub struct IracingFrame {
     pub dp_lr_tire_change: f32,
     /// Pitstop lr tire cold pressure adjustment [Pa]
     pub dp_lr_tire_cold_press: f32,
+    /// Pitstop left tire change request
+    pub dp_l_tire_change: f32,
     /// Pitstop rf tire change request
     pub dp_rf_tire_change: f32,
     /// Pitstop rf cold tire pressure adjustment [Pa]
@@ -3042,6 +3184,8 @@ pub struct IracingFrame {
     pub dp_rr_tire_change: f32,
     /// Pitstop rr cold tire pressure adjustment [Pa]
     pub dp_rr_tire_cold_press: f32,
+    /// Pitstop right tire change request
+    pub dp_r_tire_change: f32,
     /// Pitstop all tire change request
     pub dp_tire_change: f32,
     /// Pitstop windshield tearoff
@@ -3089,13 +3233,13 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
-            c_fshock_defl: match offsets.c_fshock_defl {
+            cf_shock_defl: match offsets.cf_shock_defl {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            c_fshock_defl_st: match offsets.c_fshock_defl_st {
+            cf_shock_defl_st: match offsets.cf_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3104,13 +3248,13 @@ impl IracingFrame {
                 },
                 None => Vec::new(),
             },
-            c_fshock_vel: match offsets.c_fshock_vel {
+            cf_shock_vel: match offsets.cf_shock_vel {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            c_fshock_vel_st: match offsets.c_fshock_vel_st {
+            cf_shock_vel_st: match offsets.cf_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3119,13 +3263,13 @@ impl IracingFrame {
                 },
                 None => Vec::new(),
             },
-            c_rshock_defl: match offsets.c_rshock_defl {
+            cr_shock_defl: match offsets.cr_shock_defl {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            c_rshock_defl_st: match offsets.c_rshock_defl_st {
+            cr_shock_defl_st: match offsets.cr_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3134,13 +3278,13 @@ impl IracingFrame {
                 },
                 None => Vec::new(),
             },
-            c_rshock_vel: match offsets.c_rshock_vel {
+            cr_shock_vel: match offsets.cr_shock_vel {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            c_rshock_vel_st: match offsets.c_rshock_vel_st {
+            cr_shock_vel_st: match offsets.cr_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3636,13 +3780,13 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
-            h_fshock_defl: match offsets.h_fshock_defl {
+            hf_shock_defl: match offsets.hf_shock_defl {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            h_fshock_defl_st: match offsets.h_fshock_defl_st {
+            hf_shock_defl_st: match offsets.hf_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3651,13 +3795,13 @@ impl IracingFrame {
                 },
                 None => Vec::new(),
             },
-            h_fshock_vel: match offsets.h_fshock_vel {
+            hf_shock_vel: match offsets.hf_shock_vel {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            h_fshock_vel_st: match offsets.h_fshock_vel_st {
+            hf_shock_vel_st: match offsets.hf_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3666,13 +3810,13 @@ impl IracingFrame {
                 },
                 None => Vec::new(),
             },
-            h_rshock_defl: match offsets.h_rshock_defl {
+            hr_shock_defl: match offsets.hr_shock_defl {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            h_rshock_defl_st: match offsets.h_rshock_defl_st {
+            hr_shock_defl_st: match offsets.hr_shock_defl_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3681,13 +3825,13 @@ impl IracingFrame {
                 },
                 None => Vec::new(),
             },
-            h_rshock_vel: match offsets.h_rshock_vel {
+            hr_shock_vel: match offsets.hr_shock_vel {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
             },
-            h_rshock_vel_st: match offsets.h_rshock_vel_st {
+            hr_shock_vel_st: match offsets.hr_shock_vel_st {
                 Some(ref off) => unsafe {
                     let src = buf.add(off.offset) as *const f32;
                     (0..off.count)
@@ -3729,6 +3873,36 @@ impl IracingFrame {
             is_replay_playing: match offsets.is_replay_playing {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
                 None => false,
+            },
+            lfsh_shock_defl: match offsets.lfsh_shock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            lfsh_shock_defl_st: match offsets.lfsh_shock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            lfsh_shock_vel: match offsets.lfsh_shock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            lfsh_shock_vel_st: match offsets.lfsh_shock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
             },
             lf_tires_available: match offsets.lf_tires_available {
                 Some(ref off) => unsafe {
@@ -3825,6 +3999,36 @@ impl IracingFrame {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
+            },
+            lrsh_shock_defl: match offsets.lrsh_shock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            lrsh_shock_defl_st: match offsets.lrsh_shock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            lrsh_shock_vel: match offsets.lrsh_shock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            lrsh_shock_vel_st: match offsets.lrsh_shock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
             },
             lr_tires_available: match offsets.lr_tires_available {
                 Some(ref off) => unsafe {
@@ -4427,6 +4631,36 @@ impl IracingFrame {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
                 None => false,
             },
+            rfsh_shock_defl: match offsets.rfsh_shock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rfsh_shock_defl_st: match offsets.rfsh_shock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            rfsh_shock_vel: match offsets.rfsh_shock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rfsh_shock_vel_st: match offsets.rfsh_shock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
             rf_tires_available: match offsets.rf_tires_available {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
@@ -4528,6 +4762,36 @@ impl IracingFrame {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
+            },
+            rrsh_shock_defl: match offsets.rrsh_shock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rrsh_shock_defl_st: match offsets.rrsh_shock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            rrsh_shock_vel: match offsets.rrsh_shock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rrsh_shock_vel_st: match offsets.rrsh_shock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
             },
             rr_tires_available: match offsets.rr_tires_available {
                 Some(ref off) => unsafe {
@@ -5311,6 +5575,12 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
+            dp_l_tire_change: match offsets.dp_l_tire_change {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             dp_rf_tire_change: match offsets.dp_rf_tire_change {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
@@ -5330,6 +5600,12 @@ impl IracingFrame {
                 None => 0.0,
             },
             dp_rr_tire_cold_press: match offsets.dp_rr_tire_cold_press {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dp_r_tire_change: match offsets.dp_r_tire_change {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },

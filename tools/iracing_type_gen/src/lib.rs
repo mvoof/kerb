@@ -141,9 +141,15 @@ pub fn parse_catalogue(toml_str: &str) -> Result<Vec<VarDef>, toml::de::Error> {
 /// acronym/word boundaries). Checked before the generic conversion.
 const SNAKE_OVERRIDES: &[(&str, &str)] = &[("BrakeABSactive", "brake_abs_active")];
 
-/// Tire/corner prefixes: `LFtempCL` means "LF temp CL", so the two-letter
-/// corner code is one word (`lf_temp_cl`), not the generic split (`l_ftemp_cl`).
-const CORNER_PREFIXES: &[&str] = &["LF", "LR", "RF", "RR"];
+/// Corner and axle codes that open a variable name. `LFtempCL` means
+/// "LF temp CL", so the code is one word (`lf_temp_cl`) rather than the
+/// generic split on the case change (`l_ftemp_cl`).
+///
+/// Longest first: `LFSHshockDefl` is an `LFSH` channel, and matching `LF`
+/// against it would leave `lfs_hshock_defl`.
+const CORNER_PREFIXES: &[&str] = &[
+    "LFSH", "LRSH", "RFSH", "RRSH", "CF", "CR", "HF", "HR", "LF", "LR", "RF", "RR",
+];
 
 pub fn camel_to_snake(name: &str) -> String {
     if let Some((_, snake)) = SNAKE_OVERRIDES

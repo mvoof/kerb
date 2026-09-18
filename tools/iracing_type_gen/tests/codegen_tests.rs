@@ -243,3 +243,29 @@ fn parse_catalogue_treats_an_empty_file_as_empty() {
     assert!(parse_catalogue("").expect("empty").is_empty());
     assert!(parse_catalogue("   \n").expect("blank").is_empty());
 }
+
+/// Corner and axle codes are one word. The generic rule cannot see that, since
+/// `CFshockDefl` looks like an acronym followed by a word and splits into
+/// `c_fshock_defl`; the prefix list is what keeps `cf` together.
+#[test]
+fn camel_to_snake_axle_prefixes() {
+    assert_eq!(camel_to_snake("CFshockDefl"), "cf_shock_defl");
+    assert_eq!(camel_to_snake("CRshockVel_ST"), "cr_shock_vel_st");
+    assert_eq!(camel_to_snake("HFshockDefl"), "hf_shock_defl");
+    assert_eq!(camel_to_snake("HRshockVel"), "hr_shock_vel");
+}
+
+/// The four-letter shock codes have to be tried before the two-letter corner
+/// codes they start with, or `LFSHshockDefl` matches `LF`, fails the
+/// lowercase check on `SH…`, and falls through to `lfs_hshock_defl`.
+#[test]
+fn camel_to_snake_prefers_the_longer_corner_prefix() {
+    assert_eq!(camel_to_snake("LFSHshockDefl"), "lfsh_shock_defl");
+    assert_eq!(camel_to_snake("LRSHshockVel_ST"), "lrsh_shock_vel_st");
+    assert_eq!(camel_to_snake("RFSHshockDefl_ST"), "rfsh_shock_defl_st");
+    assert_eq!(camel_to_snake("RRSHshockVel"), "rrsh_shock_vel");
+
+    // The two-letter codes still work for the names that actually use them.
+    assert_eq!(camel_to_snake("LFshockDefl"), "lf_shock_defl");
+    assert_eq!(camel_to_snake("LFtempCL"), "lf_temp_cl");
+}
