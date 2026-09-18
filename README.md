@@ -166,7 +166,9 @@ All features are enabled by default. Use `default-features = false` to opt in se
 | `telemetry_snapshot()` | `HashMap<String, TelemetryValue>` | player's car  | Dynamic access by iRacing variable name                                 |
 | `var_list_snapshot()`  | `Vec<VarMeta>`                    | —             | All variable names, types, units, and descriptions                      |
 
-`IracingFrame` is a typed struct with one pub field per variable — your IDE autocomplete shows all ~90 available fields directly. Fields use snake_case (`SteeringWheelAngle` → `steering_wheel_angle`).
+`IracingFrame` is a typed struct with one pub field per variable — your IDE autocomplete shows all ~330 available fields directly. Fields use snake_case (`SteeringWheelAngle` → `steering_wheel_angle`).
+
+Which of them actually carry data depends on the car: iRacing publishes a different variable list per car, so a field the current car does not have stays at its default. Anything outside the generated set is still reachable dynamically — `telemetry_snapshot()` returns every variable the current session declares, and `save_var_list_snapshot()` writes the catalogue with types, units and descriptions.
 
 ```rust
 Connection::IRacing(conn) => {
@@ -351,7 +353,7 @@ If the plugin is missing, `SimConnection::connect()` skips LMU and tries the nex
 ## Codegen — iRacing Typed Frame (for crate developers only)
 
 > [!IMPORTANT]
-> **End users of the crate do not need this.** `src/iracing/types.rs` is already committed to the repository with all current iRacing variables. Re-run codegen only if iRacing adds or changes variables after an SDK update.
+> **End users of the crate do not need this.** `src/iracing/types.rs` is already committed to the repository. Re-run codegen only if iRacing adds or changes variables after an SDK update, or to pick up variables only a particular car exposes.
 
 `IracingFrame` is a struct with one pub field per iRacing variable. Field names are snake_case of the iRacing variable name (`SteeringWheelAngle` → `steering_wheel_angle`).
 
@@ -364,7 +366,8 @@ If the plugin is missing, `SimConnection::connect()` skips LMU and tries the nex
 cargo run --manifest-path tools/iracing_type_gen/Cargo.toml -- src/iracing/types.rs
 ```
 
-3. Commit the updated `src/iracing/types.rs`
+3. **Read the diff before committing.** The generator writes exactly the variables the car in that session declares, so a run can delete fields as well as add them — see the warning in [`tools/iracing_type_gen/README.md`](tools/iracing_type_gen/README.md). Restore anything the run removed.
+4. Commit the updated `src/iracing/types.rs`
 
 ## Benchmarks
 
