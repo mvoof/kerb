@@ -136,8 +136,18 @@ pub struct IracingOffsets {
     pub display_units: Option<IracingOffset>,
     /// Driver activated flag
     pub driver_marker: Option<IracingOffset>,
+    /// Electrical energy from battery to MGU-K per lap [J]
+    pub energy_battery_to_mgu_k_lap: Option<IracingOffset>,
+    /// Engine ERS battery charge [J]
+    pub energy_ers_battery: Option<IracingOffset>,
+    /// Engine ERS battery charge as a percent [%]
+    pub energy_ers_battery_pct: Option<IracingOffset>,
+    /// Electrical energy available to MGU-K per lap as a percent [%]
+    pub energy_mgu_k_lap_deploy_pct: Option<IracingOffset>,
     /// Engine0Engine rpm [revs/min]
     pub engine0_rpm: Option<IracingOffset>,
+    /// Engine1Engine rpm [revs/min]
+    pub engine1_rpm: Option<IracingOffset>,
     /// Bitfield for warning lights [irsdk_EngineWarnings]
     pub engine_warnings: Option<IracingOffset>,
     /// Indicate action the reset key will take 0 enter 1 exit 2 reset
@@ -166,6 +176,22 @@ pub struct IracingOffsets {
     pub gear: Option<IracingOffset>,
     /// Percent of available time gpu took with a 1 sec avg [%]
     pub gpu_usage: Option<IracingOffset>,
+    /// HF shock deflection [m]
+    pub h_fshock_defl: Option<IracingOffset>,
+    /// HF shock deflection at 360 Hz [m]
+    pub h_fshock_defl_st: Option<IracingOffset>,
+    /// HF shock velocity [m/s]
+    pub h_fshock_vel: Option<IracingOffset>,
+    /// HF shock velocity at 360 Hz [m/s]
+    pub h_fshock_vel_st: Option<IracingOffset>,
+    /// HR shock deflection [m]
+    pub h_rshock_defl: Option<IracingOffset>,
+    /// HR shock deflection at 360 Hz [m]
+    pub h_rshock_defl_st: Option<IracingOffset>,
+    /// HR shock velocity [m/s]
+    pub h_rshock_vel: Option<IracingOffset>,
+    /// HR shock velocity at 360 Hz [m/s]
+    pub h_rshock_vel_st: Option<IracingOffset>,
     /// Raw handbrake input 0=handbrake released to 1=max force [%]
     pub handbrake_raw: Option<IracingOffset>,
     /// 0=disk based telemetry file not being written  1=being written
@@ -408,6 +434,10 @@ pub struct IracingOffsets {
     pub player_track_surface: Option<IracingOffset>,
     /// Players car track surface material type [irsdk_TrkSurf]
     pub player_track_surface_material: Option<IracingOffset>,
+    /// Engine MGU-H mechanical power [W]
+    pub power_mgu_h: Option<IracingOffset>,
+    /// Engine MGU-K mechanical power [W]
+    pub power_mgu_k: Option<IracingOffset>,
     /// Precipitation at start/finish line [%]
     pub precipitation: Option<IracingOffset>,
     /// Push to pass button state
@@ -602,6 +632,8 @@ pub struct IracingOffsets {
     pub tire_sets_available: Option<IracingOffset>,
     /// How many tire sets used so far
     pub tire_sets_used: Option<IracingOffset>,
+    /// Engine MGU-K mechanical torque [Nm]
+    pub torque_mgu_k: Option<IracingOffset>,
     /// Deprecated  set to TrackTempCrew [C]
     pub track_temp: Option<IracingOffset>,
     /// Temperature of track measured by crew around track [C]
@@ -656,10 +688,16 @@ pub struct IracingOffsets {
     pub dc_anti_roll_rear: Option<IracingOffset>,
     /// In car brake bias adjustment
     pub dc_brake_bias: Option<IracingOffset>,
+    /// In car brake misc adjustment
+    pub dc_brake_misc: Option<IracingOffset>,
     /// In car fuel mixture adjustment
     pub dc_fuel_mixture: Option<IracingOffset>,
     /// In car headlight flash control active
     pub dc_headlight_flash: Option<IracingOffset>,
+    /// In car low fuel accept
+    pub dc_low_fuel_accept: Option<IracingOffset>,
+    /// In car MGU-K deployment mode level adjustment
+    pub dc_mguk_deploy_mode: Option<IracingOffset>,
     /// Track if pit speed limiter system is enabled
     pub dc_pit_speed_limiter_toggle: Option<IracingOffset>,
     /// In car trigger push to pass
@@ -674,6 +712,10 @@ pub struct IracingOffsets {
     pub dc_toggle_windshield_wipers: Option<IracingOffset>,
     /// In car traction control adjustment
     pub dc_traction_control: Option<IracingOffset>,
+    /// In car traction control 2 adjustment
+    pub dc_traction_control2: Option<IracingOffset>,
+    /// In car traction control active
+    pub dc_traction_control_toggle: Option<IracingOffset>,
     /// In car momentarily turn on wipers
     pub dc_trigger_windshield_wipers: Option<IracingOffset>,
     /// In car right wedge/weight jacker adjustment
@@ -967,7 +1009,31 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            energy_battery_to_mgu_k_lap: vars.get("EnergyBatteryToMGU_KLap").map(|v| {
+                IracingOffset {
+                    offset: v.offset as usize,
+                    count: v.count as usize,
+                }
+            }),
+            energy_ers_battery: vars.get("EnergyERSBattery").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            energy_ers_battery_pct: vars.get("EnergyERSBatteryPct").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            energy_mgu_k_lap_deploy_pct: vars.get("EnergyMGU_KLapDeployPct").map(|v| {
+                IracingOffset {
+                    offset: v.offset as usize,
+                    count: v.count as usize,
+                }
+            }),
             engine0_rpm: vars.get("Engine0_RPM").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            engine1_rpm: vars.get("Engine1_RPM").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1024,6 +1090,38 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             gpu_usage: vars.get("GpuUsage").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_fshock_defl: vars.get("HFshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_fshock_defl_st: vars.get("HFshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_fshock_vel: vars.get("HFshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_fshock_vel_st: vars.get("HFshockVel_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_rshock_defl: vars.get("HRshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_rshock_defl_st: vars.get("HRshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_rshock_vel: vars.get("HRshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            h_rshock_vel_st: vars.get("HRshockVel_ST").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1543,6 +1641,14 @@ impl IracingOffsets {
                     count: v.count as usize,
                 }
             }),
+            power_mgu_h: vars.get("PowerMGU_H").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            power_mgu_k: vars.get("PowerMGU_K").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             precipitation: vars.get("Precipitation").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
@@ -1945,6 +2051,10 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            torque_mgu_k: vars.get("TorqueMGU_K").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             track_temp: vars.get("TrackTemp").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
@@ -2053,11 +2163,23 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            dc_brake_misc: vars.get("dcBrakeMisc").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             dc_fuel_mixture: vars.get("dcFuelMixture").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
             dc_headlight_flash: vars.get("dcHeadlightFlash").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_low_fuel_accept: vars.get("dcLowFuelAccept").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_mguk_deploy_mode: vars.get("dcMGUKDeployMode").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -2092,6 +2214,16 @@ impl IracingOffsets {
             dc_traction_control: vars.get("dcTractionControl").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
+            }),
+            dc_traction_control2: vars.get("dcTractionControl2").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_traction_control_toggle: vars.get("dcTractionControlToggle").map(|v| {
+                IracingOffset {
+                    offset: v.offset as usize,
+                    count: v.count as usize,
+                }
             }),
             dc_trigger_windshield_wipers: vars.get("dcTriggerWindshieldWipers").map(|v| {
                 IracingOffset {
@@ -2300,8 +2432,18 @@ pub struct IracingFrame {
     pub display_units: i32,
     /// Driver activated flag
     pub driver_marker: bool,
+    /// Electrical energy from battery to MGU-K per lap [J]
+    pub energy_battery_to_mgu_k_lap: f32,
+    /// Engine ERS battery charge [J]
+    pub energy_ers_battery: f32,
+    /// Engine ERS battery charge as a percent [%]
+    pub energy_ers_battery_pct: f32,
+    /// Electrical energy available to MGU-K per lap as a percent [%]
+    pub energy_mgu_k_lap_deploy_pct: f32,
     /// Engine0Engine rpm [revs/min]
     pub engine0_rpm: f32,
+    /// Engine1Engine rpm [revs/min]
+    pub engine1_rpm: f32,
     /// Bitfield for warning lights [irsdk_EngineWarnings]
     pub engine_warnings: i32,
     /// Indicate action the reset key will take 0 enter 1 exit 2 reset
@@ -2330,6 +2472,22 @@ pub struct IracingFrame {
     pub gear: i32,
     /// Percent of available time gpu took with a 1 sec avg [%]
     pub gpu_usage: f32,
+    /// HF shock deflection [m]
+    pub h_fshock_defl: f32,
+    /// HF shock deflection at 360 Hz [m]
+    pub h_fshock_defl_st: Vec<f32>,
+    /// HF shock velocity [m/s]
+    pub h_fshock_vel: f32,
+    /// HF shock velocity at 360 Hz [m/s]
+    pub h_fshock_vel_st: Vec<f32>,
+    /// HR shock deflection [m]
+    pub h_rshock_defl: f32,
+    /// HR shock deflection at 360 Hz [m]
+    pub h_rshock_defl_st: Vec<f32>,
+    /// HR shock velocity [m/s]
+    pub h_rshock_vel: f32,
+    /// HR shock velocity at 360 Hz [m/s]
+    pub h_rshock_vel_st: Vec<f32>,
     /// Raw handbrake input 0=handbrake released to 1=max force [%]
     pub handbrake_raw: f32,
     /// 0=disk based telemetry file not being written  1=being written
@@ -2572,6 +2730,10 @@ pub struct IracingFrame {
     pub player_track_surface: i32,
     /// Players car track surface material type [irsdk_TrkSurf]
     pub player_track_surface_material: i32,
+    /// Engine MGU-H mechanical power [W]
+    pub power_mgu_h: f32,
+    /// Engine MGU-K mechanical power [W]
+    pub power_mgu_k: f32,
     /// Precipitation at start/finish line [%]
     pub precipitation: f32,
     /// Push to pass button state
@@ -2766,6 +2928,8 @@ pub struct IracingFrame {
     pub tire_sets_available: i32,
     /// How many tire sets used so far
     pub tire_sets_used: i32,
+    /// Engine MGU-K mechanical torque [Nm]
+    pub torque_mgu_k: f32,
     /// Deprecated  set to TrackTempCrew [C]
     pub track_temp: f32,
     /// Temperature of track measured by crew around track [C]
@@ -2820,10 +2984,16 @@ pub struct IracingFrame {
     pub dc_anti_roll_rear: f32,
     /// In car brake bias adjustment
     pub dc_brake_bias: f32,
+    /// In car brake misc adjustment
+    pub dc_brake_misc: f32,
     /// In car fuel mixture adjustment
     pub dc_fuel_mixture: f32,
     /// In car headlight flash control active
     pub dc_headlight_flash: bool,
+    /// In car low fuel accept
+    pub dc_low_fuel_accept: bool,
+    /// In car MGU-K deployment mode level adjustment
+    pub dc_mguk_deploy_mode: f32,
     /// Track if pit speed limiter system is enabled
     pub dc_pit_speed_limiter_toggle: bool,
     /// In car trigger push to pass
@@ -2838,6 +3008,10 @@ pub struct IracingFrame {
     pub dc_toggle_windshield_wipers: bool,
     /// In car traction control adjustment
     pub dc_traction_control: f32,
+    /// In car traction control 2 adjustment
+    pub dc_traction_control2: f32,
+    /// In car traction control active
+    pub dc_traction_control_toggle: bool,
     /// In car momentarily turn on wipers
     pub dc_trigger_windshield_wipers: bool,
     /// In car right wedge/weight jacker adjustment
@@ -3342,7 +3516,37 @@ impl IracingFrame {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
                 None => false,
             },
+            energy_battery_to_mgu_k_lap: match offsets.energy_battery_to_mgu_k_lap {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            energy_ers_battery: match offsets.energy_ers_battery {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            energy_ers_battery_pct: match offsets.energy_ers_battery_pct {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            energy_mgu_k_lap_deploy_pct: match offsets.energy_mgu_k_lap_deploy_pct {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             engine0_rpm: match offsets.engine0_rpm {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            engine1_rpm: match offsets.engine1_rpm {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
@@ -3431,6 +3635,66 @@ impl IracingFrame {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
+            },
+            h_fshock_defl: match offsets.h_fshock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            h_fshock_defl_st: match offsets.h_fshock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            h_fshock_vel: match offsets.h_fshock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            h_fshock_vel_st: match offsets.h_fshock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            h_rshock_defl: match offsets.h_rshock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            h_rshock_defl_st: match offsets.h_rshock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            h_rshock_vel: match offsets.h_rshock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            h_rshock_vel_st: match offsets.h_rshock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
             },
             handbrake_raw: match offsets.handbrake_raw {
                 Some(ref off) => unsafe {
@@ -4137,6 +4401,18 @@ impl IracingFrame {
                 },
                 None => 0,
             },
+            power_mgu_h: match offsets.power_mgu_h {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            power_mgu_k: match offsets.power_mgu_k {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             precipitation: match offsets.precipitation {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
@@ -4726,6 +5002,12 @@ impl IracingFrame {
                 },
                 None => 0,
             },
+            torque_mgu_k: match offsets.torque_mgu_k {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             track_temp: match offsets.track_temp {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
@@ -4897,6 +5179,12 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
+            dc_brake_misc: match offsets.dc_brake_misc {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             dc_fuel_mixture: match offsets.dc_fuel_mixture {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
@@ -4906,6 +5194,16 @@ impl IracingFrame {
             dc_headlight_flash: match offsets.dc_headlight_flash {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
                 None => false,
+            },
+            dc_low_fuel_accept: match offsets.dc_low_fuel_accept {
+                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
+                None => false,
+            },
+            dc_mguk_deploy_mode: match offsets.dc_mguk_deploy_mode {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
             },
             dc_pit_speed_limiter_toggle: match offsets.dc_pit_speed_limiter_toggle {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
@@ -4938,6 +5236,16 @@ impl IracingFrame {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
                 None => 0.0,
+            },
+            dc_traction_control2: match offsets.dc_traction_control2 {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_traction_control_toggle: match offsets.dc_traction_control_toggle {
+                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
+                None => false,
             },
             dc_trigger_windshield_wipers: match offsets.dc_trigger_windshield_wipers {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },

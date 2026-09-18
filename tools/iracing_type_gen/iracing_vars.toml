@@ -379,10 +379,40 @@ type = "bool"
 desc = "Driver activated flag"
 
 [[var]]
+name = "EnergyBatteryToMGU_KLap"
+type = "f32"
+unit = "J"
+desc = "Electrical energy from battery to MGU-K per lap"
+
+[[var]]
+name = "EnergyERSBattery"
+type = "f32"
+unit = "J"
+desc = "Engine ERS battery charge"
+
+[[var]]
+name = "EnergyERSBatteryPct"
+type = "f32"
+unit = "%"
+desc = "Engine ERS battery charge as a percent"
+
+[[var]]
+name = "EnergyMGU_KLapDeployPct"
+type = "f32"
+unit = "%"
+desc = "Electrical energy available to MGU-K per lap as a percent"
+
+[[var]]
 name = "Engine0_RPM"
 type = "f32"
 unit = "revs/min"
 desc = "Engine0Engine rpm"
+
+[[var]]
+name = "Engine1_RPM"
+type = "f32"
+unit = "revs/min"
+desc = "Engine1Engine rpm"
 
 [[var]]
 name = "EngineWarnings"
@@ -461,6 +491,58 @@ name = "GpuUsage"
 type = "f32"
 unit = "%"
 desc = "Percent of available time gpu took with a 1 sec avg"
+
+[[var]]
+name = "HFshockDefl"
+type = "f32"
+unit = "m"
+desc = "HF shock deflection"
+
+[[var]]
+name = "HFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "HF shock deflection at 360 Hz"
+
+[[var]]
+name = "HFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "HF shock velocity"
+
+[[var]]
+name = "HFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "HF shock velocity at 360 Hz"
+
+[[var]]
+name = "HRshockDefl"
+type = "f32"
+unit = "m"
+desc = "HR shock deflection"
+
+[[var]]
+name = "HRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "HR shock deflection at 360 Hz"
+
+[[var]]
+name = "HRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "HR shock velocity"
+
+[[var]]
+name = "HRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "HR shock velocity at 360 Hz"
 
 [[var]]
 name = "HandbrakeRaw"
@@ -1150,6 +1232,18 @@ unit = "irsdk_TrkSurf"
 desc = "Players car track surface material type"
 
 [[var]]
+name = "PowerMGU_H"
+type = "f32"
+unit = "W"
+desc = "Engine MGU-H mechanical power"
+
+[[var]]
+name = "PowerMGU_K"
+type = "f32"
+unit = "W"
+desc = "Engine MGU-K mechanical power"
+
+[[var]]
 name = "Precipitation"
 type = "f32"
 unit = "%"
@@ -1705,6 +1799,12 @@ type = "i32"
 desc = "How many tire sets used so far"
 
 [[var]]
+name = "TorqueMGU_K"
+type = "f32"
+unit = "Nm"
+desc = "Engine MGU-K mechanical torque"
+
+[[var]]
 name = "TrackTemp"
 type = "f32"
 unit = "C"
@@ -1865,6 +1965,11 @@ type = "f32"
 desc = "In car brake bias adjustment"
 
 [[var]]
+name = "dcBrakeMisc"
+type = "f32"
+desc = "In car brake misc adjustment"
+
+[[var]]
 name = "dcFuelMixture"
 type = "f32"
 desc = "In car fuel mixture adjustment"
@@ -1873,6 +1978,16 @@ desc = "In car fuel mixture adjustment"
 name = "dcHeadlightFlash"
 type = "bool"
 desc = "In car headlight flash control active"
+
+[[var]]
+name = "dcLowFuelAccept"
+type = "bool"
+desc = "In car low fuel accept"
+
+[[var]]
+name = "dcMGUKDeployMode"
+type = "f32"
+desc = "In car MGU-K deployment mode level adjustment"
 
 [[var]]
 name = "dcPitSpeedLimiterToggle"
@@ -1908,6 +2023,16 @@ desc = "In car turn wipers on or off"
 name = "dcTractionControl"
 type = "f32"
 desc = "In car traction control adjustment"
+
+[[var]]
+name = "dcTractionControl2"
+type = "f32"
+desc = "In car traction control 2 adjustment"
+
+[[var]]
+name = "dcTractionControlToggle"
+type = "bool"
+desc = "In car traction control active"
 
 [[var]]
 name = "dcTriggerWindshieldWipers"
