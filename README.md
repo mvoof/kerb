@@ -359,15 +359,19 @@ If the plugin is missing, `SimConnection::connect()` skips LMU and tries the nex
 
 ### How to regenerate
 
-1. Start iRacing and enter a session (practice, qualifying, or race)
-2. Run codegen — it connects to the live session, reads all variables, and writes `types.rs`:
+1. Start iRacing and enter a session (practice, qualifying, or race) in the car whose variables you want to pick up. This step is optional — without the sim, codegen just regenerates from the catalogue.
+2. Run codegen. It merges the session's variables into `tools/iracing_type_gen/iracing_vars.toml` and writes `types.rs` from the result:
 
 ```bash
-cargo run --manifest-path tools/iracing_type_gen/Cargo.toml -- src/iracing/types.rs
+cargo run --manifest-path tools/iracing_type_gen/Cargo.toml -- \
+  tools/iracing_type_gen/iracing_vars.toml \
+  src/iracing/types.rs
 ```
 
-3. **Read the diff before committing.** The generator writes exactly the variables the car in that session declares, so a run can delete fields as well as add them — see the warning in [`tools/iracing_type_gen/README.md`](tools/iracing_type_gen/README.md). Restore anything the run removed.
-4. Commit the updated `src/iracing/types.rs`
+3. Run `cargo fmt` — the generator emits unformatted Rust
+4. Commit the updated catalogue and `src/iracing/types.rs`
+
+The catalogue is the union over every car ever seen, since iRacing declares only the variables the current car has; see [`tools/iracing_type_gen/README.md`](tools/iracing_type_gen/README.md).
 
 ## Benchmarks
 
