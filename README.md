@@ -168,7 +168,48 @@ All features are enabled by default. Use `default-features = false` to opt in se
 
 `IracingFrame` is a typed struct with one pub field per variable — your IDE autocomplete shows all ~330 available fields directly. Fields use snake_case (`SteeringWheelAngle` → `steering_wheel_angle`).
 
-Which of them actually carry data depends on the car: iRacing publishes a different variable list per car, so a field the current car does not have stays at its default. Anything outside the generated set is still reachable dynamically — `telemetry_snapshot()` returns every variable the current session declares, and `save_var_list_snapshot()` writes the catalogue with types, units and descriptions.
+#### `IracingFrame` is not the whole of shared memory
+
+Reading live shared memory does not by itself make the typed frame complete, and
+the two limits behind that are worth keeping apart.
+
+**The sim declares a different variable list per car.** Each session writes an
+`irsdk_varHeader[numVars]` array naming the variables *that car* has. A hybrid
+prototype declares `EnergyERSBatteryPct` and no `dcThrottleShape`; a car with no
+hybrid declares the mirror image. `IracingOffsets` resolves every catalogue name
+against that array at connect time, so a variable the current car lacks is
+`None` and its frame field reads as `0.0` / `false` / an empty `Vec` — not an
+error, and indistinguishable from a genuine zero. Treat an always-zero field as
+"this car may not have it" before treating it as a bug.
+
+**The typed surface is a catalogue, not a mirror.** The fields exist because
+`tools/iracing_type_gen/iracing_vars.toml` lists them, and that file is the union
+of the cars the generator has been run in so far. A variable the sim is
+publishing *right now* is still absent from `IracingFrame` if no catalogue run
+has ever seen a car that declares it. This is the case that surprises people:
+the data is in shared memory, kerb is reading that memory, and there is still no
+field for it.
+
+There is no way to close this by reading harder. The official SDK headers carry
+no variable names — only the runtime layout that describes them — so no complete
+list exists to generate from, and coverage can only be accumulated one car at a
+time.
+
+The dynamic accessors have neither limit, since they work off the session's own
+header rather than the catalogue:
+
+| Need | Use |
+| --- | --- |
+| One variable by name | `telemetry_snapshot()`, then index the map |
+| Everything this car declares | `telemetry_snapshot()` |
+| Names, types, units, descriptions | `var_list_snapshot()` |
+| The same, written to a file | `save_telemetry_snapshot()`, `save_var_list_snapshot()` |
+
+They cost a string hash per lookup and give up compile-time checking, which is
+the trade the generated struct exists to avoid — so they are the right tool for
+exploring a car, and the typed fields are the right tool once you know what you
+need. If a variable turns out to be worth having, add the car to the catalogue
+rather than keeping the string lookup.
 
 ```rust
 Connection::IRacing(conn) => {
