@@ -369,6 +369,12 @@ type = "i32"
 desc = "Status of driver change lap requirements"
 
 [[var]]
+name = "DRS_Status"
+type = "i32"
+unit = " "
+desc = "Drag Reduction System Status"
+
+[[var]]
 name = "DisplayUnits"
 type = "i32"
 desc = "Default units for the user interface 0 = english 1 = metric"
@@ -1428,6 +1434,58 @@ unit = "%"
 desc = "RF tire right percent tread remaining"
 
 [[var]]
+name = "ROLLFshockDefl"
+type = "f32"
+unit = "m"
+desc = "ROLLF shock deflection"
+
+[[var]]
+name = "ROLLFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "ROLLF shock deflection at 360 Hz"
+
+[[var]]
+name = "ROLLFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "ROLLF shock velocity"
+
+[[var]]
+name = "ROLLFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "ROLLF shock velocity at 360 Hz"
+
+[[var]]
+name = "ROLLRshockDefl"
+type = "f32"
+unit = "m"
+desc = "ROLLR shock deflection"
+
+[[var]]
+name = "ROLLRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "ROLLR shock deflection at 360 Hz"
+
+[[var]]
+name = "ROLLRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "ROLLR shock velocity"
+
+[[var]]
+name = "ROLLRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "ROLLR shock velocity at 360 Hz"
+
+[[var]]
 name = "RPM"
 type = "f32"
 unit = "revs/min"
@@ -2069,9 +2127,44 @@ type = "f32"
 desc = "In car brake bias adjustment"
 
 [[var]]
+name = "dcBrakeBiasFine"
+type = "f32"
+desc = "In car brake bias fine adjustment"
+
+[[var]]
 name = "dcBrakeMisc"
 type = "f32"
 desc = "In car brake misc adjustment"
+
+[[var]]
+name = "dcDRSToggle"
+type = "bool"
+desc = "In car toggle DRS"
+
+[[var]]
+name = "dcDashPage"
+type = "f32"
+desc = "In car dash display page adjustment"
+
+[[var]]
+name = "dcDiffEntry"
+type = "f32"
+desc = "In car diff entry adjustment"
+
+[[var]]
+name = "dcDiffExit"
+type = "f32"
+desc = "In car diff exit adjustment"
+
+[[var]]
+name = "dcDiffMiddle"
+type = "f32"
+desc = "In car diff middle adjustment"
+
+[[var]]
+name = "dcEngineBraking"
+type = "f32"
+desc = "In car engine braking adjustment"
 
 [[var]]
 name = "dcFuelMixture"
@@ -2092,6 +2185,16 @@ desc = "In car low fuel accept"
 name = "dcMGUKDeployMode"
 type = "f32"
 desc = "In car MGU-K deployment mode level adjustment"
+
+[[var]]
+name = "dcMGUKRegenGain"
+type = "f32"
+desc = "In car MUG-K re-gen gain adjustment"
+
+[[var]]
+name = "dcPeakBrakeBias"
+type = "f32"
+desc = "In car peak brake bias adjustment"
 
 [[var]]
 name = "dcPitSpeedLimiterToggle"

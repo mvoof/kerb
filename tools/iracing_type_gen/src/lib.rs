@@ -148,7 +148,8 @@ const SNAKE_OVERRIDES: &[(&str, &str)] = &[("BrakeABSactive", "brake_abs_active"
 /// Longest first: `LFSHshockDefl` is an `LFSH` channel, and matching `LF`
 /// against it would leave `lfs_hshock_defl`.
 const CORNER_PREFIXES: &[&str] = &[
-    "LFSH", "LRSH", "RFSH", "RRSH", "CF", "CR", "HF", "HR", "LF", "LR", "RF", "RR",
+    "ROLLF", "ROLLR", "LFSH", "LRSH", "RFSH", "RRSH", "CF", "CR", "HF", "HR", "LF", "LR", "RF",
+    "RR",
 ];
 
 pub fn camel_to_snake(name: &str) -> String {

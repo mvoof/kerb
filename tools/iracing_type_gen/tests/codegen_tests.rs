@@ -264,6 +264,8 @@ fn camel_to_snake_prefers_the_longer_corner_prefix() {
     assert_eq!(camel_to_snake("LRSHshockVel_ST"), "lrsh_shock_vel_st");
     assert_eq!(camel_to_snake("RFSHshockDefl_ST"), "rfsh_shock_defl_st");
     assert_eq!(camel_to_snake("RRSHshockVel"), "rrsh_shock_vel");
+    assert_eq!(camel_to_snake("ROLLFshockDefl"), "rollf_shock_defl");
+    assert_eq!(camel_to_snake("ROLLRshockVel_ST"), "rollr_shock_vel_st");
 
     // The two-letter codes still work for the names that actually use them.
     assert_eq!(camel_to_snake("LFshockDefl"), "lf_shock_defl");

@@ -132,6 +132,8 @@ pub struct IracingOffsets {
     pub dc_drivers_so_far: Option<IracingOffset>,
     /// Status of driver change lap requirements
     pub dc_lap_status: Option<IracingOffset>,
+    /// Drag Reduction System Status [ ]
+    pub drs_status: Option<IracingOffset>,
     /// Default units for the user interface 0 = english 1 = metric
     pub display_units: Option<IracingOffset>,
     /// Driver activated flag
@@ -498,6 +500,22 @@ pub struct IracingOffsets {
     pub rf_wear_m: Option<IracingOffset>,
     /// RF tire right percent tread remaining [%]
     pub rf_wear_r: Option<IracingOffset>,
+    /// ROLLF shock deflection [m]
+    pub rollf_shock_defl: Option<IracingOffset>,
+    /// ROLLF shock deflection at 360 Hz [m]
+    pub rollf_shock_defl_st: Option<IracingOffset>,
+    /// ROLLF shock velocity [m/s]
+    pub rollf_shock_vel: Option<IracingOffset>,
+    /// ROLLF shock velocity at 360 Hz [m/s]
+    pub rollf_shock_vel_st: Option<IracingOffset>,
+    /// ROLLR shock deflection [m]
+    pub rollr_shock_defl: Option<IracingOffset>,
+    /// ROLLR shock deflection at 360 Hz [m]
+    pub rollr_shock_defl_st: Option<IracingOffset>,
+    /// ROLLR shock velocity [m/s]
+    pub rollr_shock_vel: Option<IracingOffset>,
+    /// ROLLR shock velocity at 360 Hz [m/s]
+    pub rollr_shock_vel_st: Option<IracingOffset>,
     /// Engine rpm [revs/min]
     pub rpm: Option<IracingOffset>,
     /// RRSH shock deflection [m]
@@ -720,8 +738,22 @@ pub struct IracingOffsets {
     pub dc_anti_roll_rear: Option<IracingOffset>,
     /// In car brake bias adjustment
     pub dc_brake_bias: Option<IracingOffset>,
+    /// In car brake bias fine adjustment
+    pub dc_brake_bias_fine: Option<IracingOffset>,
     /// In car brake misc adjustment
     pub dc_brake_misc: Option<IracingOffset>,
+    /// In car toggle DRS
+    pub dc_drs_toggle: Option<IracingOffset>,
+    /// In car dash display page adjustment
+    pub dc_dash_page: Option<IracingOffset>,
+    /// In car diff entry adjustment
+    pub dc_diff_entry: Option<IracingOffset>,
+    /// In car diff exit adjustment
+    pub dc_diff_exit: Option<IracingOffset>,
+    /// In car diff middle adjustment
+    pub dc_diff_middle: Option<IracingOffset>,
+    /// In car engine braking adjustment
+    pub dc_engine_braking: Option<IracingOffset>,
     /// In car fuel mixture adjustment
     pub dc_fuel_mixture: Option<IracingOffset>,
     /// In car headlight flash control active
@@ -730,6 +762,10 @@ pub struct IracingOffsets {
     pub dc_low_fuel_accept: Option<IracingOffset>,
     /// In car MGU-K deployment mode level adjustment
     pub dc_mguk_deploy_mode: Option<IracingOffset>,
+    /// In car MUG-K re-gen gain adjustment
+    pub dc_mguk_regen_gain: Option<IracingOffset>,
+    /// In car peak brake bias adjustment
+    pub dc_peak_brake_bias: Option<IracingOffset>,
     /// Track if pit speed limiter system is enabled
     pub dc_pit_speed_limiter_toggle: Option<IracingOffset>,
     /// In car trigger push to pass
@@ -1034,6 +1070,10 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             dc_lap_status: vars.get("DCLapStatus").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            drs_status: vars.get("DRS_Status").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -1805,6 +1845,38 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            rollf_shock_defl: vars.get("ROLLFshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollf_shock_defl_st: vars.get("ROLLFshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollf_shock_vel: vars.get("ROLLFshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollf_shock_vel_st: vars.get("ROLLFshockVel_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollr_shock_defl: vars.get("ROLLRshockDefl").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollr_shock_defl_st: vars.get("ROLLRshockDefl_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollr_shock_vel: vars.get("ROLLRshockVel").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            rollr_shock_vel_st: vars.get("ROLLRshockVel_ST").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             rpm: vars.get("RPM").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
@@ -2263,7 +2335,35 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            dc_brake_bias_fine: vars.get("dcBrakeBiasFine").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             dc_brake_misc: vars.get("dcBrakeMisc").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_drs_toggle: vars.get("dcDRSToggle").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_dash_page: vars.get("dcDashPage").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_diff_entry: vars.get("dcDiffEntry").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_diff_exit: vars.get("dcDiffExit").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_diff_middle: vars.get("dcDiffMiddle").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_engine_braking: vars.get("dcEngineBraking").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -2280,6 +2380,14 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             dc_mguk_deploy_mode: vars.get("dcMGUKDeployMode").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_mguk_regen_gain: vars.get("dcMGUKRegenGain").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_peak_brake_bias: vars.get("dcPeakBrakeBias").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -2536,6 +2644,8 @@ pub struct IracingFrame {
     pub dc_drivers_so_far: i32,
     /// Status of driver change lap requirements
     pub dc_lap_status: i32,
+    /// Drag Reduction System Status [ ]
+    pub drs_status: i32,
     /// Default units for the user interface 0 = english 1 = metric
     pub display_units: i32,
     /// Driver activated flag
@@ -2902,6 +3012,22 @@ pub struct IracingFrame {
     pub rf_wear_m: f32,
     /// RF tire right percent tread remaining [%]
     pub rf_wear_r: f32,
+    /// ROLLF shock deflection [m]
+    pub rollf_shock_defl: f32,
+    /// ROLLF shock deflection at 360 Hz [m]
+    pub rollf_shock_defl_st: Vec<f32>,
+    /// ROLLF shock velocity [m/s]
+    pub rollf_shock_vel: f32,
+    /// ROLLF shock velocity at 360 Hz [m/s]
+    pub rollf_shock_vel_st: Vec<f32>,
+    /// ROLLR shock deflection [m]
+    pub rollr_shock_defl: f32,
+    /// ROLLR shock deflection at 360 Hz [m]
+    pub rollr_shock_defl_st: Vec<f32>,
+    /// ROLLR shock velocity [m/s]
+    pub rollr_shock_vel: f32,
+    /// ROLLR shock velocity at 360 Hz [m/s]
+    pub rollr_shock_vel_st: Vec<f32>,
     /// Engine rpm [revs/min]
     pub rpm: f32,
     /// RRSH shock deflection [m]
@@ -3124,8 +3250,22 @@ pub struct IracingFrame {
     pub dc_anti_roll_rear: f32,
     /// In car brake bias adjustment
     pub dc_brake_bias: f32,
+    /// In car brake bias fine adjustment
+    pub dc_brake_bias_fine: f32,
     /// In car brake misc adjustment
     pub dc_brake_misc: f32,
+    /// In car toggle DRS
+    pub dc_drs_toggle: bool,
+    /// In car dash display page adjustment
+    pub dc_dash_page: f32,
+    /// In car diff entry adjustment
+    pub dc_diff_entry: f32,
+    /// In car diff exit adjustment
+    pub dc_diff_exit: f32,
+    /// In car diff middle adjustment
+    pub dc_diff_middle: f32,
+    /// In car engine braking adjustment
+    pub dc_engine_braking: f32,
     /// In car fuel mixture adjustment
     pub dc_fuel_mixture: f32,
     /// In car headlight flash control active
@@ -3134,6 +3274,10 @@ pub struct IracingFrame {
     pub dc_low_fuel_accept: bool,
     /// In car MGU-K deployment mode level adjustment
     pub dc_mguk_deploy_mode: f32,
+    /// In car MUG-K re-gen gain adjustment
+    pub dc_mguk_regen_gain: f32,
+    /// In car peak brake bias adjustment
+    pub dc_peak_brake_bias: f32,
     /// Track if pit speed limiter system is enabled
     pub dc_pit_speed_limiter_toggle: bool,
     /// In car trigger push to pass
@@ -3645,6 +3789,12 @@ impl IracingFrame {
                 None => 0,
             },
             dc_lap_status: match offsets.dc_lap_status {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
+                },
+                None => 0,
+            },
+            drs_status: match offsets.drs_status {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const i32)
                 },
@@ -4757,6 +4907,66 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
+            rollf_shock_defl: match offsets.rollf_shock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rollf_shock_defl_st: match offsets.rollf_shock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            rollf_shock_vel: match offsets.rollf_shock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rollf_shock_vel_st: match offsets.rollf_shock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            rollr_shock_defl: match offsets.rollr_shock_defl {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rollr_shock_defl_st: match offsets.rollr_shock_defl_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
+            rollr_shock_vel: match offsets.rollr_shock_vel {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            rollr_shock_vel_st: match offsets.rollr_shock_vel_st {
+                Some(ref off) => unsafe {
+                    let src = buf.add(off.offset) as *const f32;
+                    (0..off.count)
+                        .map(|i| std::ptr::read_unaligned(src.add(i)))
+                        .collect()
+                },
+                None => Vec::new(),
+            },
             rpm: match offsets.rpm {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
@@ -5443,7 +5653,47 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
+            dc_brake_bias_fine: match offsets.dc_brake_bias_fine {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             dc_brake_misc: match offsets.dc_brake_misc {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_drs_toggle: match offsets.dc_drs_toggle {
+                Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
+                None => false,
+            },
+            dc_dash_page: match offsets.dc_dash_page {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_diff_entry: match offsets.dc_diff_entry {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_diff_exit: match offsets.dc_diff_exit {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_diff_middle: match offsets.dc_diff_middle {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_engine_braking: match offsets.dc_engine_braking {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
@@ -5464,6 +5714,18 @@ impl IracingFrame {
                 None => false,
             },
             dc_mguk_deploy_mode: match offsets.dc_mguk_deploy_mode {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_mguk_regen_gain: match offsets.dc_mguk_regen_gain {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
+            dc_peak_brake_bias: match offsets.dc_peak_brake_bias {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
                 },
