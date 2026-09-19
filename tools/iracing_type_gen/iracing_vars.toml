@@ -2147,6 +2147,11 @@ type = "f32"
 desc = "In car dash display page adjustment"
 
 [[var]]
+name = "dcDashPage2"
+type = "f32"
+desc = "In car second dash display page adjustment"
+
+[[var]]
 name = "dcDiffEntry"
 type = "f32"
 desc = "In car diff entry adjustment"
@@ -2175,6 +2180,11 @@ desc = "In car fuel mixture adjustment"
 name = "dcHeadlightFlash"
 type = "bool"
 desc = "In car headlight flash control active"
+
+[[var]]
+name = "dcLaunchRPM"
+type = "f32"
+desc = "In car launch rpm adjustment"
 
 [[var]]
 name = "dcLowFuelAccept"

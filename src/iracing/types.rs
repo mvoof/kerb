@@ -746,6 +746,8 @@ pub struct IracingOffsets {
     pub dc_drs_toggle: Option<IracingOffset>,
     /// In car dash display page adjustment
     pub dc_dash_page: Option<IracingOffset>,
+    /// In car second dash display page adjustment
+    pub dc_dash_page2: Option<IracingOffset>,
     /// In car diff entry adjustment
     pub dc_diff_entry: Option<IracingOffset>,
     /// In car diff exit adjustment
@@ -758,6 +760,8 @@ pub struct IracingOffsets {
     pub dc_fuel_mixture: Option<IracingOffset>,
     /// In car headlight flash control active
     pub dc_headlight_flash: Option<IracingOffset>,
+    /// In car launch rpm adjustment
+    pub dc_launch_rpm: Option<IracingOffset>,
     /// In car low fuel accept
     pub dc_low_fuel_accept: Option<IracingOffset>,
     /// In car MGU-K deployment mode level adjustment
@@ -2351,6 +2355,10 @@ impl IracingOffsets {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
+            dc_dash_page2: vars.get("dcDashPage2").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
             dc_diff_entry: vars.get("dcDiffEntry").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
@@ -2372,6 +2380,10 @@ impl IracingOffsets {
                 count: v.count as usize,
             }),
             dc_headlight_flash: vars.get("dcHeadlightFlash").map(|v| IracingOffset {
+                offset: v.offset as usize,
+                count: v.count as usize,
+            }),
+            dc_launch_rpm: vars.get("dcLaunchRPM").map(|v| IracingOffset {
                 offset: v.offset as usize,
                 count: v.count as usize,
             }),
@@ -3258,6 +3270,8 @@ pub struct IracingFrame {
     pub dc_drs_toggle: bool,
     /// In car dash display page adjustment
     pub dc_dash_page: f32,
+    /// In car second dash display page adjustment
+    pub dc_dash_page2: f32,
     /// In car diff entry adjustment
     pub dc_diff_entry: f32,
     /// In car diff exit adjustment
@@ -3270,6 +3284,8 @@ pub struct IracingFrame {
     pub dc_fuel_mixture: f32,
     /// In car headlight flash control active
     pub dc_headlight_flash: bool,
+    /// In car launch rpm adjustment
+    pub dc_launch_rpm: f32,
     /// In car low fuel accept
     pub dc_low_fuel_accept: bool,
     /// In car MGU-K deployment mode level adjustment
@@ -5675,6 +5691,12 @@ impl IracingFrame {
                 },
                 None => 0.0,
             },
+            dc_dash_page2: match offsets.dc_dash_page2 {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
+            },
             dc_diff_entry: match offsets.dc_diff_entry {
                 Some(ref off) => unsafe {
                     std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
@@ -5708,6 +5730,12 @@ impl IracingFrame {
             dc_headlight_flash: match offsets.dc_headlight_flash {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
                 None => false,
+            },
+            dc_launch_rpm: match offsets.dc_launch_rpm {
+                Some(ref off) => unsafe {
+                    std::ptr::read_unaligned(buf.add(off.offset) as *const f32)
+                },
+                None => 0.0,
             },
             dc_low_fuel_accept: match offsets.dc_low_fuel_accept {
                 Some(ref off) => unsafe { std::ptr::read_unaligned(buf.add(off.offset)) != 0 },
