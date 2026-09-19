@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0] - 2026-09-19
+
+### Added
+- **`tools/iracing_type_gen/iracing_vars.toml`** — a curated variable catalogue, the union over every car seen so far, and now the source of truth `src/iracing/types.rs` is generated from. A codegen run merges the live session into it and never removes from it; retiring a variable is a manual edit of the catalogue.
+- **`IracingFrame` grows from 332 to 408 fields**, merged from six cars. New groups: the GTP hybrid set (`EnergyERSBatteryPct`, `EnergyERSBattery`, `EnergyBatteryToMGU_KLap`, `EnergyMGU_KLapDeployPct`, `PowerMGU_K`, `PowerMGU_H`, `TorqueMGU_K`, `dcMGUKDeployMode`, `dcMGUKRegenGain`); DRS (`DRS_Status`, `dcDRSToggle`); the in-car adjustments (`dcDiffEntry`, `dcDiffMiddle`, `dcDiffExit`, `dcEngineBraking`, `dcBrakeBiasFine`, `dcPeakBrakeBias`, `dcTractionControl2`, `dcTractionControlToggle`, `dcAntiRollFront`, `dcAntiRollRear`, `dcBrakeMisc`, `dcLowFuelAccept`, `dcLaunchRPM`, `dcDashPage`, `dcDashPage2`); the `CF`/`CR`/`HF`/`HR`/`ROLLF`/`ROLLR`/`*SH` shock deflection and velocity channels at 60 Hz and 360 Hz; and the pit-service controls (`dpTireChange`, `dpLTireChange`, `dpRTireChange`, `dpWingFront`, `dpWingRear`).
+- Codegen API for the merge: `merge_defs`, `MergeReport`, `catalogue_to_toml`, `parse_catalogue`.
+
+### Changed
+- **The generator takes two arguments, `<catalogue.toml> <output.rs>`**, and **no longer needs iRacing running**. Without the sim it generates from the catalogue alone, which is what CI and anyone without iRacing installed can do; with the sim it merges the session first and reports what it added, what it reshaped, and how many catalogued entries this car does not expose.
+
+### Fixed
+- **Corner and axle prefixes no longer split into the wrong snake_case.** The generic split read a leading code as an acronym, so `CFshockDefl` became `c_fshock_defl` and `LFSHshockDefl` became `lfs_hshock_defl`. `ROLLF`, `ROLLR`, `LFSH`, `LRSH`, `RFSH`, `RRSH`, `CF`, `CR`, `HF`, `HR` are now recognised, ordered longest first so `LFSH` is not swallowed by `LF`. No released field is renamed — every affected field is new in this version. `RollRate` is untouched; the match is case sensitive.
+
+### Documentation
+- The README and the codegen README described a catalogue that did not exist, and an `IracingFrame<'a>` borrowing the connection with `value(name)`, `all()` and ~90 accessor methods, where the generated type is an owned struct with a single `from_raw`. Both corrected.
+- A new section spells out why a typed field can be missing what the sim is publishing right now: catalogued but not declared by this car, so the offset resolves `None` and the field reads as a default indistinguishable from a real zero; or published by the sim but absent from the catalogue, so no field exists at all. Both route to `var_list_snapshot()` and `telemetry_snapshot()`.
+
+
 ## [0.3.0] - 2026-08-06
 
 ### Added
