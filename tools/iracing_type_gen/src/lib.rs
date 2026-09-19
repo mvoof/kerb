@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct VarDef {
     pub name: String,
     #[serde(rename = "type")]
@@ -22,13 +22,135 @@ struct VarFile {
     var: Vec<VarDef>,
 }
 
+/// What a merge did to the catalogue, for the operator to read before committing.
+#[derive(Default)]
+pub struct MergeReport {
+    /// Variables the session declared that the catalogue had never seen.
+    pub added: Vec<String>,
+    /// Variables whose type or element count the session declares differently.
+    pub redefined: Vec<String>,
+    /// Variables the catalogue holds that this car does not expose. They are
+    /// kept — another car still publishes them — and listed only so a genuine
+    /// removal by iRacing is not silently carried forever.
+    pub absent: Vec<String>,
+}
+
+/// Fold the variables of one session into the catalogue.
+///
+/// The catalogue is the union over every car ever seen, because iRacing
+/// declares only the variables the current car has: merging is what keeps a
+/// regeneration in a GTP car from dropping the fields that only a formula car
+/// or only a road car publishes. Entries are therefore never removed here.
+///
+/// Where both sides know a variable, the session wins on shape (type and
+/// count) and on any description or unit it actually carries — the sim is
+/// authoritative, and an empty string from it is absence, not a correction.
+pub fn merge_defs(catalogue: &[VarDef], session: &[VarDef]) -> (Vec<VarDef>, MergeReport) {
+    let mut merged: Vec<VarDef> = catalogue.to_vec();
+    let mut report = MergeReport::default();
+
+    for incoming in session {
+        let existing = merged.iter_mut().find(|held| held.name == incoming.name);
+
+        let Some(held) = existing else {
+            report.added.push(incoming.name.clone());
+            merged.push(incoming.clone());
+
+            continue;
+        };
+
+        if held.type_ != incoming.type_ || held.count != incoming.count {
+            report.redefined.push(incoming.name.clone());
+            held.type_ = incoming.type_.clone();
+            held.count = incoming.count;
+        }
+
+        if !incoming.unit.is_empty() {
+            held.unit = incoming.unit.clone();
+        }
+
+        if !incoming.desc.is_empty() {
+            held.desc = incoming.desc.clone();
+        }
+    }
+
+    for held in &merged {
+        if !session.iter().any(|incoming| incoming.name == held.name) {
+            report.absent.push(held.name.clone());
+        }
+    }
+
+    merged.sort_by(|left, right| left.name.cmp(&right.name));
+
+    (merged, report)
+}
+
+/// Render the catalogue back as TOML, sorted by name.
+pub fn catalogue_to_toml(vars: &[VarDef]) -> String {
+    let mut out = String::new();
+
+    out.push_str("# Catalogue of iRacing telemetry variables known to kerb.\n");
+    out.push_str("# Source of truth for src/iracing/types.rs — see the README.\n");
+    out.push_str("#\n");
+    out.push_str("# The union over every car ever seen. iRacing declares only the variables the\n");
+    out.push_str("# current car has, so entries are added by a merge and never removed by one;\n");
+    out.push_str("# a variable absent from a session simply resolves to None at connect time.\n");
+
+    for var in vars {
+        out.push_str("\n[[var]]\n");
+        out.push_str(&format!("name = {}\n", toml_string(&var.name)));
+        out.push_str(&format!("type = {}\n", toml_string(&var.type_)));
+
+        if var.count != 1 {
+            out.push_str(&format!("count = {}\n", var.count));
+        }
+
+        if !var.unit.is_empty() {
+            out.push_str(&format!("unit = {}\n", toml_string(&var.unit)));
+        }
+
+        if !var.desc.is_empty() {
+            out.push_str(&format!("desc = {}\n", toml_string(&var.desc)));
+        }
+    }
+
+    out
+}
+
+/// Descriptions come from shared memory and are not guaranteed to be free of
+/// quotes or backslashes, so they are escaped rather than interpolated raw.
+fn toml_string(value: &str) -> String {
+    let escaped = value.replace('\\', "\\\\").replace('"', "\\\"");
+
+    format!("\"{escaped}\"")
+}
+
+/// Read a catalogue file. An absent file is an empty catalogue, so the first
+/// run bootstraps it from the session instead of failing.
+pub fn parse_catalogue(toml_str: &str) -> Result<Vec<VarDef>, toml::de::Error> {
+    if toml_str.trim().is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let file: VarFile = toml::from_str(toml_str)?;
+
+    Ok(file.var)
+}
+
 /// iRacing names that defeat mechanical CamelCase splitting (irregular
 /// acronym/word boundaries). Checked before the generic conversion.
 const SNAKE_OVERRIDES: &[(&str, &str)] = &[("BrakeABSactive", "brake_abs_active")];
 
-/// Tire/corner prefixes: `LFtempCL` means "LF temp CL", so the two-letter
-/// corner code is one word (`lf_temp_cl`), not the generic split (`l_ftemp_cl`).
-const CORNER_PREFIXES: &[&str] = &["LF", "LR", "RF", "RR"];
+/// Corner and axle codes that open a variable name. `LFtempCL` means
+/// "LF temp CL", so the code is one word (`lf_temp_cl`) rather than the
+/// generic split on the case change (`l_ftemp_cl`).
+///
+/// Longest first: `LFSHshockDefl` is an `LFSH` channel, and matching `LF`
+/// against it would leave `lfs_hshock_defl`.
+const CORNER_PREFIXES: &[&str] = &[
+    "ROLLF", "ROLLR", "LFSH", "LRSH", "RFSH", "RRSH", "CF", "CR", "HF", "HR", "LF", "LR", "RF",
+    "RR",
+];
 
 pub fn camel_to_snake(name: &str) -> String {
     if let Some((_, snake)) = SNAKE_OVERRIDES

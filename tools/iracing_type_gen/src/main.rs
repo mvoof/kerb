@@ -1,4 +1,6 @@
-use iracing_type_gen::{VarDef, generate_from_defs};
+use iracing_type_gen::{
+    VarDef, catalogue_to_toml, generate_from_defs, merge_defs, parse_catalogue,
+};
 use std::fs;
 use std::path::Path;
 use windows_sys::Win32::Foundation::{CloseHandle, INVALID_HANDLE_VALUE};
@@ -149,45 +151,102 @@ impl IracingFrame {
 fn main() {
     let args: Vec<String> = std::env::args().collect();
 
-    if args.len() != 2 {
-        eprintln!("Usage: iracing_type_gen <output.rs>");
-        eprintln!("  iRacing must be running.");
+    if args.len() != 3 {
+        eprintln!("Usage: iracing_type_gen <catalogue.toml> <output.rs>");
+        eprintln!("  Generates <output.rs> from the catalogue.");
+        eprintln!("  With iRacing running, the session is merged into the catalogue first.");
         std::process::exit(1);
     }
 
-    let output_path = &args[1];
-    let output_path_obj = Path::new(output_path);
+    let catalogue_path = &args[1];
+    let output_path = &args[2];
 
-    // 1. If output file is missing, immediately write a placeholder so the project can compile in normal mode!
-    if !output_path_obj.exists() {
-        println!(
-            "Types file is missing. Creating a dummy placeholder at {}",
-            output_path
-        );
-        if let Err(e) = write_dummy_placeholder(output_path) {
-            eprintln!("Warning: Failed to write placeholder: {}", e);
+    // A missing output file would stop the crate compiling, and the operator
+    // may be here precisely because of that. Put a placeholder in first so a
+    // failure further down never leaves the tree unbuildable.
+    if !Path::new(output_path).exists() {
+        println!("{output_path} is missing. Writing a placeholder first.");
+
+        if let Err(error) = write_dummy_placeholder(output_path) {
+            eprintln!("Warning: cannot write placeholder: {error}");
         }
     }
 
-    // 2. Connect to running iRacing session
-    let mut vars = match read_iracing_variables() {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("Error: {}", e);
-            eprintln!("iRacing must be running when codegen is executed.");
-            // We exit here, but we already created a placeholder if the file was missing, so compilation won't fail!
+    let catalogue_src = fs::read_to_string(catalogue_path).unwrap_or_default();
+
+    let catalogue = match parse_catalogue(&catalogue_src) {
+        Ok(vars) => vars,
+        Err(error) => {
+            eprintln!("Cannot parse {catalogue_path}: {error}");
             std::process::exit(1);
         }
     };
 
-    vars.sort_by(|a, b| a.name.cmp(&b.name));
+    let vars = match read_iracing_variables() {
+        Ok(session) => merge_session(catalogue_path, &catalogue, &session),
+        Err(error) => {
+            if catalogue.is_empty() {
+                eprintln!("Error: {error}");
+                eprintln!(
+                    "The catalogue is empty, so there is nothing to generate from.                      Start iRacing and enter a session to bootstrap it."
+                );
+                std::process::exit(1);
+            }
 
-    let output = generate_from_defs(&vars);
+            println!("{error}");
+            println!(
+                "Generating from the catalogue alone ({} variables).",
+                catalogue.len()
+            );
 
-    fs::write(output_path, output).unwrap_or_else(|e| {
-        eprintln!("Cannot write {}: {}", output_path, e);
+            catalogue
+        }
+    };
+
+    fs::write(output_path, generate_from_defs(&vars)).unwrap_or_else(|error| {
+        eprintln!("Cannot write {output_path}: {error}");
         std::process::exit(1);
     });
 
-    println!("Generated {} ({} variables)", output_path, vars.len());
+    println!("Generated {output_path} ({} variables)", vars.len());
+}
+
+/// Fold the live session into the catalogue and write it back, reporting what
+/// changed. The catalogue only ever grows: a variable the current car lacks is
+/// still published by some other car, so it is kept rather than dropped.
+fn merge_session(catalogue_path: &str, catalogue: &[VarDef], session: &[VarDef]) -> Vec<VarDef> {
+    let (merged, report) = merge_defs(catalogue, session);
+
+    println!(
+        "Session declares {} variables; catalogue held {}, now {}.",
+        session.len(),
+        catalogue.len(),
+        merged.len()
+    );
+
+    if !report.added.is_empty() {
+        println!("Added {}: {}", report.added.len(), report.added.join(", "));
+    }
+
+    if !report.redefined.is_empty() {
+        println!(
+            "Redefined {}: {}",
+            report.redefined.len(),
+            report.redefined.join(", ")
+        );
+    }
+
+    if !report.absent.is_empty() {
+        println!(
+            "Kept {} not exposed by this car (normal — the list is per car).",
+            report.absent.len()
+        );
+    }
+
+    fs::write(catalogue_path, catalogue_to_toml(&merged)).unwrap_or_else(|error| {
+        eprintln!("Cannot write {catalogue_path}: {error}");
+        std::process::exit(1);
+    });
+
+    merged
 }

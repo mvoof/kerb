@@ -1,0 +1,2362 @@
+# Catalogue of iRacing telemetry variables known to kerb.
+# Source of truth for src/iracing/types.rs — see the README.
+#
+# The union over every car ever seen. iRacing declares only the variables the
+# current car has, so entries are added by a merge and never removed by one;
+# a variable absent from a session simply resolves to None at connect time.
+
+[[var]]
+name = "AirDensity"
+type = "f32"
+unit = "kg/m^3"
+desc = "Density of air at start/finish line"
+
+[[var]]
+name = "AirPressure"
+type = "f32"
+unit = "Pa"
+desc = "Pressure of air at start/finish line"
+
+[[var]]
+name = "AirTemp"
+type = "f32"
+unit = "C"
+desc = "Temperature of air at start/finish line"
+
+[[var]]
+name = "Brake"
+type = "f32"
+unit = "%"
+desc = "0=brake released to 1=max pedal force"
+
+[[var]]
+name = "BrakeABSactive"
+type = "bool"
+desc = "true if abs is currently reducing brake force pressure"
+
+[[var]]
+name = "BrakeRaw"
+type = "f32"
+unit = "%"
+desc = "Raw brake input 0=brake released to 1=max pedal force"
+
+[[var]]
+name = "CFshockDefl"
+type = "f32"
+unit = "m"
+desc = "CF shock deflection"
+
+[[var]]
+name = "CFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "CF shock deflection at 360 Hz"
+
+[[var]]
+name = "CFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "CF shock velocity"
+
+[[var]]
+name = "CFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "CF shock velocity at 360 Hz"
+
+[[var]]
+name = "CRshockDefl"
+type = "f32"
+unit = "m"
+desc = "CR shock deflection"
+
+[[var]]
+name = "CRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "CR shock deflection at 360 Hz"
+
+[[var]]
+name = "CRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "CR shock velocity"
+
+[[var]]
+name = "CRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "CR shock velocity at 360 Hz"
+
+[[var]]
+name = "CamCameraNumber"
+type = "i32"
+desc = "Active camera number"
+
+[[var]]
+name = "CamCameraState"
+type = "i32"
+unit = "irsdk_CameraState"
+desc = "State of camera system"
+
+[[var]]
+name = "CamCarIdx"
+type = "i32"
+desc = "Active camera's focus car index"
+
+[[var]]
+name = "CamGroupNumber"
+type = "i32"
+desc = "Active camera group number"
+
+[[var]]
+name = "CarDistAhead"
+type = "f32"
+unit = "m"
+desc = "Distance to first car in front of player in meters"
+
+[[var]]
+name = "CarDistBehind"
+type = "f32"
+unit = "m"
+desc = "Distance to first car behind player in meters"
+
+[[var]]
+name = "CarIdxBestLapNum"
+type = "i32"
+count = 72
+desc = "Cars best lap number"
+
+[[var]]
+name = "CarIdxBestLapTime"
+type = "f32"
+count = 72
+unit = "s"
+desc = "Cars best lap time"
+
+[[var]]
+name = "CarIdxClass"
+type = "i32"
+count = 72
+desc = "Cars class id by car index"
+
+[[var]]
+name = "CarIdxClassPosition"
+type = "i32"
+count = 72
+desc = "Cars class position in race by car index"
+
+[[var]]
+name = "CarIdxEstTime"
+type = "f32"
+count = 72
+unit = "s"
+desc = "Estimated time to reach current location on track"
+
+[[var]]
+name = "CarIdxF2Time"
+type = "f32"
+count = 72
+unit = "s"
+desc = "Race time behind leader or fastest lap time otherwise"
+
+[[var]]
+name = "CarIdxFastRepairsUsed"
+type = "i32"
+count = 72
+desc = "How many fast repairs each car has used"
+
+[[var]]
+name = "CarIdxGear"
+type = "i32"
+count = 72
+desc = "-1=reverse  0=neutral  1..n=current gear by car index"
+
+[[var]]
+name = "CarIdxLap"
+type = "i32"
+count = 72
+desc = "Laps started by car index"
+
+[[var]]
+name = "CarIdxLapCompleted"
+type = "i32"
+count = 72
+desc = "Laps completed by car index"
+
+[[var]]
+name = "CarIdxLapDistPct"
+type = "f32"
+count = 72
+unit = "%"
+desc = "Percentage distance around lap by car index"
+
+[[var]]
+name = "CarIdxLastLapTime"
+type = "f32"
+count = 72
+unit = "s"
+desc = "Cars last lap time"
+
+[[var]]
+name = "CarIdxOnPitRoad"
+type = "bool"
+count = 72
+desc = "On pit road between the cones by car index"
+
+[[var]]
+name = "CarIdxP2P_Count"
+type = "i32"
+count = 72
+desc = "Push2Pass count of usage (or remaining in Race)"
+
+[[var]]
+name = "CarIdxP2P_Status"
+type = "bool"
+count = 72
+desc = "Push2Pass active or not"
+
+[[var]]
+name = "CarIdxPaceFlags"
+type = "i32"
+count = 72
+unit = "irsdk_PaceFlags"
+desc = "Pacing status flags for each car"
+
+[[var]]
+name = "CarIdxPaceLine"
+type = "i32"
+count = 72
+desc = "What line cars are pacing in  or -1 if not pacing"
+
+[[var]]
+name = "CarIdxPaceRow"
+type = "i32"
+count = 72
+desc = "What row cars are pacing in  or -1 if not pacing"
+
+[[var]]
+name = "CarIdxPosition"
+type = "i32"
+count = 72
+desc = "Cars position in race by car index"
+
+[[var]]
+name = "CarIdxQualTireCompound"
+type = "i32"
+count = 72
+desc = "Cars Qual tire compound"
+
+[[var]]
+name = "CarIdxQualTireCompoundLocked"
+type = "bool"
+count = 72
+desc = "Cars Qual tire compound is locked-in"
+
+[[var]]
+name = "CarIdxRPM"
+type = "f32"
+count = 72
+unit = "revs/min"
+desc = "Engine rpm by car index"
+
+[[var]]
+name = "CarIdxSessionFlags"
+type = "i32"
+count = 72
+unit = "irsdk_Flags"
+desc = "Session flags for each player"
+
+[[var]]
+name = "CarIdxSteer"
+type = "f32"
+count = 72
+unit = "rad"
+desc = "Steering wheel angle by car index"
+
+[[var]]
+name = "CarIdxTireCompound"
+type = "i32"
+count = 72
+desc = "Cars current tire compound"
+
+[[var]]
+name = "CarIdxTrackSurface"
+type = "i32"
+count = 72
+unit = "irsdk_TrkLoc"
+desc = "Track surface type by car index"
+
+[[var]]
+name = "CarIdxTrackSurfaceMaterial"
+type = "i32"
+count = 72
+unit = "irsdk_TrkSurf"
+desc = "Track surface material type by car index"
+
+[[var]]
+name = "CarLeftRight"
+type = "i32"
+unit = "irsdk_CarLeftRight"
+desc = "Notify if car is to the left or right of driver"
+
+[[var]]
+name = "ChanAvgLatency"
+type = "f32"
+unit = "s"
+desc = "Communications average latency"
+
+[[var]]
+name = "ChanClockSkew"
+type = "f32"
+unit = "s"
+desc = "Communications server clock skew"
+
+[[var]]
+name = "ChanLatency"
+type = "f32"
+unit = "s"
+desc = "Communications latency"
+
+[[var]]
+name = "ChanPartnerQuality"
+type = "f32"
+unit = "%"
+desc = "Partner communications quality"
+
+[[var]]
+name = "ChanQuality"
+type = "f32"
+unit = "%"
+desc = "Communications quality"
+
+[[var]]
+name = "Clutch"
+type = "f32"
+unit = "%"
+desc = "0=disengaged to 1=fully engaged"
+
+[[var]]
+name = "ClutchRaw"
+type = "f32"
+unit = "%"
+desc = "Raw clutch input 0=disengaged to 1=fully engaged"
+
+[[var]]
+name = "CpuUsageBG"
+type = "f32"
+unit = "%"
+desc = "Percent of available time bg thread took with a 1 sec avg"
+
+[[var]]
+name = "CpuUsageFG"
+type = "f32"
+unit = "%"
+desc = "Percent of available time fg thread took with a 1 sec avg"
+
+[[var]]
+name = "DCDriversSoFar"
+type = "i32"
+desc = "Number of team drivers who have run a stint"
+
+[[var]]
+name = "DCLapStatus"
+type = "i32"
+desc = "Status of driver change lap requirements"
+
+[[var]]
+name = "DRS_Status"
+type = "i32"
+unit = " "
+desc = "Drag Reduction System Status"
+
+[[var]]
+name = "DisplayUnits"
+type = "i32"
+desc = "Default units for the user interface 0 = english 1 = metric"
+
+[[var]]
+name = "DriverMarker"
+type = "bool"
+desc = "Driver activated flag"
+
+[[var]]
+name = "EnergyBatteryToMGU_KLap"
+type = "f32"
+unit = "J"
+desc = "Electrical energy from battery to MGU-K per lap"
+
+[[var]]
+name = "EnergyERSBattery"
+type = "f32"
+unit = "J"
+desc = "Engine ERS battery charge"
+
+[[var]]
+name = "EnergyERSBatteryPct"
+type = "f32"
+unit = "%"
+desc = "Engine ERS battery charge as a percent"
+
+[[var]]
+name = "EnergyMGU_KLapDeployPct"
+type = "f32"
+unit = "%"
+desc = "Electrical energy available to MGU-K per lap as a percent"
+
+[[var]]
+name = "Engine0_RPM"
+type = "f32"
+unit = "revs/min"
+desc = "Engine0Engine rpm"
+
+[[var]]
+name = "Engine1_RPM"
+type = "f32"
+unit = "revs/min"
+desc = "Engine1Engine rpm"
+
+[[var]]
+name = "EngineWarnings"
+type = "i32"
+unit = "irsdk_EngineWarnings"
+desc = "Bitfield for warning lights"
+
+[[var]]
+name = "EnterExitReset"
+type = "i32"
+desc = "Indicate action the reset key will take 0 enter 1 exit 2 reset"
+
+[[var]]
+name = "FastRepairAvailable"
+type = "i32"
+desc = "How many fast repairs left  255 is unlimited"
+
+[[var]]
+name = "FastRepairUsed"
+type = "i32"
+desc = "How many fast repairs used so far"
+
+[[var]]
+name = "FogLevel"
+type = "f32"
+unit = "%"
+desc = "Fog level at start/finish line"
+
+[[var]]
+name = "FrameRate"
+type = "f32"
+unit = "fps"
+desc = "Average frames per second"
+
+[[var]]
+name = "FrontTireSetsAvailable"
+type = "i32"
+desc = "How many front tire sets are remaining  255 is unlimited"
+
+[[var]]
+name = "FrontTireSetsUsed"
+type = "i32"
+desc = "How many front tire sets used so far"
+
+[[var]]
+name = "FuelLevel"
+type = "f32"
+unit = "l"
+desc = "Liters of fuel remaining"
+
+[[var]]
+name = "FuelLevelPct"
+type = "f32"
+unit = "%"
+desc = "Percent fuel remaining"
+
+[[var]]
+name = "FuelPress"
+type = "f32"
+unit = "bar"
+desc = "Engine fuel pressure"
+
+[[var]]
+name = "FuelUsePerHour"
+type = "f32"
+unit = "kg/h"
+desc = "Engine fuel used instantaneous"
+
+[[var]]
+name = "Gear"
+type = "i32"
+desc = "-1=reverse  0=neutral  1..n=current gear"
+
+[[var]]
+name = "GpuUsage"
+type = "f32"
+unit = "%"
+desc = "Percent of available time gpu took with a 1 sec avg"
+
+[[var]]
+name = "HFshockDefl"
+type = "f32"
+unit = "m"
+desc = "HF shock deflection"
+
+[[var]]
+name = "HFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "HF shock deflection at 360 Hz"
+
+[[var]]
+name = "HFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "HF shock velocity"
+
+[[var]]
+name = "HFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "HF shock velocity at 360 Hz"
+
+[[var]]
+name = "HRshockDefl"
+type = "f32"
+unit = "m"
+desc = "HR shock deflection"
+
+[[var]]
+name = "HRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "HR shock deflection at 360 Hz"
+
+[[var]]
+name = "HRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "HR shock velocity"
+
+[[var]]
+name = "HRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "HR shock velocity at 360 Hz"
+
+[[var]]
+name = "HandbrakeRaw"
+type = "f32"
+unit = "%"
+desc = "Raw handbrake input 0=handbrake released to 1=max force"
+
+[[var]]
+name = "IsDiskLoggingActive"
+type = "bool"
+desc = "0=disk based telemetry file not being written  1=being written"
+
+[[var]]
+name = "IsDiskLoggingEnabled"
+type = "bool"
+desc = "0=disk based telemetry turned off  1=turned on"
+
+[[var]]
+name = "IsGarageVisible"
+type = "bool"
+desc = "1=Garage screen is visible"
+
+[[var]]
+name = "IsInGarage"
+type = "bool"
+desc = "1=Car in garage physics running"
+
+[[var]]
+name = "IsOnTrack"
+type = "bool"
+desc = "1=Car on track physics running with player in car"
+
+[[var]]
+name = "IsOnTrackCar"
+type = "bool"
+desc = "1=Car on track physics running"
+
+[[var]]
+name = "IsReplayPlaying"
+type = "bool"
+desc = "0=replay not playing  1=replay playing"
+
+[[var]]
+name = "LFSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "LFSH shock deflection"
+
+[[var]]
+name = "LFSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "LFSH shock deflection at 360 Hz"
+
+[[var]]
+name = "LFSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "LFSH shock velocity"
+
+[[var]]
+name = "LFSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "LFSH shock velocity at 360 Hz"
+
+[[var]]
+name = "LFTiresAvailable"
+type = "i32"
+desc = "How many left front tires are remaining  255 is unlimited"
+
+[[var]]
+name = "LFTiresUsed"
+type = "i32"
+desc = "How many left front tires used so far"
+
+[[var]]
+name = "LFbrakeLinePress"
+type = "f32"
+unit = "bar"
+desc = "LF brake line pressure"
+
+[[var]]
+name = "LFcoldPressure"
+type = "f32"
+unit = "kPa"
+desc = "LF tire cold pressure  as set in the garage"
+
+[[var]]
+name = "LFodometer"
+type = "f32"
+unit = "m"
+desc = "LF distance tire traveled since being placed on car"
+
+[[var]]
+name = "LFshockDefl"
+type = "f32"
+unit = "m"
+desc = "LF shock deflection"
+
+[[var]]
+name = "LFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "LF shock deflection at 360 Hz"
+
+[[var]]
+name = "LFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "LF shock velocity"
+
+[[var]]
+name = "LFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "LF shock velocity at 360 Hz"
+
+[[var]]
+name = "LFtempCL"
+type = "f32"
+unit = "C"
+desc = "LF tire left carcass temperature"
+
+[[var]]
+name = "LFtempCM"
+type = "f32"
+unit = "C"
+desc = "LF tire middle carcass temperature"
+
+[[var]]
+name = "LFtempCR"
+type = "f32"
+unit = "C"
+desc = "LF tire right carcass temperature"
+
+[[var]]
+name = "LFwearL"
+type = "f32"
+unit = "%"
+desc = "LF tire left percent tread remaining"
+
+[[var]]
+name = "LFwearM"
+type = "f32"
+unit = "%"
+desc = "LF tire middle percent tread remaining"
+
+[[var]]
+name = "LFwearR"
+type = "f32"
+unit = "%"
+desc = "LF tire right percent tread remaining"
+
+[[var]]
+name = "LRSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "LRSH shock deflection"
+
+[[var]]
+name = "LRSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "LRSH shock deflection at 360 Hz"
+
+[[var]]
+name = "LRSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "LRSH shock velocity"
+
+[[var]]
+name = "LRSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "LRSH shock velocity at 360 Hz"
+
+[[var]]
+name = "LRTiresAvailable"
+type = "i32"
+desc = "How many left rear tires are remaining  255 is unlimited"
+
+[[var]]
+name = "LRTiresUsed"
+type = "i32"
+desc = "How many left rear tires used so far"
+
+[[var]]
+name = "LRbrakeLinePress"
+type = "f32"
+unit = "bar"
+desc = "LR brake line pressure"
+
+[[var]]
+name = "LRcoldPressure"
+type = "f32"
+unit = "kPa"
+desc = "LR tire cold pressure  as set in the garage"
+
+[[var]]
+name = "LRodometer"
+type = "f32"
+unit = "m"
+desc = "LR distance tire traveled since being placed on car"
+
+[[var]]
+name = "LRshockDefl"
+type = "f32"
+unit = "m"
+desc = "LR shock deflection"
+
+[[var]]
+name = "LRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "LR shock deflection at 360 Hz"
+
+[[var]]
+name = "LRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "LR shock velocity"
+
+[[var]]
+name = "LRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "LR shock velocity at 360 Hz"
+
+[[var]]
+name = "LRtempCL"
+type = "f32"
+unit = "C"
+desc = "LR tire left carcass temperature"
+
+[[var]]
+name = "LRtempCM"
+type = "f32"
+unit = "C"
+desc = "LR tire middle carcass temperature"
+
+[[var]]
+name = "LRtempCR"
+type = "f32"
+unit = "C"
+desc = "LR tire right carcass temperature"
+
+[[var]]
+name = "LRwearL"
+type = "f32"
+unit = "%"
+desc = "LR tire left percent tread remaining"
+
+[[var]]
+name = "LRwearM"
+type = "f32"
+unit = "%"
+desc = "LR tire middle percent tread remaining"
+
+[[var]]
+name = "LRwearR"
+type = "f32"
+unit = "%"
+desc = "LR tire right percent tread remaining"
+
+[[var]]
+name = "Lap"
+type = "i32"
+desc = "Laps started count"
+
+[[var]]
+name = "LapBestLap"
+type = "i32"
+desc = "Players best lap number"
+
+[[var]]
+name = "LapBestLapTime"
+type = "f32"
+unit = "s"
+desc = "Players best lap time"
+
+[[var]]
+name = "LapBestNLapLap"
+type = "i32"
+desc = "Player last lap in best N average lap time"
+
+[[var]]
+name = "LapBestNLapTime"
+type = "f32"
+unit = "s"
+desc = "Player best N average lap time"
+
+[[var]]
+name = "LapCompleted"
+type = "i32"
+desc = "Laps completed count"
+
+[[var]]
+name = "LapCurrentLapTime"
+type = "f32"
+unit = "s"
+desc = "Estimate of players current lap time as shown in F3 box"
+
+[[var]]
+name = "LapDeltaToBestLap"
+type = "f32"
+unit = "s"
+desc = "Delta time for best lap"
+
+[[var]]
+name = "LapDeltaToBestLap_DD"
+type = "f32"
+unit = "s/s"
+desc = "Rate of change of delta time for best lap"
+
+[[var]]
+name = "LapDeltaToBestLap_OK"
+type = "bool"
+desc = "Delta time for best lap is valid"
+
+[[var]]
+name = "LapDeltaToOptimalLap"
+type = "f32"
+unit = "s"
+desc = "Delta time for optimal lap"
+
+[[var]]
+name = "LapDeltaToOptimalLap_DD"
+type = "f32"
+unit = "s/s"
+desc = "Rate of change of delta time for optimal lap"
+
+[[var]]
+name = "LapDeltaToOptimalLap_OK"
+type = "bool"
+desc = "Delta time for optimal lap is valid"
+
+[[var]]
+name = "LapDeltaToSessionBestLap"
+type = "f32"
+unit = "s"
+desc = "Delta time for session best lap"
+
+[[var]]
+name = "LapDeltaToSessionBestLap_DD"
+type = "f32"
+unit = "s/s"
+desc = "Rate of change of delta time for session best lap"
+
+[[var]]
+name = "LapDeltaToSessionBestLap_OK"
+type = "bool"
+desc = "Delta time for session best lap is valid"
+
+[[var]]
+name = "LapDeltaToSessionLastlLap"
+type = "f32"
+unit = "s"
+desc = "Delta time for session last lap"
+
+[[var]]
+name = "LapDeltaToSessionLastlLap_DD"
+type = "f32"
+unit = "s/s"
+desc = "Rate of change of delta time for session last lap"
+
+[[var]]
+name = "LapDeltaToSessionLastlLap_OK"
+type = "bool"
+desc = "Delta time for session last lap is valid"
+
+[[var]]
+name = "LapDeltaToSessionOptimalLap"
+type = "f32"
+unit = "s"
+desc = "Delta time for session optimal lap"
+
+[[var]]
+name = "LapDeltaToSessionOptimalLap_DD"
+type = "f32"
+unit = "s/s"
+desc = "Rate of change of delta time for session optimal lap"
+
+[[var]]
+name = "LapDeltaToSessionOptimalLap_OK"
+type = "bool"
+desc = "Delta time for session optimal lap is valid"
+
+[[var]]
+name = "LapDist"
+type = "f32"
+unit = "m"
+desc = "Meters traveled from S/F this lap"
+
+[[var]]
+name = "LapDistPct"
+type = "f32"
+unit = "%"
+desc = "Percentage distance around lap"
+
+[[var]]
+name = "LapLasNLapSeq"
+type = "i32"
+desc = "Player num consecutive clean laps completed for N average"
+
+[[var]]
+name = "LapLastLapTime"
+type = "f32"
+unit = "s"
+desc = "Players last lap time"
+
+[[var]]
+name = "LapLastNLapTime"
+type = "f32"
+unit = "s"
+desc = "Player last N average lap time"
+
+[[var]]
+name = "LatAccel"
+type = "f32"
+unit = "m/s^2"
+desc = "Lateral acceleration (including gravity)"
+
+[[var]]
+name = "LatAccel_ST"
+type = "f32"
+count = 6
+unit = "m/s^2"
+desc = "Lateral acceleration (including gravity) at 360 Hz"
+
+[[var]]
+name = "LeftTireSetsAvailable"
+type = "i32"
+desc = "How many left tire sets are remaining  255 is unlimited"
+
+[[var]]
+name = "LeftTireSetsUsed"
+type = "i32"
+desc = "How many left tire sets used so far"
+
+[[var]]
+name = "LoadNumTextures"
+type = "bool"
+desc = "True if the car_num texture will be loaded"
+
+[[var]]
+name = "LongAccel"
+type = "f32"
+unit = "m/s^2"
+desc = "Longitudinal acceleration (including gravity)"
+
+[[var]]
+name = "LongAccel_ST"
+type = "f32"
+count = 6
+unit = "m/s^2"
+desc = "Longitudinal acceleration (including gravity) at 360 Hz"
+
+[[var]]
+name = "ManifoldPress"
+type = "f32"
+unit = "bar"
+desc = "Engine manifold pressure"
+
+[[var]]
+name = "ManualBoost"
+type = "bool"
+desc = "Hybrid manual boost state"
+
+[[var]]
+name = "ManualNoBoost"
+type = "bool"
+desc = "Hybrid manual no boost state"
+
+[[var]]
+name = "MemPageFaultSec"
+type = "f32"
+desc = "Memory page faults per second"
+
+[[var]]
+name = "MemSoftPageFaultSec"
+type = "f32"
+desc = "Memory soft page faults per second"
+
+[[var]]
+name = "OilLevel"
+type = "f32"
+unit = "l"
+desc = "Engine oil level"
+
+[[var]]
+name = "OilPress"
+type = "f32"
+unit = "bar"
+desc = "Engine oil pressure"
+
+[[var]]
+name = "OilTemp"
+type = "f32"
+unit = "C"
+desc = "Engine oil temperature"
+
+[[var]]
+name = "OkToReloadTextures"
+type = "bool"
+desc = "True if it is ok to reload car textures at this time"
+
+[[var]]
+name = "OnPitRoad"
+type = "bool"
+desc = "Is the player car on pit road between the cones"
+
+[[var]]
+name = "P2P_Count"
+type = "i32"
+desc = "Push2Pass count of usage (or remaining in Race) on your car"
+
+[[var]]
+name = "P2P_Status"
+type = "bool"
+desc = "Push2Pass active or not on your car"
+
+[[var]]
+name = "PaceMode"
+type = "i32"
+unit = "irsdk_PaceMode"
+desc = "Are we pacing or not"
+
+[[var]]
+name = "PitOptRepairLeft"
+type = "f32"
+unit = "s"
+desc = "Time left for optional repairs if repairs are active"
+
+[[var]]
+name = "PitRepairLeft"
+type = "f32"
+unit = "s"
+desc = "Time left for mandatory pit repairs if repairs are active"
+
+[[var]]
+name = "PitSvFlags"
+type = "i32"
+unit = "irsdk_PitSvFlags"
+desc = "Bitfield of pit service checkboxes"
+
+[[var]]
+name = "PitSvFuel"
+type = "f32"
+unit = "l or kWh"
+desc = "Pit service fuel add amount"
+
+[[var]]
+name = "PitSvLFP"
+type = "f32"
+unit = "kPa"
+desc = "Pit service left front tire pressure"
+
+[[var]]
+name = "PitSvLRP"
+type = "f32"
+unit = "kPa"
+desc = "Pit service left rear tire pressure"
+
+[[var]]
+name = "PitSvRFP"
+type = "f32"
+unit = "kPa"
+desc = "Pit service right front tire pressure"
+
+[[var]]
+name = "PitSvRRP"
+type = "f32"
+unit = "kPa"
+desc = "Pit service right rear tire pressure"
+
+[[var]]
+name = "PitSvTireCompound"
+type = "i32"
+desc = "Pit service pending tire compound"
+
+[[var]]
+name = "Pitch"
+type = "f32"
+unit = "rad"
+desc = "Pitch orientation"
+
+[[var]]
+name = "PitchRate"
+type = "f32"
+unit = "rad/s"
+desc = "Pitch rate"
+
+[[var]]
+name = "PitchRate_ST"
+type = "f32"
+count = 6
+unit = "rad/s"
+desc = "Pitch rate at 360 Hz"
+
+[[var]]
+name = "PitsOpen"
+type = "bool"
+desc = "True if pit stop is allowed for the current player"
+
+[[var]]
+name = "PitstopActive"
+type = "bool"
+desc = "Is the player getting pit stop service"
+
+[[var]]
+name = "PlayerCarClass"
+type = "i32"
+desc = "Player car class id"
+
+[[var]]
+name = "PlayerCarClassPosition"
+type = "i32"
+desc = "Players class position in race"
+
+[[var]]
+name = "PlayerCarDriverIncidentCount"
+type = "i32"
+desc = "Teams current drivers incident count for this session"
+
+[[var]]
+name = "PlayerCarDryTireSetLimit"
+type = "i32"
+desc = "Players dry tire set limit"
+
+[[var]]
+name = "PlayerCarIdx"
+type = "i32"
+desc = "Players carIdx"
+
+[[var]]
+name = "PlayerCarInPitStall"
+type = "bool"
+desc = "Players car is properly in their pitstall"
+
+[[var]]
+name = "PlayerCarMyIncidentCount"
+type = "i32"
+desc = "Players own incident count for this session"
+
+[[var]]
+name = "PlayerCarPitSvStatus"
+type = "i32"
+unit = "irsdk_PitSvStatus"
+desc = "Players car pit service status bits"
+
+[[var]]
+name = "PlayerCarPosition"
+type = "i32"
+desc = "Players position in race"
+
+[[var]]
+name = "PlayerCarPowerAdjust"
+type = "f32"
+unit = "%"
+desc = "Players power adjust"
+
+[[var]]
+name = "PlayerCarSLBlinkRPM"
+type = "f32"
+unit = "revs/min"
+desc = "Shift light blink rpm"
+
+[[var]]
+name = "PlayerCarSLFirstRPM"
+type = "f32"
+unit = "revs/min"
+desc = "Shift light first light rpm"
+
+[[var]]
+name = "PlayerCarSLLastRPM"
+type = "f32"
+unit = "revs/min"
+desc = "Shift light last light rpm"
+
+[[var]]
+name = "PlayerCarSLShiftRPM"
+type = "f32"
+unit = "revs/min"
+desc = "Shift light shift rpm"
+
+[[var]]
+name = "PlayerCarTeamIncidentCount"
+type = "i32"
+desc = "Players team incident count for this session"
+
+[[var]]
+name = "PlayerCarTowTime"
+type = "f32"
+unit = "s"
+desc = "Players car is being towed if time is greater than zero"
+
+[[var]]
+name = "PlayerCarWeightPenalty"
+type = "f32"
+unit = "kg"
+desc = "Players weight penalty"
+
+[[var]]
+name = "PlayerFastRepairsUsed"
+type = "i32"
+desc = "Players car number of fast repairs used"
+
+[[var]]
+name = "PlayerIncidents"
+type = "i32"
+unit = "irsdk_IncidentFlags"
+desc = "Log incidents that the player recieved"
+
+[[var]]
+name = "PlayerTireCompound"
+type = "i32"
+desc = "Players car current tire compound"
+
+[[var]]
+name = "PlayerTrackSurface"
+type = "i32"
+unit = "irsdk_TrkLoc"
+desc = "Players car track surface type"
+
+[[var]]
+name = "PlayerTrackSurfaceMaterial"
+type = "i32"
+unit = "irsdk_TrkSurf"
+desc = "Players car track surface material type"
+
+[[var]]
+name = "PowerMGU_H"
+type = "f32"
+unit = "W"
+desc = "Engine MGU-H mechanical power"
+
+[[var]]
+name = "PowerMGU_K"
+type = "f32"
+unit = "W"
+desc = "Engine MGU-K mechanical power"
+
+[[var]]
+name = "Precipitation"
+type = "f32"
+unit = "%"
+desc = "Precipitation at start/finish line"
+
+[[var]]
+name = "PushToPass"
+type = "bool"
+desc = "Push to pass button state"
+
+[[var]]
+name = "PushToTalk"
+type = "bool"
+desc = "Push to talk button state"
+
+[[var]]
+name = "RFSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "RFSH shock deflection"
+
+[[var]]
+name = "RFSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "RFSH shock deflection at 360 Hz"
+
+[[var]]
+name = "RFSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "RFSH shock velocity"
+
+[[var]]
+name = "RFSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "RFSH shock velocity at 360 Hz"
+
+[[var]]
+name = "RFTiresAvailable"
+type = "i32"
+desc = "How many right front tires are remaining  255 is unlimited"
+
+[[var]]
+name = "RFTiresUsed"
+type = "i32"
+desc = "How many right front tires used so far"
+
+[[var]]
+name = "RFbrakeLinePress"
+type = "f32"
+unit = "bar"
+desc = "RF brake line pressure"
+
+[[var]]
+name = "RFcoldPressure"
+type = "f32"
+unit = "kPa"
+desc = "RF tire cold pressure  as set in the garage"
+
+[[var]]
+name = "RFodometer"
+type = "f32"
+unit = "m"
+desc = "RF distance tire traveled since being placed on car"
+
+[[var]]
+name = "RFshockDefl"
+type = "f32"
+unit = "m"
+desc = "RF shock deflection"
+
+[[var]]
+name = "RFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "RF shock deflection at 360 Hz"
+
+[[var]]
+name = "RFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "RF shock velocity"
+
+[[var]]
+name = "RFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "RF shock velocity at 360 Hz"
+
+[[var]]
+name = "RFtempCL"
+type = "f32"
+unit = "C"
+desc = "RF tire left carcass temperature"
+
+[[var]]
+name = "RFtempCM"
+type = "f32"
+unit = "C"
+desc = "RF tire middle carcass temperature"
+
+[[var]]
+name = "RFtempCR"
+type = "f32"
+unit = "C"
+desc = "RF tire right carcass temperature"
+
+[[var]]
+name = "RFwearL"
+type = "f32"
+unit = "%"
+desc = "RF tire left percent tread remaining"
+
+[[var]]
+name = "RFwearM"
+type = "f32"
+unit = "%"
+desc = "RF tire middle percent tread remaining"
+
+[[var]]
+name = "RFwearR"
+type = "f32"
+unit = "%"
+desc = "RF tire right percent tread remaining"
+
+[[var]]
+name = "ROLLFshockDefl"
+type = "f32"
+unit = "m"
+desc = "ROLLF shock deflection"
+
+[[var]]
+name = "ROLLFshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "ROLLF shock deflection at 360 Hz"
+
+[[var]]
+name = "ROLLFshockVel"
+type = "f32"
+unit = "m/s"
+desc = "ROLLF shock velocity"
+
+[[var]]
+name = "ROLLFshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "ROLLF shock velocity at 360 Hz"
+
+[[var]]
+name = "ROLLRshockDefl"
+type = "f32"
+unit = "m"
+desc = "ROLLR shock deflection"
+
+[[var]]
+name = "ROLLRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "ROLLR shock deflection at 360 Hz"
+
+[[var]]
+name = "ROLLRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "ROLLR shock velocity"
+
+[[var]]
+name = "ROLLRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "ROLLR shock velocity at 360 Hz"
+
+[[var]]
+name = "RPM"
+type = "f32"
+unit = "revs/min"
+desc = "Engine rpm"
+
+[[var]]
+name = "RRSHshockDefl"
+type = "f32"
+unit = "m"
+desc = "RRSH shock deflection"
+
+[[var]]
+name = "RRSHshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "RRSH shock deflection at 360 Hz"
+
+[[var]]
+name = "RRSHshockVel"
+type = "f32"
+unit = "m/s"
+desc = "RRSH shock velocity"
+
+[[var]]
+name = "RRSHshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "RRSH shock velocity at 360 Hz"
+
+[[var]]
+name = "RRTiresAvailable"
+type = "i32"
+desc = "How many right rear tires are remaining  255 is unlimited"
+
+[[var]]
+name = "RRTiresUsed"
+type = "i32"
+desc = "How many right rear tires used so far"
+
+[[var]]
+name = "RRbrakeLinePress"
+type = "f32"
+unit = "bar"
+desc = "RR brake line pressure"
+
+[[var]]
+name = "RRcoldPressure"
+type = "f32"
+unit = "kPa"
+desc = "RR tire cold pressure  as set in the garage"
+
+[[var]]
+name = "RRodometer"
+type = "f32"
+unit = "m"
+desc = "RR distance tire traveled since being placed on car"
+
+[[var]]
+name = "RRshockDefl"
+type = "f32"
+unit = "m"
+desc = "RR shock deflection"
+
+[[var]]
+name = "RRshockDefl_ST"
+type = "f32"
+count = 6
+unit = "m"
+desc = "RR shock deflection at 360 Hz"
+
+[[var]]
+name = "RRshockVel"
+type = "f32"
+unit = "m/s"
+desc = "RR shock velocity"
+
+[[var]]
+name = "RRshockVel_ST"
+type = "f32"
+count = 6
+unit = "m/s"
+desc = "RR shock velocity at 360 Hz"
+
+[[var]]
+name = "RRtempCL"
+type = "f32"
+unit = "C"
+desc = "RR tire left carcass temperature"
+
+[[var]]
+name = "RRtempCM"
+type = "f32"
+unit = "C"
+desc = "RR tire middle carcass temperature"
+
+[[var]]
+name = "RRtempCR"
+type = "f32"
+unit = "C"
+desc = "RR tire right carcass temperature"
+
+[[var]]
+name = "RRwearL"
+type = "f32"
+unit = "%"
+desc = "RR tire left percent tread remaining"
+
+[[var]]
+name = "RRwearM"
+type = "f32"
+unit = "%"
+desc = "RR tire middle percent tread remaining"
+
+[[var]]
+name = "RRwearR"
+type = "f32"
+unit = "%"
+desc = "RR tire right percent tread remaining"
+
+[[var]]
+name = "RaceLaps"
+type = "i32"
+desc = "Laps completed in race"
+
+[[var]]
+name = "RadioTransmitCarIdx"
+type = "i32"
+desc = "The car index of the current person speaking on the radio"
+
+[[var]]
+name = "RadioTransmitFrequencyIdx"
+type = "i32"
+desc = "The frequency index of the current person speaking on the radio"
+
+[[var]]
+name = "RadioTransmitRadioIdx"
+type = "i32"
+desc = "The radio index of the current person speaking on the radio"
+
+[[var]]
+name = "RearTireSetsAvailable"
+type = "i32"
+desc = "How many rear tire sets are remaining  255 is unlimited"
+
+[[var]]
+name = "RearTireSetsUsed"
+type = "i32"
+desc = "How many rear tire sets used so far"
+
+[[var]]
+name = "RelativeHumidity"
+type = "f32"
+unit = "%"
+desc = "Relative Humidity at start/finish line"
+
+[[var]]
+name = "ReplayFrameNum"
+type = "i32"
+desc = "Integer replay frame number (60 per second)"
+
+[[var]]
+name = "ReplayFrameNumEnd"
+type = "i32"
+desc = "Integer replay frame number from end of tape"
+
+[[var]]
+name = "ReplayPlaySlowMotion"
+type = "bool"
+desc = "0=not slow motion  1=replay is in slow motion"
+
+[[var]]
+name = "ReplayPlaySpeed"
+type = "i32"
+desc = "Replay playback speed"
+
+[[var]]
+name = "ReplaySessionNum"
+type = "i32"
+desc = "Replay session number"
+
+[[var]]
+name = "ReplaySessionTime"
+type = "f64"
+unit = "s"
+desc = "Seconds since replay session start"
+
+[[var]]
+name = "RightTireSetsAvailable"
+type = "i32"
+desc = "How many right tire sets are remaining  255 is unlimited"
+
+[[var]]
+name = "RightTireSetsUsed"
+type = "i32"
+desc = "How many right tire sets used so far"
+
+[[var]]
+name = "Roll"
+type = "f32"
+unit = "rad"
+desc = "Roll orientation"
+
+[[var]]
+name = "RollRate"
+type = "f32"
+unit = "rad/s"
+desc = "Roll rate"
+
+[[var]]
+name = "RollRate_ST"
+type = "f32"
+count = 6
+unit = "rad/s"
+desc = "Roll rate at 360 Hz"
+
+[[var]]
+name = "SessionFlags"
+type = "i32"
+unit = "irsdk_Flags"
+desc = "Session flags"
+
+[[var]]
+name = "SessionJokerLapsRemain"
+type = "i32"
+desc = "Joker laps remaining to be taken"
+
+[[var]]
+name = "SessionLapsRemain"
+type = "i32"
+desc = "Old laps left till session ends use SessionLapsRemainEx"
+
+[[var]]
+name = "SessionLapsRemainEx"
+type = "i32"
+desc = "New improved laps left till session ends"
+
+[[var]]
+name = "SessionLapsTotal"
+type = "i32"
+desc = "Total number of laps in session"
+
+[[var]]
+name = "SessionNum"
+type = "i32"
+desc = "Session number"
+
+[[var]]
+name = "SessionOnJokerLap"
+type = "bool"
+desc = "Player is currently completing a joker lap"
+
+[[var]]
+name = "SessionState"
+type = "i32"
+unit = "irsdk_SessionState"
+desc = "Session state"
+
+[[var]]
+name = "SessionTick"
+type = "i32"
+desc = "Current update number"
+
+[[var]]
+name = "SessionTime"
+type = "f64"
+unit = "s"
+desc = "Seconds since session start"
+
+[[var]]
+name = "SessionTimeOfDay"
+type = "f32"
+unit = "s"
+desc = "Time of day in seconds"
+
+[[var]]
+name = "SessionTimeRemain"
+type = "f64"
+unit = "s"
+desc = "Seconds left till session ends"
+
+[[var]]
+name = "SessionTimeTotal"
+type = "f64"
+unit = "s"
+desc = "Total number of seconds in session"
+
+[[var]]
+name = "SessionUniqueID"
+type = "i32"
+desc = "Session ID"
+
+[[var]]
+name = "ShiftGrindRPM"
+type = "f32"
+unit = "RPM"
+desc = "RPM of shifter grinding noise"
+
+[[var]]
+name = "ShiftIndicatorPct"
+type = "f32"
+unit = "%"
+desc = "DEPRECATED use DriverCarSLBlinkRPM instead"
+
+[[var]]
+name = "ShiftPowerPct"
+type = "f32"
+unit = "%"
+desc = "Friction torque applied to gears when shifting or grinding"
+
+[[var]]
+name = "Shifter"
+type = "i32"
+desc = "Log inputs from the players shifter control"
+
+[[var]]
+name = "Skies"
+type = "i32"
+desc = "Skies (0=clear/1=p cloudy/2=m cloudy/3=overcast)"
+
+[[var]]
+name = "SolarAltitude"
+type = "f32"
+unit = "rad"
+desc = "Sun angle above horizon in radians"
+
+[[var]]
+name = "SolarAzimuth"
+type = "f32"
+unit = "rad"
+desc = "Sun angle clockwise from north in radians"
+
+[[var]]
+name = "Speed"
+type = "f32"
+unit = "m/s"
+desc = "GPS vehicle speed"
+
+[[var]]
+name = "SteeringFFBEnabled"
+type = "bool"
+desc = "Force feedback is enabled"
+
+[[var]]
+name = "SteeringWheelAngle"
+type = "f32"
+unit = "rad"
+desc = "Steering wheel angle"
+
+[[var]]
+name = "SteeringWheelAngleMax"
+type = "f32"
+unit = "rad"
+desc = "Steering wheel max angle"
+
+[[var]]
+name = "SteeringWheelLimiter"
+type = "f32"
+unit = "%"
+desc = "Force feedback limiter strength limits impacts and oscillation"
+
+[[var]]
+name = "SteeringWheelMaxForceNm"
+type = "f32"
+unit = "N*m"
+desc = "Value of strength or max force slider in Nm for FFB"
+
+[[var]]
+name = "SteeringWheelPctDamper"
+type = "f32"
+unit = "%"
+desc = "Force feedback % max damping"
+
+[[var]]
+name = "SteeringWheelPctIntensity"
+type = "f32"
+unit = "%"
+desc = "Force feedback % max intensity"
+
+[[var]]
+name = "SteeringWheelPctSmoothing"
+type = "f32"
+unit = "%"
+desc = "Force feedback % max smoothing"
+
+[[var]]
+name = "SteeringWheelPctTorque"
+type = "f32"
+unit = "%"
+desc = "Force feedback % max torque on steering shaft unsigned"
+
+[[var]]
+name = "SteeringWheelPctTorqueSign"
+type = "f32"
+unit = "%"
+desc = "Force feedback % max torque on steering shaft signed"
+
+[[var]]
+name = "SteeringWheelPctTorqueSignStops"
+type = "f32"
+unit = "%"
+desc = "Force feedback % max torque on steering shaft signed stops"
+
+[[var]]
+name = "SteeringWheelPeakForceNm"
+type = "f32"
+unit = "N*m"
+desc = "Peak torque mapping to direct input units for FFB"
+
+[[var]]
+name = "SteeringWheelTorque"
+type = "f32"
+unit = "N*m"
+desc = "Output torque on steering shaft"
+
+[[var]]
+name = "SteeringWheelTorque_ST"
+type = "f32"
+count = 6
+unit = "N*m"
+desc = "Output torque on steering shaft at 360 Hz"
+
+[[var]]
+name = "SteeringWheelUseLinear"
+type = "bool"
+desc = "True if steering wheel force is using linear mode"
+
+[[var]]
+name = "Throttle"
+type = "f32"
+unit = "%"
+desc = "0=off throttle to 1=full throttle"
+
+[[var]]
+name = "ThrottleRaw"
+type = "f32"
+unit = "%"
+desc = "Raw throttle input 0=off throttle to 1=full throttle"
+
+[[var]]
+name = "TireLF_RumblePitch"
+type = "f32"
+unit = "Hz"
+desc = "Players LF Tire Sound rumblestrip pitch"
+
+[[var]]
+name = "TireLR_RumblePitch"
+type = "f32"
+unit = "Hz"
+desc = "Players LR Tire Sound rumblestrip pitch"
+
+[[var]]
+name = "TireRF_RumblePitch"
+type = "f32"
+unit = "Hz"
+desc = "Players RF Tire Sound rumblestrip pitch"
+
+[[var]]
+name = "TireRR_RumblePitch"
+type = "f32"
+unit = "Hz"
+desc = "Players RR Tire Sound rumblestrip pitch"
+
+[[var]]
+name = "TireSetsAvailable"
+type = "i32"
+desc = "How many tire sets are remaining  255 is unlimited"
+
+[[var]]
+name = "TireSetsUsed"
+type = "i32"
+desc = "How many tire sets used so far"
+
+[[var]]
+name = "TorqueMGU_K"
+type = "f32"
+unit = "Nm"
+desc = "Engine MGU-K mechanical torque"
+
+[[var]]
+name = "TrackTemp"
+type = "f32"
+unit = "C"
+desc = "Deprecated  set to TrackTempCrew"
+
+[[var]]
+name = "TrackTempCrew"
+type = "f32"
+unit = "C"
+desc = "Temperature of track measured by crew around track"
+
+[[var]]
+name = "TrackWetness"
+type = "i32"
+unit = "irsdk_TrackWetness"
+desc = "How wet is the average track surface"
+
+[[var]]
+name = "VelocityX"
+type = "f32"
+unit = "m/s"
+desc = "X velocity"
+
+[[var]]
+name = "VelocityX_ST"
+type = "f32"
+count = 6
+unit = "m/s at 360 Hz"
+desc = "X velocity"
+
+[[var]]
+name = "VelocityY"
+type = "f32"
+unit = "m/s"
+desc = "Y velocity"
+
+[[var]]
+name = "VelocityY_ST"
+type = "f32"
+count = 6
+unit = "m/s at 360 Hz"
+desc = "Y velocity"
+
+[[var]]
+name = "VelocityZ"
+type = "f32"
+unit = "m/s"
+desc = "Z velocity"
+
+[[var]]
+name = "VelocityZ_ST"
+type = "f32"
+count = 6
+unit = "m/s at 360 Hz"
+desc = "Z velocity"
+
+[[var]]
+name = "VertAccel"
+type = "f32"
+unit = "m/s^2"
+desc = "Vertical acceleration (including gravity)"
+
+[[var]]
+name = "VertAccel_ST"
+type = "f32"
+count = 6
+unit = "m/s^2"
+desc = "Vertical acceleration (including gravity) at 360 Hz"
+
+[[var]]
+name = "VidCapActive"
+type = "bool"
+desc = "True if video currently being captured"
+
+[[var]]
+name = "VidCapEnabled"
+type = "bool"
+desc = "True if video capture system is enabled"
+
+[[var]]
+name = "Voltage"
+type = "f32"
+unit = "V"
+desc = "Engine voltage"
+
+[[var]]
+name = "WaterLevel"
+type = "f32"
+unit = "l"
+desc = "Engine coolant level"
+
+[[var]]
+name = "WaterTemp"
+type = "f32"
+unit = "C"
+desc = "Engine coolant temp"
+
+[[var]]
+name = "WeatherDeclaredWet"
+type = "bool"
+desc = "The steward says rain tires can be used"
+
+[[var]]
+name = "WindDir"
+type = "f32"
+unit = "rad"
+desc = "Wind direction at start/finish line"
+
+[[var]]
+name = "WindVel"
+type = "f32"
+unit = "m/s"
+desc = "Wind velocity at start/finish line"
+
+[[var]]
+name = "Yaw"
+type = "f32"
+unit = "rad"
+desc = "Yaw orientation"
+
+[[var]]
+name = "YawNorth"
+type = "f32"
+unit = "rad"
+desc = "Yaw orientation relative to north"
+
+[[var]]
+name = "YawRate"
+type = "f32"
+unit = "rad/s"
+desc = "Yaw rate"
+
+[[var]]
+name = "YawRate_ST"
+type = "f32"
+count = 6
+unit = "rad/s"
+desc = "Yaw rate at 360 Hz"
+
+[[var]]
+name = "dcABS"
+type = "f32"
+desc = "In car abs adjustment"
+
+[[var]]
+name = "dcAntiRollFront"
+type = "f32"
+desc = "In car front anti roll bar adjustment"
+
+[[var]]
+name = "dcAntiRollRear"
+type = "f32"
+desc = "In car rear anti roll bar adjustment"
+
+[[var]]
+name = "dcBrakeBias"
+type = "f32"
+desc = "In car brake bias adjustment"
+
+[[var]]
+name = "dcBrakeBiasFine"
+type = "f32"
+desc = "In car brake bias fine adjustment"
+
+[[var]]
+name = "dcBrakeMisc"
+type = "f32"
+desc = "In car brake misc adjustment"
+
+[[var]]
+name = "dcDRSToggle"
+type = "bool"
+desc = "In car toggle DRS"
+
+[[var]]
+name = "dcDashPage"
+type = "f32"
+desc = "In car dash display page adjustment"
+
+[[var]]
+name = "dcDashPage2"
+type = "f32"
+desc = "In car second dash display page adjustment"
+
+[[var]]
+name = "dcDiffEntry"
+type = "f32"
+desc = "In car diff entry adjustment"
+
+[[var]]
+name = "dcDiffExit"
+type = "f32"
+desc = "In car diff exit adjustment"
+
+[[var]]
+name = "dcDiffMiddle"
+type = "f32"
+desc = "In car diff middle adjustment"
+
+[[var]]
+name = "dcEngineBraking"
+type = "f32"
+desc = "In car engine braking adjustment"
+
+[[var]]
+name = "dcFuelMixture"
+type = "f32"
+desc = "In car fuel mixture adjustment"
+
+[[var]]
+name = "dcHeadlightFlash"
+type = "bool"
+desc = "In car headlight flash control active"
+
+[[var]]
+name = "dcLaunchRPM"
+type = "f32"
+desc = "In car launch rpm adjustment"
+
+[[var]]
+name = "dcLowFuelAccept"
+type = "bool"
+desc = "In car low fuel accept"
+
+[[var]]
+name = "dcMGUKDeployMode"
+type = "f32"
+desc = "In car MGU-K deployment mode level adjustment"
+
+[[var]]
+name = "dcMGUKRegenGain"
+type = "f32"
+desc = "In car MUG-K re-gen gain adjustment"
+
+[[var]]
+name = "dcPeakBrakeBias"
+type = "f32"
+desc = "In car peak brake bias adjustment"
+
+[[var]]
+name = "dcPitSpeedLimiterToggle"
+type = "bool"
+desc = "Track if pit speed limiter system is enabled"
+
+[[var]]
+name = "dcPushToPass"
+type = "bool"
+desc = "In car trigger push to pass"
+
+[[var]]
+name = "dcStarter"
+type = "bool"
+desc = "In car trigger car starter"
+
+[[var]]
+name = "dcTearOffVisor"
+type = "bool"
+desc = "In car tear off visor film"
+
+[[var]]
+name = "dcThrottleShape"
+type = "f32"
+desc = "In car throttle shape adjustment"
+
+[[var]]
+name = "dcToggleWindshieldWipers"
+type = "bool"
+desc = "In car turn wipers on or off"
+
+[[var]]
+name = "dcTractionControl"
+type = "f32"
+desc = "In car traction control adjustment"
+
+[[var]]
+name = "dcTractionControl2"
+type = "f32"
+desc = "In car traction control 2 adjustment"
+
+[[var]]
+name = "dcTractionControlToggle"
+type = "bool"
+desc = "In car traction control active"
+
+[[var]]
+name = "dcTriggerWindshieldWipers"
+type = "bool"
+desc = "In car momentarily turn on wipers"
+
+[[var]]
+name = "dcWeightJackerRight"
+type = "f32"
+desc = "In car right wedge/weight jacker adjustment"
+
+[[var]]
+name = "dpFastRepair"
+type = "f32"
+desc = "Pitstop fast repair set"
+
+[[var]]
+name = "dpFuelAddKg"
+type = "f32"
+unit = "kg"
+desc = "Pitstop fuel add amount"
+
+[[var]]
+name = "dpFuelAutoFillActive"
+type = "f32"
+desc = "Pitstop auto fill fuel next stop flag"
+
+[[var]]
+name = "dpFuelAutoFillEnabled"
+type = "f32"
+desc = "Pitstop auto fill fuel system enabled"
+
+[[var]]
+name = "dpFuelFill"
+type = "f32"
+desc = "Pitstop fuel fill flag"
+
+[[var]]
+name = "dpLFTireChange"
+type = "f32"
+desc = "Pitstop lf tire change request"
+
+[[var]]
+name = "dpLFTireColdPress"
+type = "f32"
+unit = "Pa"
+desc = "Pitstop lf tire cold pressure adjustment"
+
+[[var]]
+name = "dpLRTireChange"
+type = "f32"
+desc = "Pitstop lr tire change request"
+
+[[var]]
+name = "dpLRTireColdPress"
+type = "f32"
+unit = "Pa"
+desc = "Pitstop lr tire cold pressure adjustment"
+
+[[var]]
+name = "dpLTireChange"
+type = "f32"
+desc = "Pitstop left tire change request"
+
+[[var]]
+name = "dpRFTireChange"
+type = "f32"
+desc = "Pitstop rf tire change request"
+
+[[var]]
+name = "dpRFTireColdPress"
+type = "f32"
+unit = "Pa"
+desc = "Pitstop rf cold tire pressure adjustment"
+
+[[var]]
+name = "dpRRTireChange"
+type = "f32"
+desc = "Pitstop rr tire change request"
+
+[[var]]
+name = "dpRRTireColdPress"
+type = "f32"
+unit = "Pa"
+desc = "Pitstop rr cold tire pressure adjustment"
+
+[[var]]
+name = "dpRTireChange"
+type = "f32"
+desc = "Pitstop right tire change request"
+
+[[var]]
+name = "dpTireChange"
+type = "f32"
+desc = "Pitstop all tire change request"
+
+[[var]]
+name = "dpWindshieldTearoff"
+type = "f32"
+desc = "Pitstop windshield tearoff"
+
+[[var]]
+name = "dpWingFront"
+type = "f32"
+desc = "Pitstop front wing adjustment"
+
+[[var]]
+name = "dpWingRear"
+type = "f32"
+desc = "Pitstop rear wing adjustment"
